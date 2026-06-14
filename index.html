@@ -979,7 +979,7 @@ input, select, textarea, button { -webkit-appearance: none; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.4</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.5</div>
 
   </div>
 </div>
@@ -2136,8 +2136,8 @@ function saveDb() {
     else safeRender(renderDashboard, 'dashboard');
   }
 
-  // 저장 즉시 SSE 수신 5초 차단 — 클라우드 반영 전 덮어쓰기 방지
-  _fbIgnoreUntil = Date.now() + 5000;
+  // 저장 즉시 SSE 수신 2초 차단 — 클라우드 반영 전 덮어쓰기 방지
+  _fbIgnoreUntil = Date.now() + 2000;
   // Firebase 동기화 — _fbEventSource 연결된 경우만
   if(_fbEventSource) {
     // dirty 섹션 없으면 전체로 처리
@@ -2419,7 +2419,7 @@ async function restoreSnapshot(index) {
 
 async function pushToFirebase() {
   const now = Date.now();
-  _fbIgnoreUntil = now + 3000;
+  _fbIgnoreUntil = now + 1500; // 1.5초만 차단 (너무 길면 동기화 놓침)
   const user = document.getElementById('sbUserName')?.textContent || 'admin';
 
   // dirty 섹션이 없으면 전체 저장
@@ -2463,9 +2463,7 @@ function startFirebaseListener() {
     _fbEventSource = null;
   }
 
-  const myName = () => document.getElementById('sbUserName')?.textContent || 'admin';
   let _sseErrorCount = 0;
-
   // 타임스탬프 경로만 리스닝 — 변경 감지 후 변경된 섹션만 fetch
   try {
     const tsSource = new EventSource(FB_SECTIONS.ts);
@@ -2476,10 +2474,12 @@ function startFirebaseListener() {
         const remote = msg.data;
         if(!remote) return;
         const updatedBy = remote.updatedBy || '다른 사용자';
-        if(updatedBy === myName()) return;
-        const localTs  = parseInt(_storage.getItem('luke_local_ts') || '0');
         const remoteTs = remote.updatedAt || 0;
-        if(localTs >= remoteTs) return;
+        const localTs  = parseInt(_storage.getItem('luke_local_ts') || '0');
+
+        // 내가 방금 저장한 것은 _fbIgnoreUntil로 이미 차단됨
+        // localTs보다 최신인 경우만 처리 (같을 때도 처리 — 다른 기기 동기화)
+        if(remoteTs <= localTs) return;
 
         // 변경된 섹션들을 병렬로 fetch
         const changed = [];
@@ -2489,14 +2489,10 @@ function startFirebaseListener() {
             if(!res.ok) return;
             const json = await res.json();
             if(!json) return;
-            const secTs = json.updatedAt || 0;
-            if(secTs > localTs) {
-              // 해당 섹션만 교체
-              const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
-              if(secData !== null && secData !== undefined) {
-                db[sec] = secData;
-                changed.push(sec);
-              }
+            const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
+            if(secData !== null && secData !== undefined) {
+              db[sec] = secData;
+              changed.push(sec);
             }
           } catch(e) { console.warn('섹션 fetch 실패:', sec, e.message); }
         }));
@@ -2509,7 +2505,7 @@ function startFirebaseListener() {
         renderAll();
         const t = new Date(remoteTs).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
         setFbStatus('online', '동기화됨 · ' + updatedBy + ' · ' + t);
-        toast(updatedBy + '의 변경사항이 동기화되었습니다. (' + changed.join(', ') + ')');
+        toast(updatedBy + '의 변경사항이 동기화되었습니다.');
       } catch(err) { console.warn('SSE 파싱 오류:', err); }
     });
 
@@ -3644,7 +3640,7 @@ function renderAttendance(){
     if(btnEl) btnEl.classList.toggle('active',t==='daily');
   });
   const dv=document.getElementById('attDate').value;
-  // attDateLabel 제거됨
+
   const active=db.members.filter(m=>m.status==='active').sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const att=db.attendance[dv]||{};
   const attEl=document.getElementById('attList');
@@ -4019,8 +4015,6 @@ function getSchoolName() {
 }
 function applySchoolName() {
   const name = getSchoolName();
-  const badge = document.getElementById('tbBadge');
-  if (badge) badge.textContent = name;
   const loginBadge = document.getElementById('loginSchoolName');
   if (loginBadge) loginBadge.textContent = name;
   const input = document.getElementById('schoolNameInput');
