@@ -1040,7 +1040,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.0</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.4</div>
 
   </div>
 </div>
@@ -1757,6 +1757,63 @@ select { -webkit-appearance: auto; }
   </div>
 </div>
 
+<!-- 비밀번호 확인 모달 (초기화/불러오기/버전복구 공통) -->
+<div class="modal-overlay" id="pwConfirmModal">
+  <div class="modal" style="width:400px;">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:var(--coral-bg);"><span style="font-size:20px;" id="pwConfirmIcon">⚠️</span></div>
+      <div>
+        <div class="modal-title" id="pwConfirmTitle">확인</div>
+        <div class="card-subtitle" id="pwConfirmDesc"></div>
+      </div>
+      <button class="modal-close" onclick="closePwConfirmModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+
+    <!-- 경고 메시지 -->
+    <div id="pwConfirmWarning" style="background:var(--coral-bg);border:1px solid #F5C4BA;border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--coral);display:none;"></div>
+
+    <!-- 날짜 비교 (불러오기 전용) -->
+    <div id="pwConfirmDateCompare" style="display:none;margin-bottom:16px;">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--muted);font-weight:600;">📅 백업 파일</span>
+          <span style="font-size:12.5px;color:var(--ink-3);" id="pwConfirmFileDate">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--muted);font-weight:600;">☁️ 현재 데이터</span>
+          <span style="font-size:12.5px;color:var(--ink-3);" id="pwConfirmCloudDate">-</span>
+        </div>
+        <div id="pwConfirmDateMsg" style="font-size:12px;font-weight:600;padding-top:4px;border-top:1px solid var(--border);"></div>
+      </div>
+    </div>
+
+    <!-- 불러오기 전용: 백업 선택 -->
+    <div id="pwConfirmBackupOption" style="display:none;margin-bottom:16px;">
+      <div style="background:var(--amber-bg);border:1px solid #F0C060;border-radius:var(--r-md);padding:12px 14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;">⚠️ 주의</div>
+        <div style="font-size:12.5px;color:var(--ink-3);">백업 파일이 현재보다 오래된 데이터일 수 있습니다.<br>현재 데이터를 먼저 백업하는 것을 권장합니다.</div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--ink-3);">
+        <input type="checkbox" id="pwConfirmBackupFirst" checked style="width:16px;height:16px;accent-color:var(--purple);">
+        현재 데이터 백업 후 불러오기
+      </label>
+    </div>
+
+    <!-- 비밀번호 입력 -->
+    <div class="form-group">
+      <label class="form-label">비밀번호 확인</label>
+      <input type="password" class="form-input" id="pwConfirmInput" placeholder="비밀번호를 입력하세요"
+        onkeydown="if(event.key==='Enter') confirmPwAction()">
+    </div>
+    <div id="pwConfirmError" style="font-size:12px;color:var(--coral);margin-top:6px;display:none;">비밀번호가 올바르지 않습니다.</div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closePwConfirmModal()">취소</button>
+      <button class="btn btn-danger" id="pwConfirmBtn" onclick="confirmPwAction()">확인</button>
+    </div>
+  </div>
+</div>
+
 <!-- 버전 이력 복구 모달 -->
 <div class="modal-overlay" id="historyModal">
   <div class="modal" style="width:560px;">
@@ -2464,30 +2521,76 @@ document.addEventListener('click', function(e) {
 
 // 스냅샷으로 복구
 async function restoreSnapshot(index) {
-  if(!confirm('이 시점의 데이터로 복구하시겠습니까?\n현재 데이터는 사라집니다.')) return;
+  const localTs = parseInt(_storage.getItem('luke_local_ts') || '0') || null;
+  let snapTs = null;
+
+  // 스냅샷 날짜 미리 조회
   try {
     const res = await fetchWithTimeout(FB_HISTORY_URL, {}, 8000);
     const history = await res.json();
-    if(!history || !history[index]) { toast('복구 데이터를 찾을 수 없습니다.', true); return; }
+    if(history && history[index]) snapTs = history[index].savedAt || null;
+  } catch(e) {}
 
-    const snap = history[index];
-    // deep clone — 참조 문제 방지 (원본 스냅샷 데이터 오염 차단)
-    const restored = JSON.parse(JSON.stringify(JSON.parse(snap.data)));
-    db = restored;
-    if(!db.attendance)      db.attendance = {};
-    if(!db.stockLog)        db.stockLog   = [];
-    if(!db.auth)            db.auth       = {id:'admin', pw:'1234'};
-    if(!db.meta)            db.meta       = {};
-    if(!db.meta.customCats) db.meta.customCats = [];
+  const fmt = ts => {
+    if(!ts) return '알 수 없음';
+    const d = new Date(ts);
+    return d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) + ' ' +
+           d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  };
 
-    markAllDirty();
-    saveDb(); // Firebase에도 바로 반영
-    renderAll();
-    closeHistoryModal();
-    toast('복구되었습니다! (' + snap.label + ')');
-  } catch(e) {
-    toast('복구 실패: ' + e.message, true);
+  // 날짜 비교 메시지 계산
+  let dateMsg = '날짜 정보를 확인할 수 없습니다.';
+  let dateMsgColor = 'var(--muted)';
+  if(snapTs && localTs) {
+    const diffMs = localTs - snapTs;
+    const diffDays = Math.floor(Math.abs(diffMs) / (1000*60*60*24));
+    const diffHours = Math.floor(Math.abs(diffMs) / (1000*60*60));
+    const diffStr = diffDays > 0 ? `${diffDays}일` : `${diffHours}시간`;
+    if(diffMs > 0)      { dateMsg = `⚠️ 스냅샷이 현재 데이터보다 ${diffStr} 이전입니다.`; dateMsgColor = 'var(--coral)'; }
+    else if(diffMs < 0) { dateMsg = `✓ 스냅샷이 현재 데이터보다 ${diffStr} 최신입니다.`; dateMsgColor = 'var(--teal)'; }
+    else                { dateMsg = '동일한 시점의 데이터입니다.'; }
   }
+
+  openPwConfirmModal({
+    title: '버전 이력 복구',
+    desc: '선택한 시점의 데이터로 되돌립니다',
+    warning: '현재 데이터가 선택한 시점으로 교체됩니다.',
+    icon: '🕐',
+    btnText: '복구',
+    btnClass: 'btn-primary',
+    fileDateLabel: '🕐 스냅샷 시점',
+    cloudDateLabel: '☁️ 현재 데이터',
+    callback: async () => {
+      try {
+        const res2 = await fetchWithTimeout(FB_HISTORY_URL, {}, 8000);
+        const history2 = await res2.json();
+        if(!history2 || !history2[index]) { toast('복구 데이터를 찾을 수 없습니다.', true); return; }
+        const snap = history2[index];
+        const restored = JSON.parse(JSON.stringify(JSON.parse(snap.data)));
+        db = restored;
+        if(!db.attendance)      db.attendance = {};
+        if(!db.stockLog)        db.stockLog   = [];
+        if(!db.auth)            db.auth       = {id:'admin', pw:'1234'};
+        if(!db.meta)            db.meta       = {};
+        if(!db.meta.customCats) db.meta.customCats = [];
+        markAllDirty();
+        saveDb(); renderAll();
+        closeHistoryModal();
+        toast('복구되었습니다! (' + snap.label + ')');
+      } catch(e) {
+        toast('복구 실패: ' + e.message, true);
+      }
+    }
+  });
+
+  // 모달 열린 후 날짜 표시 (openPwConfirmModal이 dateCompare를 숨기므로 이후에 표시)
+  setTimeout(() => {
+    document.getElementById('pwConfirmFileDate').textContent  = fmt(snapTs);
+    document.getElementById('pwConfirmCloudDate').textContent = fmt(localTs);
+    document.getElementById('pwConfirmDateMsg').textContent   = dateMsg;
+    document.getElementById('pwConfirmDateMsg').style.color   = dateMsgColor;
+    document.getElementById('pwConfirmDateCompare').style.display = 'block';
+  }, 10);
 }
 
 // ── 변경된 섹션만 추적
@@ -4376,68 +4479,167 @@ function saveAtt(){saveDb();toast('출석 정보가 저장되었습니다.');}
 // DATA I/O
 // ═══════════════════════════════════
 function exportData(){
-  const d=kstDateStr();
-  const b=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(b);
-  a.download=getSchoolName()+'_데이터_'+d+'.json';
-  a.click();URL.revokeObjectURL(a.href);
+  const d = kstDateStr();
+  // 날짜 비교를 위해 타임스탬프 포함
+  const exportObj = Object.assign({}, db, { updatedAt: Date.now() });
+  const b = new Blob([JSON.stringify(exportObj, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = getSchoolName() + '_데이터_' + d + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
   toast('데이터가 저장되었습니다.');
 }
-function importData(e){
-  const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=ev=>{
-    try{
-      const imp=JSON.parse(ev.target.result);
 
-      // 스키마 검증 — 필수 필드 타입 확인
-      if(!imp || typeof imp !== 'object')        { toast('올바른 파일이 아닙니다.',true); return; }
-      if(!Array.isArray(imp.members))            { toast('올바른 파일이 아닙니다. (members)',true); return; }
-      if(imp.payments && typeof imp.payments !== 'object') { toast('올바른 파일이 아닙니다. (payments)',true); return; }
-      if(imp.materials && !Array.isArray(imp.materials))   { toast('올바른 파일이 아닙니다. (materials)',true); return; }
-      if(imp.attendance && typeof imp.attendance !== 'object') { toast('올바른 파일이 아닙니다. (attendance)',true); return; }
-      // 회원 데이터 기본 검증
+// ══════════════════════════════════════════
+// 비밀번호 확인 모달 (초기화/불러오기/버전복구 공통)
+// ══════════════════════════════════════════
+let _pwConfirmCallback = null;
+
+function openPwConfirmModal({ title, desc, warning, icon='⚠️', btnText='확인', btnClass='btn-danger', showBackupOption=false, fileDateLabel='📅 백업 파일', cloudDateLabel='☁️ 현재 데이터', callback }) {
+  _pwConfirmCallback = callback;
+  document.getElementById('pwConfirmTitle').textContent = title;
+  document.getElementById('pwConfirmDesc').textContent = desc || '';
+  document.getElementById('pwConfirmIcon').textContent = icon;
+  document.getElementById('pwConfirmBtn').textContent = btnText;
+  document.getElementById('pwConfirmBtn').className = `btn ${btnClass}`;
+  document.getElementById('pwConfirmInput').value = '';
+  document.getElementById('pwConfirmError').style.display = 'none';
+  document.getElementById('pwConfirmDateCompare').style.display = 'none';
+
+  // 날짜 레이블 업데이트
+  const dateRows = document.querySelectorAll('#pwConfirmDateCompare [style*="font-weight:600"]');
+  if(dateRows[0]) dateRows[0].textContent = fileDateLabel;
+  if(dateRows[1]) dateRows[1].textContent = cloudDateLabel;
+
+  const warningEl = document.getElementById('pwConfirmWarning');
+  if(warning) { warningEl.textContent = warning; warningEl.style.display = 'block'; }
+  else { warningEl.style.display = 'none'; }
+
+  const backupEl = document.getElementById('pwConfirmBackupOption');
+  backupEl.style.display = showBackupOption ? 'block' : 'none';
+
+  document.getElementById('pwConfirmModal').classList.add('open');
+  setTimeout(() => document.getElementById('pwConfirmInput').focus(), 100);
+}
+
+function closePwConfirmModal() {
+  document.getElementById('pwConfirmModal').classList.remove('open');
+  _pwConfirmCallback = null;
+}
+
+function confirmPwAction() {
+  const pw = document.getElementById('pwConfirmInput').value;
+  if(pw !== db.auth.pw) {
+    document.getElementById('pwConfirmError').style.display = 'block';
+    document.getElementById('pwConfirmInput').value = '';
+    document.getElementById('pwConfirmInput').focus();
+    return;
+  }
+  const backupFirst = document.getElementById('pwConfirmBackupFirst').checked &&
+                      document.getElementById('pwConfirmBackupOption').style.display !== 'none';
+  closePwConfirmModal();
+  if(_pwConfirmCallback) _pwConfirmCallback({ backupFirst });
+}
+
+// ── 초기화 (비밀번호 확인)
+async function resetAll() {
+  openPwConfirmModal({
+    title: '전체 데이터 초기화',
+    desc: '모든 데이터가 영구 삭제됩니다',
+    warning: '이 작업은 되돌릴 수 없습니다. 초기화 전 자동으로 스냅샷이 저장됩니다.',
+    icon: '🗑️',
+    btnText: '초기화',
+    btnClass: 'btn-danger',
+    callback: async () => {
+      if(!confirm('정말로 초기화하시겠습니까?\n마지막 확인입니다.')) return;
+      try { await saveSnapshot(); } catch(e){}
+      _skipNextSnapshot = true;
+      const auth = db.auth;
+      const schoolName = db.meta?.schoolName || '';
+      db = { members:[], payments:{}, materials:[], attendance:{}, stockLog:[], auth, meta:{v:2, schoolName} };
+      markAllDirty();
+      saveDb(); renderAll(); toast('초기화되었습니다.');
+    }
+  });
+}
+
+// ── 데이터 불러오기 (비밀번호 확인)
+function importData(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imp = JSON.parse(ev.target.result);
+      if(!imp || typeof imp !== 'object')           { toast('올바른 파일이 아닙니다.', true); return; }
+      if(!Array.isArray(imp.members))               { toast('올바른 파일이 아닙니다. (members)', true); return; }
+      if(imp.payments && typeof imp.payments !== 'object') { toast('올바른 파일이 아닙니다. (payments)', true); return; }
+      if(imp.materials && !Array.isArray(imp.materials))   { toast('올바른 파일이 아닙니다. (materials)', true); return; }
+      if(imp.attendance && typeof imp.attendance !== 'object') { toast('올바른 파일이 아닙니다. (attendance)', true); return; }
       if(imp.members.length > 0) {
         const sample = imp.members[0];
         if(typeof sample !== 'object' || !sample.id || !sample.name) {
-          toast('회원 데이터 형식이 올바르지 않습니다.',true); return;
+          toast('회원 데이터 형식이 올바르지 않습니다.', true); return;
         }
       }
 
-      if(!confirm('현재 데이터를 불러온 파일로 교체하시겠습니까?'))return;
+      // 날짜 비교 계산
+      const fmt = ts => {
+        if(!ts) return '알 수 없음';
+        const d = new Date(ts);
+        return d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'}) + ' ' +
+               d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+      };
+      const fileTs  = imp.updatedAt || imp.meta?.updatedAt || null;
+      const localTs = parseInt(_storage.getItem('luke_local_ts') || '0') || null;
+      let dateMsg = '날짜 정보를 확인할 수 없습니다.';
+      let dateMsgColor = 'var(--muted)';
+      if(fileTs && localTs) {
+        const diffMs = localTs - fileTs;
+        const diffDays  = Math.floor(Math.abs(diffMs) / (1000*60*60*24));
+        const diffHours = Math.floor(Math.abs(diffMs) / (1000*60*60));
+        const diffStr = diffDays > 0 ? `${diffDays}일` : `${diffHours}시간`;
+        if(diffMs > 0)      { dateMsg = `⚠️ 백업 파일이 현재 데이터보다 ${diffStr} 이전입니다.`; dateMsgColor = 'var(--coral)'; }
+        else if(diffMs < 0) { dateMsg = `✓ 백업 파일이 현재 데이터보다 ${diffStr} 최신입니다.`; dateMsgColor = 'var(--teal)'; }
+        else                { dateMsg = '동일한 시점의 데이터입니다.'; }
+      }
 
-      db=JSON.parse(JSON.stringify(imp));
-      if(!db.attendance)      db.attendance={};
-      if(!db.auth)            db.auth={id:'admin',pw:'1234'};
-      if(!db.materials)       db.materials=[];
-      if(!db.stockLog)        db.stockLog=[];
-      if(!db.meta)            db.meta={};
-      if(!db.meta.customCats) db.meta.customCats=[];
-      // 가져온 데이터 재고 재계산
-      try { recalculateAllStock(); } catch(e){}
-      markAllDirty();
-      saveDb();renderAll();toast('데이터를 불러왔습니다.');
-    }catch(err){toast('파일 오류가 발생했습니다.',true);}
+      openPwConfirmModal({
+        title: '데이터 불러오기',
+        desc: '현재 데이터를 백업 파일로 교체합니다',
+        icon: '📂',
+        btnText: '불러오기',
+        btnClass: 'btn-primary',
+        showBackupOption: true,
+        fileDateLabel: '📅 백업 파일',
+        cloudDateLabel: '☁️ 현재 데이터',
+        callback: async ({ backupFirst }) => {
+          if(backupFirst) exportData();
+          db = JSON.parse(JSON.stringify(imp));
+          if(!db.attendance)      db.attendance = {};
+          if(!db.auth)            db.auth = { id:'admin', pw:'1234' };
+          if(!db.materials)       db.materials = [];
+          if(!db.stockLog)        db.stockLog = [];
+          if(!db.meta)            db.meta = {};
+          if(!db.meta.customCats) db.meta.customCats = [];
+          try { recalculateAllStock(); } catch(e){}
+          markAllDirty();
+          saveDb(); renderAll();
+          toast(backupFirst ? '백업 후 데이터를 불러왔습니다.' : '데이터를 불러왔습니다.');
+        }
+      });
+
+      // 모달 열린 후 날짜 표시
+      setTimeout(() => {
+        document.getElementById('pwConfirmFileDate').textContent  = fmt(fileTs);
+        document.getElementById('pwConfirmCloudDate').textContent = fmt(localTs);
+        document.getElementById('pwConfirmDateMsg').textContent   = dateMsg;
+        document.getElementById('pwConfirmDateMsg').style.color   = dateMsgColor;
+        document.getElementById('pwConfirmDateCompare').style.display = 'block';
+      }, 10);
+    } catch(err) { toast('파일 오류가 발생했습니다.', true); }
   };
-  r.readAsText(f);e.target.value='';
+  reader.readAsText(f); e.target.value = '';
 }
-async function resetAll(){
-  if(!confirm('모든 데이터가 삭제됩니다. 계속하시겠습니까?'))return;
-  if(!confirm('정말로 초기화하시겠습니까? 버전 이력으로 복구는 가능합니다.'))return;
-  // 초기화 전 스냅샷 강제 저장
-  try { await saveSnapshot(); } catch(e){}
-  _skipNextSnapshot = true; // 초기화 후 빈 DB 스냅샷 방지
-  const auth=db.auth;
-  const schoolName=db.meta?.schoolName||'';
-  db={members:[],payments:{},materials:[],attendance:{},stockLog:[],auth,meta:{v:2,schoolName}};
-  markAllDirty();
-  saveDb();renderAll();toast('초기화되었습니다.');
-}
-
-// ══════════════════════════════════════════
-// 자동 로그인
-// ══════════════════════════════════════════
 const AUTO_LOGIN_KEY = 'luke_auto_login';
 const AUTO_LOGIN_SESSION = 'luke_session';
 
