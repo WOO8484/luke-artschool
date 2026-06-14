@@ -330,6 +330,7 @@ body {
 
 /* GRID LAYOUTS */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
+.two-col > * { min-height: 0; }
 .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
 /* BUTTONS */
@@ -1363,7 +1364,7 @@ input, select, textarea, button { -webkit-appearance: none; }
         <div class="two-col" style="align-items:stretch;">
 
           <!-- 학원 정보 카드 -->
-          <div class="card" style="display:flex;flex-direction:column;height:100%;box-sizing:border-box;flex:1 1 0;">
+          <div class="card" style="display:flex;flex-direction:column;align-self:stretch;">
             <div class="card-header"><div class="card-title">학원 정보</div></div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>학원 이름</strong><span>상단 배지와 알림 문구에 반영됩니다</span></div>
@@ -1403,7 +1404,7 @@ input, select, textarea, button { -webkit-appearance: none; }
           </div>
 
           <!-- 데이터 관리 카드 -->
-          <div class="card" style="display:flex;flex-direction:column;height:100%;box-sizing:border-box;flex:1 1 0;">
+          <div class="card" style="display:flex;flex-direction:column;align-self:stretch;">
             <div class="card-header">
               <div class="card-title">데이터 관리</div>
             </div>
