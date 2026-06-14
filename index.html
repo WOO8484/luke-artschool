@@ -1062,7 +1062,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.9</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.0</div>
 
   </div>
 </div>
@@ -1578,7 +1578,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.9</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.0</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1696,7 +1696,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.9</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.0</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -4914,31 +4914,47 @@ function importData(e) {
   };
   reader.readAsText(f); e.target.value = '';
 }
-const AUTO_LOGIN_KEY = 'luke_auto_login';
-const AUTO_LOGIN_SESSION = 'luke_session';
+// ── 세션 로그인: sessionStorage 사용 (탭 유지 시 새로고침 복원, 탭 닫으면 소멸)
+const AUTO_LOGIN_KEY     = 'luke_auto_login';   // 영구 자동로그인 설정값 (하위 호환용 유지)
+const AUTO_LOGIN_SESSION = 'luke_session';       // 영구 자동로그인 세션 (하위 호환용 유지)
+const SESSION_KEY        = 'luke_tab_session';   // 탭 세션 (sessionStorage)
 
 function isAutoLoginEnabled() {
   return _storage.getItem(AUTO_LOGIN_KEY) === 'true';
 }
 function toggleAutoLogin(enabled) {
   _storage.setItem(AUTO_LOGIN_KEY, enabled ? 'true' : 'false');
-  if(!enabled) _storage.removeItem(AUTO_LOGIN_SESSION);
+  if (!enabled) _storage.removeItem(AUTO_LOGIN_SESSION);
   toast(enabled ? '자동 로그인이 켜졌습니다.' : '자동 로그인이 꺼졌습니다.');
 }
+
+// 로그인 시 — 탭 세션 + (자동로그인 켜져 있으면) 영구 세션 둘 다 저장
 function saveLoginSession(id) {
-  if(isAutoLoginEnabled()) {
+  try { sessionStorage.setItem(SESSION_KEY, id); } catch(e) {}
+  if (isAutoLoginEnabled()) {
     _storage.setItem(AUTO_LOGIN_SESSION, id);
   }
 }
+
+// 로그아웃 시 — 둘 다 삭제
 function clearLoginSession() {
+  try { sessionStorage.removeItem(SESSION_KEY); } catch(e) {}
   _storage.removeItem(AUTO_LOGIN_SESSION);
 }
+
 function checkAutoLogin() {
-  if(!isAutoLoginEnabled()) return false;
-  const id = _storage.getItem(AUTO_LOGIN_SESSION);
-  if(!id) return false;
+  // 1순위: 탭 세션 (새로고침 복원)
+  let id = null;
+  try { id = sessionStorage.getItem(SESSION_KEY); } catch(e) {}
+  // 2순위: 영구 자동로그인 (탭 새로 열어도 유지)
+  if (!id && isAutoLoginEnabled()) {
+    id = _storage.getItem(AUTO_LOGIN_SESSION);
+  }
+  if (!id) return false;
+
   const acc = (db.auth.accounts || []).find(a => a.id === id);
-  if(!acc) return false;
+  if (!acc) return false;
+
   _currentUser = { id: acc.id, name: acc.name || acc.id, title: acc.title || '', role: acc.role || 'staff', permissions: acc.permissions || [] };
   const loginScreen = document.getElementById('loginScreen');
   const appShell    = document.getElementById('appShell');
@@ -4954,9 +4970,10 @@ function checkAutoLogin() {
   setTimeout(autoReconnectFirebase, 400);
   return true;
 }
+
 function renderAutoLoginToggle() {
   const toggle = document.getElementById('autoLoginToggle');
-  if(toggle) toggle.checked = isAutoLoginEnabled();
+  if (toggle) toggle.checked = isAutoLoginEnabled();
 }
 
 // ══════════════════════════════════════════
@@ -5120,7 +5137,7 @@ function deleteAccount(id) {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.9';
+const CURRENT_SW_VERSION = 'v1.0-build2.0';
 
 async function checkVersionAndReload() {
   try {
