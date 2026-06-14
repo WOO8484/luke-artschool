@@ -1040,7 +1040,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.4</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.5</div>
 
   </div>
 </div>
@@ -2382,22 +2382,10 @@ function fetchWithTimeout(url, options={}, ms=10000) {
 }
 
 // ── 데이터 읽기
-async function fbGet() {
-  const res = await fetchWithTimeout(FB_URL, {}, 10000);
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
-}
+// fbGet/fbPut — 레거시 전체경로 함수 (섹션별 저장으로 교체됨, 제거)
 
 // ── 데이터 쓰기
-async function fbPut(payload) {
-  const res = await fetchWithTimeout(FB_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }, 10000);
-  if(!res.ok) throw new Error('HTTP ' + res.status);
-  return res.json();
-}
+
 
 // ══════════════════════════════════════════
 // 버전 이력 관리 (최근 10개 스냅샷)
