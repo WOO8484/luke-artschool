@@ -1062,7 +1062,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.0</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.1</div>
 
   </div>
 </div>
@@ -1152,15 +1152,15 @@ select { -webkit-appearance: auto; }
         <div id="dashBirthdayAlert" style="display:none;margin-bottom:12px;"></div>
         <div id="dashLongAbsent" style="display:none;margin-bottom:12px;"></div>
         <div class="stats-grid" id="dashStats"></div>
-        <div style="display:flex;gap:16px;margin-bottom:16px;align-items:stretch;">
-          <div class="card" style="flex:1;display:flex;flex-direction:column;">
+        <div id="dashCardsRow" style="display:flex;gap:16px;margin-bottom:16px;align-items:stretch;">
+          <div id="dashCardTuition" class="card" style="flex:1;display:flex;flex-direction:column;">
             <div class="card-header">
               <div><div class="card-title">이번 달 원비 현황</div><div class="card-subtitle" id="dashTuitionSub"></div></div>
               <button class="btn btn-sm btn-ghost" onclick="showPage('tuition',document.querySelector('[data-page=tuition]'))">전체보기</button>
             </div>
             <div id="dashTuition" style="flex:1;"></div>
           </div>
-          <div class="card" style="flex:1;display:flex;flex-direction:column;margin-top:0;">
+          <div id="dashCardMaterials" class="card" style="flex:1;display:flex;flex-direction:column;margin-top:0;">
             <div class="card-header">
               <div><div class="card-title">재고 부족 자재</div></div>
               <button class="btn btn-sm btn-ghost" onclick="showPage('materials',document.querySelector('[data-page=materials]'))">전체보기</button>
@@ -1168,18 +1168,18 @@ select { -webkit-appearance: auto; }
             <div id="dashMaterials" style="flex:1;"></div>
           </div>
         </div>
-        <div class="card">
+        <div id="dashCardMembers" class="card">
           <div class="card-header">
             <div class="card-title">최근 등록 회원</div>
             <button class="btn btn-sm btn-ghost" onclick="showPage('members',document.querySelector('[data-page=members]'))">전체보기</button>
           </div>
           <div id="dashMembers"></div>
         </div>
-        <div class="card" style="margin-top:16px;margin-bottom:16px;">
+        <div id="dashCardTrend" class="card" style="margin-top:16px;margin-bottom:16px;">
           <div class="card-header"><div><div class="card-title">회원 증감 추이</div><div class="card-subtitle">최근 6개월</div></div></div>
           <div id="dashMemberTrend" style="padding:4px 0;"></div>
         </div>
-        <div class="card" style="margin-top:0px;">
+        <div id="dashCardRevenue" class="card" style="margin-top:0px;">
           <div class="card-header">
             <div><div class="card-title">월별 수납 추이</div><div class="card-subtitle" id="dashChartSub"></div></div>
           </div>
@@ -1578,7 +1578,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.0</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.1</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1696,7 +1696,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.0</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.1</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -1718,21 +1718,59 @@ select { -webkit-appearance: auto; }
       <!-- ── 탭1: 업데이트 이력 ── -->
       <div id="uhPanel1">
 
-        <!-- v1.0 -->
+        <!-- build 2.1 -->
         <div style="padding:14px 0;border-bottom:1px solid var(--border);">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0</span>
-            <span style="font-size:12px;color:var(--muted);">2026년 06월 14일</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.1</span>
+            <span style="font-size:12px;color:var(--muted);">2026년 06월</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>홈 화면 앱 추가 지원 (Service Worker)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>앱 시작 시 자동 버전 체크 및 업데이트</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>자동 로그인 (설정에서 켜기/끄기 가능)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>아이패드 반응형 UI 최적화</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>대시보드 통계 / 차트 / 생일 알림</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>권한별 대시보드 — 접근 권한에 따라 통계/카드/차트 자동 구성</li>
+          </ul>
+        </div>
+
+        <!-- build 2.0 -->
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.0</span>
+            <span style="font-size:12px;color:var(--muted);">2026년 06월</span>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>세션 로그인 — 새로고침 시 로그인 유지, 탭 닫으면 자동 로그아웃</li>
+          </ul>
+        </div>
+
+        <!-- build 1.x 보안/계정 -->
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.x</span>
+            <span style="font-size:12px;color:var(--muted);">2026년 06월</span>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>다중 계정 시스템 — 관리자·원장·실장·강사·기타 직책별 계정 생성</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>세분화된 권한 제어 — 8개 권한 항목 개별 부여 (버튼/기능 단위까지 적용)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>비밀번호 SHA-256 해싱 — 평문 저장 제거, 기존 비밀번호 자동 마이그레이션</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>납부·입출고 이력에 처리자 이름 자동 기록</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>PWA 완성 — manifest.json 추가로 홈 화면 아이콘 정상 표시</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>버전 체계 정립 — v1.0 (메이저) · build X.X (마이너)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>iOS Safari 체크박스 미표시 버그 수정</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 삭제 시 Firebase 동기화 누락 버그 수정</li>
+          </ul>
+        </div>
+
+        <!-- v1.0 최초 출시 -->
+        <div style="padding:14px 0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="background:var(--ink-3);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · 최초 출시</span>
+            <span style="font-size:12px;color:var(--muted);">2026년 06월 14일</span>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 관리</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>홈 화면 앱 추가 지원 (Service Worker)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>앱 시작 시 자동 버전 체크 및 업데이트</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>대시보드 통계 / 차트 / 생일 알림</li>
           </ul>
         </div>
 
@@ -1751,9 +1789,10 @@ select { -webkit-appearance: auto; }
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
             <li style="font-size:13px;color:var(--ink-3);">• 전체 회원 수 / 이번 달 납부율 / 미납 현황 통계</li>
             <li style="font-size:13px;color:var(--ink-3);">• 오늘 출석 현황 실시간 표시</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 월별 신규 회원 추이 차트</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 미납 회원 목록 바로가기</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 월별 신규 회원 추이 차트 / 월별 수납 추이 차트</li>
             <li style="font-size:13px;color:var(--ink-3);">• 재고 부족 자재 알림</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 생일 알림 / 장기 결석 알림</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 권한별 맞춤 구성 — 접근 가능한 섹션만 표시</li>
           </ul>
         </div>
 
@@ -1766,10 +1805,10 @@ select { -webkit-appearance: auto; }
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
             <li style="font-size:13px;color:var(--ink-3);">• 회원 등록 / 수정 / 탈퇴 처리</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 수강 카테고리 분류 (수채화, 유화 등 커스텀 가능)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 수강 카테고리 분류 (커스텀 가능)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 회원별 상세 정보 — 연락처 / 등록일 / 메모</li>
             <li style="font-size:13px;color:var(--ink-3);">• 재원 / 탈퇴 회원 구분 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 이름 / 카테고리 검색 및 필터</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 이름 / 연락처 검색 및 필터</li>
           </ul>
         </div>
 
@@ -1782,10 +1821,10 @@ select { -webkit-appearance: auto; }
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
             <li style="font-size:13px;color:var(--ink-3);">• 월별 납부 / 미납 현황 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 회원별 원비 금액 개별 설정</li>
             <li style="font-size:13px;color:var(--ink-3);">• 납부 방법 기록 (현금 / 계좌이체 / 카드)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 월별 총 수입 / 납부율 통계</li>
             <li style="font-size:13px;color:var(--ink-3);">• 미납자 목록 한눈에 확인</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 납부 이력에 처리자 이름 자동 기록</li>
           </ul>
         </div>
 
@@ -1794,10 +1833,10 @@ select { -webkit-appearance: auto; }
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
             <span style="font-size:18px;">📋</span>
             <span style="font-size:14px;font-weight:700;color:var(--ink);">출결 관리</span>
-            <span style="font-size:11.5px;color:var(--muted);">출석 / 결석 / 조퇴 기록</span>
+            <span style="font-size:11.5px;color:var(--muted);">출석 / 결석 / 지각 기록</span>
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
-            <li style="font-size:13px;color:var(--ink-3);">• 일별 출석 체크 (출석 / 결석 / 조퇴 / 공결)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 일별 출석 체크 (출석 / 결석 / 지각)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 달력 뷰 — 월간 출결 현황 시각화</li>
             <li style="font-size:13px;color:var(--ink-3);">• 출석률 순위 — 회원별 출석률 랭킹</li>
             <li style="font-size:13px;color:var(--ink-3);">• 기간별 출결 통계 요약</li>
@@ -1817,6 +1856,24 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 입고 / 사용 이력 기록</li>
             <li style="font-size:13px;color:var(--ink-3);">• 재고 부족 자재 자동 알림</li>
             <li style="font-size:13px;color:var(--ink-3);">• 카테고리별 자재 분류</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 입출고 이력에 처리자 이름 자동 기록</li>
+          </ul>
+        </div>
+
+        <!-- 계정 및 권한 -->
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:18px;">🔐</span>
+            <span style="font-size:14px;font-weight:700;color:var(--ink);">계정 및 권한</span>
+            <span style="font-size:11.5px;color:var(--muted);">다중 계정 / 역할 기반 접근 제어</span>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
+            <li style="font-size:13px;color:var(--ink-3);">• 관리자 계정 — 모든 기능 접근, 계정 생성/삭제</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 직책별 계정 — 원장 / 실장 / 강사 / 기타 (직접 입력)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 8개 권한 항목 개별 부여 (버튼·기능 단위까지 제어)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 직책 선택 시 권한 자동 템플릿 적용 (수정 가능)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 비밀번호 SHA-256 해싱 저장</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 세션 로그인 — 새로고침 유지, 탭 닫으면 자동 로그아웃</li>
           </ul>
         </div>
 
@@ -1828,15 +1885,12 @@ select { -webkit-appearance: auto; }
             <span style="font-size:11.5px;color:var(--muted);">시스템 및 데이터 관리</span>
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
-            <li style="font-size:13px;color:var(--ink-3);">• Firebase 클라우드 실시간 동기화 (PC / 아이패드 / 아이폰 / 안드로이드)</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 자동 로그인 (앱 재실행 시 로그인 유지 — 설정에서 켜기/끄기)</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 앱 시작 시 자동 버전 체크 및 업데이트</li>
+            <li style="font-size:13px;color:var(--ink-3);">• Firebase 클라우드 실시간 동기화</li>
             <li style="font-size:13px;color:var(--ink-3);">• 학원 이름 설정</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 관리자 계정 / 비밀번호 변경</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 데이터 백업 (JSON 파일 저장)</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 데이터 복원 (백업 파일 불러오기)</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 데이터 백업 (JSON 파일 저장) / 복원</li>
             <li style="font-size:13px;color:var(--ink-3);">• 버전 이력 복구 (최근 10개 시점)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 전체 데이터 초기화</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 자동 버전 체크 및 업데이트</li>
           </ul>
         </div>
 
@@ -1852,8 +1906,8 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 📱 아이패드 — Safari (홈 화면 앱 추가 지원)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 📱 아이폰 — Safari (홈 화면 앱 추가 지원)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 📱 안드로이드 — Chrome (홈 화면 앱 추가 지원)</li>
-            <li style="font-size:13px;color:var(--ink-3);margin-top:4px;color:var(--teal);">✓ 모든 기기에서 Firebase 실시간 동기화</li>
-            <li style="font-size:13px;color:var(--ink-3);color:var(--teal);">✓ 업데이트 시 자동 캐시 갱신 (Service Worker)</li>
+            <li style="font-size:13px;color:var(--teal);margin-top:4px;">✓ 모든 기기에서 Firebase 실시간 동기화</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 업데이트 시 자동 캐시 갱신 (Service Worker)</li>
           </ul>
         </div>
 
@@ -3237,6 +3291,12 @@ function renderAll() {
 // DASHBOARD
 // ═══════════════════════════════════
 function renderDashboard() {
+  const isAdmin = _currentUser?.role === 'admin';
+  const canMembers  = isAdmin || hasPerm('members');
+  const canPayments = isAdmin || hasPerm('payments') || hasPerm('payments_view');
+  const canMaterials= isAdmin || hasPerm('materials') || hasPerm('materials_view');
+  const canAtt      = isAdmin || hasPerm('attendance');
+
   const active = db.members.filter(m => m.status === 'active');
   const withdrawn = db.members.filter(m => m.status === 'withdrawn');
   const thisMonth = kstMonthStr();
@@ -3252,15 +3312,18 @@ function renderDashboard() {
   const todayPresent = Object.values(todayAtt).filter(v=>v==='present'||v==='late').length;
 
   const dashStatsEl = document.getElementById('dashStats'); if(!dashStatsEl) return;
-  // 인라인 스타일 완전 제거 — CSS 미디어 쿼리에만 위임
   dashStatsEl.removeAttribute('style');
-  dashStatsEl.innerHTML = `
+
+  // ── 권한별 stat 카드 구성
+  const statCards = [];
+  if (canMembers) statCards.push(`
     <div class="stat-card" style="--clr:var(--purple-bg);">
       <div class="stat-icon" style="background:var(--purple-bg);color:var(--purple);"><span class="ti ti-users"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span></div>
       <div class="stat-label">전체 회원</div>
       <div class="stat-value">${db.members.filter(m=>m.status!=='withdrawn').length}</div>
       <div class="stat-sub">재원 ${active.length}명 · 탈퇴 ${withdrawn.length}명</div>
-    </div>
+    </div>`);
+  if (canPayments) statCards.push(`
     <div class="stat-card" style="--clr:var(--teal-bg);">
       <div class="stat-icon" style="background:var(--teal-bg);color:var(--teal);"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span></div>
       <div class="stat-label">이번 달 납부</div>
@@ -3272,60 +3335,96 @@ function renderDashboard() {
       <div class="stat-label">이번 달 미납</div>
       <div class="stat-value" style="color:var(--coral);">${unpaid}</div>
       <div class="stat-sub">재원 기준</div>
-    </div>
+    </div>`);
+  if (canMaterials) statCards.push(`
     <div class="stat-card" style="--clr:var(--amber-bg);">
       <div class="stat-icon" style="background:var(--amber-bg);color:var(--amber);"><span class="ti ti-alert-triangle"><svg viewBox="0 0 24 24"><path d="m10.363 3.591-8.106 13.534A1.914 1.914 0 0 0 3.91 20h16.18a1.914 1.914 0 0 0 1.653-2.875L13.637 3.591a1.914 1.914 0 0 0-3.274 0z"/><path d="M12 9v4M12 17h.01"/></svg></span></div>
       <div class="stat-label">재고 부족</div>
       <div class="stat-value" style="color:var(--amber);">${low.length}</div>
       <div class="stat-sub">자재 항목</div>
-    </div>
+    </div>`);
+  if (canAtt) statCards.push(`
     <div class="stat-card" style="--clr:var(--teal-bg);">
       <div class="stat-icon" style="background:var(--teal-bg);color:var(--teal);"><span class="ti ti-user-check"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="m16 11 2 2 4-4"/></svg></span></div>
       <div class="stat-label">오늘 출석</div>
       <div class="stat-value" style="color:var(--teal);">${todayPresent}</div>
       <div class="stat-sub">전체 ${active.length}명 중</div>
-    </div>`;
+    </div>`);
+
+  dashStatsEl.innerHTML = statCards.join('');
+
+  // ── 권한별 카드 섹션 표시/숨김
+  const show = (id, visible) => { const el=document.getElementById(id); if(el) el.style.display=visible?'':'none'; };
+
+  show('dashCardTuition',  canPayments);
+  show('dashCardMaterials',canMaterials);
+  // 두 카드 모두 숨겨지면 행 자체도 숨김
+  show('dashCardsRow', canPayments || canMaterials);
+  // 한 쪽만 있으면 flex 정렬 조정
+  if (canPayments && canMaterials) {
+    const row = document.getElementById('dashCardsRow');
+    if (row) row.style.display = 'flex';
+  }
+  show('dashCardMembers', canMembers);
+  show('dashCardTrend',   canMembers);
+  show('dashCardRevenue', canPayments);
+  show('dashBirthdayAlert', canMembers);
+  show('dashLongAbsent',    canMembers);
 
   if(!document.getElementById('dashTuitionSub')) return;
-  document.getElementById('dashTuitionSub').textContent = thisMonth.replace('-','년 ')+'월';
-  const tuitionEl = document.getElementById('dashTuition');
-  if (active.length === 0) {
-    tuitionEl.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-icon"><span class="ti ti-credit-card" style="font-size:38px;color:var(--muted-2);"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h.01M11 15h2"/></svg></span></div><div class="empty-text">재원 회원이 없습니다</div></div>';
-  } else {
-    tuitionEl.innerHTML = active.slice(0,7).map(m => {
-      const k = m.id+'_'+thisMonth;
-      const isPaid = db.payments[k]?.paid;
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:13px;font-weight:500;">${m.name}</span>
-        <span class="badge ${isPaid?'badge-teal':'badge-coral'}">${isPaid?'납부':'미납'}</span>
-      </div>`;
-    }).join('') + (active.length>7 ? `<div style="text-align:center;font-size:11px;color:var(--muted);padding:8px 0;">+${active.length-7}명 더</div>` : '');
+
+  // ── 원비 현황
+  if (canPayments) {
+    document.getElementById('dashTuitionSub').textContent = thisMonth.replace('-','년 ')+'월';
+    const tuitionEl = document.getElementById('dashTuition');
+    if (active.length === 0) {
+      tuitionEl.innerHTML = '<div class="empty-state" style="padding:24px"><div class="empty-icon"><span class="ti ti-credit-card" style="font-size:38px;color:var(--muted-2);"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h.01M11 15h2"/></svg></span></div><div class="empty-text">재원 회원이 없습니다</div></div>';
+    } else {
+      tuitionEl.innerHTML = active.slice(0,7).map(m => {
+        const k = m.id+'_'+thisMonth;
+        const isPaid = db.payments[k]?.paid;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:13px;font-weight:500;">${m.name}</span>
+          <span class="badge ${isPaid?'badge-teal':'badge-coral'}">${isPaid?'납부':'미납'}</span>
+        </div>`;
+      }).join('') + (active.length>7 ? `<div style="text-align:center;font-size:11px;color:var(--muted);padding:8px 0;">+${active.length-7}명 더</div>` : '');
+    }
   }
 
-  const matEl = document.getElementById('dashMaterials');
-  matEl.innerHTML = low.length === 0
-    ? '<div class="empty-state" style="padding:24px"><div class="empty-icon"><span class="ti ti-circle-check" style="font-size:38px;color:var(--teal);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span></div><div class="empty-text">모든 재고 정상</div></div>'
-    : low.map(m => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
-        <div><div style="font-size:13px;font-weight:600;">${m.name}</div><div style="font-size:11px;color:var(--muted);">현재 ${m.qty}${m.unit} / 최소 ${m.minQty}${m.unit}</div></div>
-        <span class="badge badge-amber">부족</span>
-      </div>`).join('');
+  // ── 재고 부족
+  if (canMaterials) {
+    const matEl = document.getElementById('dashMaterials');
+    matEl.innerHTML = low.length === 0
+      ? '<div class="empty-state" style="padding:24px"><div class="empty-icon"><span class="ti ti-circle-check" style="font-size:38px;color:var(--teal);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span></div><div class="empty-text">모든 재고 정상</div></div>'
+      : low.map(m => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div><div style="font-size:13px;font-weight:600;">${m.name}</div><div style="font-size:11px;color:var(--muted);">현재 ${m.qty}${m.unit} / 최소 ${m.minQty}${m.unit}</div></div>
+          <span class="badge badge-amber">부족</span>
+        </div>`).join('');
+  }
 
-  renderRevenueChart();
-  renderMemberTrendChart();
-  renderBirthdayAlert();
-  renderLongAbsentAlert();
+  // ── 차트 & 알림
+  if (canPayments)  renderRevenueChart();
+  if (canMembers)   { renderMemberTrendChart(); renderBirthdayAlert(); renderLongAbsentAlert(); }
 
-  const recent = [...db.members].sort((a,b)=>new Date(b.startDate)-new Date(a.startDate)).slice(0,5);
-  document.getElementById('dashMembers').innerHTML = recent.length === 0
-    ? '<div class="empty-state"><div class="empty-icon"><span class="ti ti-users" style="font-size:38px;color:var(--muted-2);"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span></div><div class="empty-text">등록된 회원이 없습니다</div></div>'
-    : `<table style="width:100%;border-collapse:collapse">${recent.map(m=>`
-      <tr>
-        <td style="padding:9px 12px;"><div class="td-name">${m.name}</div><div class="td-sub">${m.course}</div></td>
-        <td style="padding:9px 12px;font-size:12px;color:var(--muted);">${m.phone||'-'}</td>
-        <td style="padding:9px 12px;font-size:12px;color:var(--muted);">${m.startDate||'-'}</td>
-        <td style="padding:9px 12px;"><span class="badge ${m.status==='active'?'badge-teal':'badge-gray'}">${m.status==='active'?'재원':'퇴원'}</span></td>
-      </tr>`).join('')}</table>`;
+  // ── 최근 등록 회원
+  if (canMembers) {
+    const recent = [...db.members].sort((a,b)=>new Date(b.startDate)-new Date(a.startDate)).slice(0,5);
+    document.getElementById('dashMembers').innerHTML = recent.length === 0
+      ? '<div class="empty-state"><div class="empty-icon"><span class="ti ti-users" style="font-size:38px;color:var(--muted-2);"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span></div><div class="empty-text">등록된 회원이 없습니다</div></div>'
+      : `<table style="width:100%;border-collapse:collapse">${recent.map(m=>`
+        <tr>
+          <td style="padding:9px 12px;"><div class="td-name">${m.name}</div><div class="td-sub">${m.course}</div></td>
+          <td style="padding:9px 12px;font-size:12px;color:var(--muted);">${m.phone||'-'}</td>
+          <td style="padding:9px 12px;font-size:12px;color:var(--muted);">${m.startDate||'-'}</td>
+          <td style="padding:9px 12px;"><span class="badge ${m.status==='active'?'badge-teal':'badge-gray'}">${m.status==='active'?'재원':'퇴원'}</span></td>
+        </tr>`).join('')}</table>`;
+  }
+
+  // ── 출결만 있는 경우 — 오늘 출석 현황 간단 표시
+  if (!canMembers && !canPayments && !canMaterials && canAtt) {
+    dashStatsEl.style.gridTemplateColumns = 'repeat(1,1fr)';
+  }
 }
 
 // ═══════════════════════════════════
@@ -5137,7 +5236,7 @@ function deleteAccount(id) {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build2.0';
+const CURRENT_SW_VERSION = 'v1.0-build2.1';
 
 async function checkVersionAndReload() {
   try {
