@@ -1396,7 +1396,7 @@ input, select, textarea, button { -webkit-appearance: none; }
         <div class="two-col">
 
           <!-- 학원 정보 카드 -->
-          <div class="card">
+          <div class="card" id="settingsCard1">
             <div class="card-header"><div class="card-title">학원 정보</div></div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>학원 이름</strong><span>상단 배지와 알림 문구에 반영됩니다</span></div>
@@ -1436,7 +1436,7 @@ input, select, textarea, button { -webkit-appearance: none; }
           </div>
 
           <!-- 데이터 관리 카드 -->
-          <div class="card">
+          <div class="card" id="settingsCard2">
             <div class="card-header">
               <div class="card-title">데이터 관리</div>
             </div>
@@ -2772,6 +2772,8 @@ function showPage(page, el) {
     attendance: renderAttendance
   };
   if (renderMap[page]) safeRender(renderMap[page], page);
+  // 설정 페이지 진입 시 카드 높이 맞추기
+  if(page === 'settings') setTimeout(matchSettingsCardHeight, 50);
   // 모바일 / 아이패드: 페이지 이동 후 사이드바 닫기
   if(window.innerWidth <= 1024) closeSidebar();
 }
@@ -2779,6 +2781,18 @@ function showPage(page, el) {
 // ═══════════════════════════════════
 // INIT
 // ═══════════════════════════════════
+function matchSettingsCardHeight() {
+  const c1 = document.getElementById('settingsCard1');
+  const c2 = document.getElementById('settingsCard2');
+  if(!c1 || !c2) return;
+  // 높이 초기화 후 측정
+  c1.style.height = '';
+  c2.style.height = '';
+  const h = Math.max(c1.offsetHeight, c2.offsetHeight);
+  c1.style.height = h + 'px';
+  c2.style.height = h + 'px';
+}
+
 function safeRender(fn, name) {
   try { fn(); } catch(e) { console.error('렌더 오류 ['+name+']:', e); }
 }
@@ -2795,6 +2809,8 @@ function renderAll() {
   safeRender(renderTuition,    'tuition');
   safeRender(renderMaterials,  'materials');
   safeRender(renderAttendance, 'attendance');
+  // 설정 카드 높이 맞추기 (렌더 후 실행)
+  setTimeout(matchSettingsCardHeight, 50);
 }
 
 loadDb();
@@ -4323,6 +4339,12 @@ async function resetAll(){
   markAllDirty();
   saveDb();renderAll();toast('초기화되었습니다.');
 }
+
+// 창 크기 변경 시 설정 카드 높이 재조정
+window.addEventListener('resize', () => {
+  clearTimeout(window._resizeTimer);
+  window._resizeTimer = setTimeout(matchSettingsCardHeight, 100);
+});
 
 // ── Service Worker 등록 (캐시 자동 업데이트)
 if('serviceWorker' in navigator) {
