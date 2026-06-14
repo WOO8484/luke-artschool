@@ -694,6 +694,37 @@ input, select, textarea, button { -webkit-appearance: none; }
   .three-col { grid-template-columns: 1fr 1fr !important; }
   .form-grid { grid-template-columns: 1fr 1fr !important; gap: 12px; }
 
+  /* ── 아이패드 Safari grid 높이 버그 수정 ── */
+  /* Safari는 grid children에 height:100%가 필요 */
+  .two-col { display: -webkit-grid; display: grid; align-items: stretch; }
+  .two-col > .card {
+    height: 100% !important;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: -webkit-flex !important;
+    display: flex !important;
+    -webkit-flex-direction: column !important;
+    flex-direction: column !important;
+  }
+
+  /* 수업일수 칩 — Safari inline-flex 줄바꿈 방지 */
+  .class-chip {
+    display: -webkit-inline-flex !important;
+    display: inline-flex !important;
+    white-space: nowrap !important;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+  }
+
+  /* 테이블 td 세로 정렬 */
+  td { vertical-align: middle !important; text-align: left; }
+
+  /* 수업일수/월원비 컬럼 가운데 정렬 */
+  td:nth-child(5), td:nth-child(6) { text-align: center !important; }
+
+  /* 출결 날짜 입력 */
+  #attDate { width: 120px !important; font-size: 12px !important; padding: 8px 6px !important; }
+
   /* 버튼 — 터치 영역 최소 44px */
   .btn    { font-size: 13.5px; padding: 10px 16px; min-height: 44px; }
   .btn-sm { font-size: 12.5px; padding: 8px 13px;  min-height: 38px; }
