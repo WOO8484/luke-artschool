@@ -642,6 +642,21 @@ tbody tr:hover td { background: var(--bg); }
 }
 #toast.show { opacity: 1; transform: translateY(0); }
 
+/* PERMISSION CHECKBOX */
+.perm-checkbox-row {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 7px 10px; border-radius: var(--r-sm);
+  cursor: pointer; transition: background 0.12s;
+  user-select: none;
+}
+.perm-checkbox-row:hover { background: var(--bg-2); }
+.perm-checkbox-row input[type="checkbox"] {
+  width: 15px; height: 15px; flex-shrink: 0;
+  accent-color: var(--purple); margin-top: 1px; cursor: pointer;
+}
+.perm-label { font-size: 12.5px; font-weight: 500; color: var(--ink-3); line-height: 1.4; }
+.perm-sub { display: block; font-size: 10.5px; color: var(--muted); font-weight: 400; }
+
 /* PASSWORD CHANGE */
 .pw-row { display: flex; align-items: center; gap: 10px; }
 
@@ -1044,7 +1059,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.2</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.5</div>
 
   </div>
 </div>
@@ -1560,7 +1575,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.2</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.5</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1576,36 +1591,83 @@ select { -webkit-appearance: auto; }
 
 <!-- ══════════ 계정 추가/수정 모달 ══════════ -->
 <div class="modal-overlay" id="accountModal">
-  <div class="modal" style="width:420px;">
+  <div class="modal" style="width:480px;">
     <div class="modal-header">
       <div>
         <div class="modal-title" id="accountModalTitle">계정 추가</div>
-        <div class="card-subtitle">새 강사 계정을 만듭니다</div>
+        <div class="card-subtitle" id="accModalSubtitle">새 계정을 만듭니다</div>
       </div>
       <button class="modal-close" onclick="closeAccountModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
-    <div class="form-grid" style="grid-template-columns:1fr;">
-      <div class="form-group full">
+
+    <!-- 기본 정보 -->
+    <div class="form-grid" style="margin-bottom:18px;">
+      <div class="form-group">
         <label class="form-label">이름 (표시용)</label>
-        <input type="text" class="form-input" id="accName" placeholder="예: 김선생님">
+        <input type="text" class="form-input" id="accName" placeholder="예: 김선생님" autocomplete="off">
       </div>
-      <div class="form-group full">
+      <div class="form-group">
         <label class="form-label">아이디</label>
         <input type="text" class="form-input" id="accId" placeholder="영문/숫자" autocomplete="off">
       </div>
-      <div class="form-group full">
-        <label class="form-label">비밀번호</label>
+      <div class="form-group">
+        <label class="form-label">비밀번호 <span style="color:var(--muted);font-weight:400;">(수정 시 비워두면 유지)</span></label>
         <input type="password" class="form-input" id="accPw" placeholder="비밀번호" autocomplete="new-password">
       </div>
-      <div class="form-group full">
-        <label class="form-label">역할</label>
-        <select class="form-input" id="accRole">
-          <option value="staff">강사 — 출결·회원 조회</option>
-          <option value="owner">원장 — 전체 권한</option>
-        </select>
+      <div class="form-group">
+        <label class="form-label">직책</label>
+        <div style="display:flex;gap:6px;">
+          <select class="form-input" id="accTitle" onchange="onTitleChange(this.value)" style="flex:1;">
+            <option value="원장">원장</option>
+            <option value="실장">실장</option>
+            <option value="강사" selected>강사</option>
+            <option value="기타">기타 (직접입력)</option>
+          </select>
+          <input type="text" class="form-input" id="accTitleCustom" placeholder="직접입력" style="display:none;width:100px;" oninput="document.getElementById('accTitle').value='기타'">
+        </div>
       </div>
     </div>
-    <div class="modal-footer" style="margin-top:20px;">
+
+    <!-- 권한 설정 -->
+    <div style="background:var(--bg);border-radius:var(--r-md);padding:14px 16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.3px;text-transform:uppercase;margin-bottom:10px;">권한 설정</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_members">
+          <span class="perm-label">회원 관리 <span class="perm-sub">등록·수정·삭제</span></span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_attendance">
+          <span class="perm-label">출결 관리</span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_payments">
+          <span class="perm-label">원비 수납 처리</span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_payments_view">
+          <span class="perm-label">원비 조회 <span class="perm-sub">수납 불가</span></span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_materials">
+          <span class="perm-label">자재 입출고</span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_materials_view">
+          <span class="perm-label">자재 조회 <span class="perm-sub">입출고 불가</span></span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_backup">
+          <span class="perm-label">데이터 백업·복원</span>
+        </label>
+        <label class="perm-checkbox-row" onclick="event.stopPropagation()">
+          <input type="checkbox" id="perm_settings">
+          <span class="perm-label">학원 설정 변경</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="margin-top:16px;">
       <button class="btn btn-ghost" onclick="closeAccountModal()">취소</button>
       <button class="btn btn-primary" onclick="saveAccount()">저장</button>
     </div>
@@ -1626,7 +1688,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.2</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.5</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2171,7 +2233,7 @@ const _storage = (() => {
   }
 })();
 
-let db = { members:[], payments:{}, materials:[], attendance:{}, stockLog:[], auth:{ accounts:[{ id:'admin', pw:'1234', name:'원장', role:'owner' }] }, meta:{v:2} };
+let db = { members:[], payments:{}, materials:[], attendance:{}, stockLog:[], auth:{ accounts:[{ id:'admin', pw:'1234', name:'관리자', title:'관리자', role:'admin', permissions:['members','payments','payments_view','materials','materials_view','attendance','backup','settings'] }] }, meta:{v:2} };
 
 // ── 한국 시간(KST) 헬퍼 — toISOString()은 UTC라 자정 전후 날짜 오류 발생 가능
 function kstDate() {
@@ -2193,11 +2255,16 @@ function loadDb() {
   if (!db.materials)  db.materials  = [];
   if (!db.attendance) db.attendance = {};
   // ── auth 구조 마이그레이션: 구버전 { id, pw } → 신버전 { accounts: [...] }
-  if (!db.auth) db.auth = { accounts: [{ id:'admin', pw:'1234', name:'원장', role:'owner' }] };
+  if (!db.auth) db.auth = { accounts: [{ id:'admin', pw:'1234', name:'관리자', title:'관리자', role:'admin', permissions: PERM_ALL }] };
   if (!db.auth.accounts) {
-    // 구버전 단일 계정을 accounts 배열로 변환
-    db.auth = { accounts: [{ id: db.auth.id || 'admin', pw: db.auth.pw || '1234', name: '원장', role: 'owner' }] };
+    db.auth = { accounts: [{ id: db.auth.id || 'admin', pw: db.auth.pw || '1234', name: '관리자', title:'관리자', role: 'admin', permissions: PERM_ALL }] };
   }
+  // ── 기존 계정에 permissions / title 필드 없으면 추가
+  db.auth.accounts.forEach(acc => {
+    if (!acc.permissions) acc.permissions = acc.role === 'admin' || acc.role === 'owner' ? PERM_ALL : PERM_TEMPLATES['강사'];
+    if (!acc.title) acc.title = acc.role === 'admin' || acc.role === 'owner' ? '원장' : '강사';
+    if (!acc.role) acc.role = 'staff';
+  });
   if (!db.meta)       db.meta = {};
   if (!db.meta.customCats) db.meta.customCats = [];
   if (!db.stockLog) db.stockLog = [];
@@ -2904,8 +2971,38 @@ function isHashed(pw) {
   return typeof pw === 'string' && /^[0-9a-f]{64}$/.test(pw);
 }
 
+// ══════════════════════════════════════════
+// 권한 시스템
+// ══════════════════════════════════════════
+const PERM_ALL = ['members','payments','payments_view','materials','materials_view','attendance','backup','settings'];
+
+const PERM_LABELS = {
+  members:       '회원 관리 (등록·수정·삭제)',
+  payments:      '원비 수납 처리',
+  payments_view: '원비 조회',
+  materials:     '자재 입출고',
+  materials_view:'자재 조회',
+  attendance:    '출결 관리',
+  backup:        '데이터 백업·복원',
+  settings:      '학원 설정 변경',
+};
+
+// 직책별 기본 권한 템플릿
+const PERM_TEMPLATES = {
+  '원장':  ['members','payments','payments_view','materials','materials_view','attendance'],
+  '실장':  ['members','payments','payments_view','materials','materials_view','attendance'],
+  '강사':  ['attendance'],
+};
+
+// 권한 체크 헬퍼
+function hasPerm(perm) {
+  if (!_currentUser) return false;
+  if (_currentUser.role === 'admin') return true; // 관리자는 항상 전체
+  return (_currentUser.permissions || []).includes(perm);
+}
+
 // ── 현재 로그인 사용자
-let _currentUser = null; // { id, name, role }
+let _currentUser = null; // { id, name, title, role, permissions }
 
 // ── 평문 비밀번호를 해시로 마이그레이션 (최초 1회, 전 계정)
 async function migratePwIfNeeded() {
@@ -2927,7 +3024,7 @@ async function doLogin() {
   const hashed = await sha256(pw);
   const acc = (db.auth.accounts || []).find(a => a.id === id && a.pw === hashed);
   if (acc) {
-    _currentUser = { id: acc.id, name: acc.name || acc.id, role: acc.role || 'staff' };
+    _currentUser = { id: acc.id, name: acc.name || acc.id, title: acc.title || '', role: acc.role || 'staff', permissions: acc.permissions || [] };
     const loginScreen = document.getElementById('loginScreen');
     const appShell = document.getElementById('appShell');
     loginScreen.classList.add('hidden');
@@ -2950,13 +3047,27 @@ async function doLogin() {
 
 // ── 역할별 UI 제한
 function applyRoleUI() {
-  const isOwner = _currentUser?.role === 'owner';
-  // 강사는 설정 메뉴 숨김
+  const isAdmin = _currentUser?.role === 'admin';
+
+  // 설정 메뉴 — settings 권한 or 관리자만
   const settingsNav = document.querySelector('[data-page="settings"]');
-  if (settingsNav) settingsNav.style.display = isOwner ? '' : 'none';
-  // 강사는 데이터 관리 버튼들 숨김 (초기화, 백업 등)
+  if (settingsNav) settingsNav.style.display = (isAdmin || hasPerm('settings') || hasPerm('backup')) ? '' : 'none';
+
+  // 설정 페이지 내 데이터 관리 카드 — backup 권한
   const settingsCard2 = document.getElementById('settingsCard2');
-  if (settingsCard2) settingsCard2.style.display = isOwner ? '' : 'none';
+  if (settingsCard2) settingsCard2.style.display = (isAdmin || hasPerm('backup')) ? '' : 'none';
+
+  // 네비 메뉴 접근 제어 (조회 권한이라도 있으면 보임)
+  const navMap = {
+    members:   hasPerm('members'),
+    tuition:   hasPerm('payments') || hasPerm('payments_view'),
+    materials: hasPerm('materials') || hasPerm('materials_view'),
+    attendance:hasPerm('attendance'),
+  };
+  Object.entries(navMap).forEach(([page, visible]) => {
+    const nav = document.querySelector(`[data-page="${page}"]`);
+    if (nav) nav.style.display = (isAdmin || visible) ? '' : 'none';
+  });
 }
 function doLogout() {
   if (!confirm('로그아웃 하시겠습니까?')) return;
@@ -4763,7 +4874,7 @@ function checkAutoLogin() {
   if(!id) return false;
   const acc = (db.auth.accounts || []).find(a => a.id === id);
   if(!acc) return false;
-  _currentUser = { id: acc.id, name: acc.name || acc.id, role: acc.role || 'staff' };
+  _currentUser = { id: acc.id, name: acc.name || acc.id, title: acc.title || '', role: acc.role || 'staff', permissions: acc.permissions || [] };
   const loginScreen = document.getElementById('loginScreen');
   const appShell    = document.getElementById('appShell');
   loginScreen.classList.add('hidden');
@@ -4786,38 +4897,46 @@ function renderAutoLoginToggle() {
 // ══════════════════════════════════════════
 // 계정 관리
 // ══════════════════════════════════════════
-const ROLE_LABEL = { owner: '원장', staff: '강사' };
-const ROLE_COLOR = { owner: 'badge-purple', staff: 'badge-teal' };
+// ══════════════════════════════════════════
+// 계정 관리
+// ══════════════════════════════════════════
+const TITLE_OPTIONS = ['원장','실장','강사'];
+const TITLE_COLOR   = { '원장':'badge-purple', '실장':'badge-amber', '강사':'badge-teal' };
 
 function renderAccountList() {
   const el = document.getElementById('accountList');
   if (!el) return;
-  const isOwner = _currentUser?.role === 'owner';
+  const isAdmin = _currentUser?.role === 'admin';
   const accounts = db.auth.accounts || [];
-
-  // 계정 추가 버튼은 원장만
   const addSection = document.getElementById('addAccountSection');
-  if (addSection) addSection.style.display = isOwner ? '' : 'none';
-
-  el.innerHTML = accounts.map(acc => `
-    <div class="settings-row" style="align-items:center;">
-      <div style="display:flex;align-items:center;gap:10px;flex:1;">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0;">
+  if (addSection) addSection.style.display = isAdmin ? '' : 'none';
+  el.innerHTML = accounts.map(acc => {
+    const titleBadge = TITLE_COLOR[acc.title] || 'badge-gray';
+    const isMe = acc.id === _currentUser?.id;
+    const isAccAdmin = acc.role === 'admin';
+    const permCount = isAccAdmin ? PERM_ALL.length : (acc.permissions||[]).length;
+    return `
+    <div class="settings-row" style="align-items:center;padding:10px 0;">
+      <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;flex-shrink:0;">
           ${(acc.name||acc.id).charAt(0).toUpperCase()}
         </div>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--ink);">${acc.name || acc.id}</div>
-          <div style="font-size:11px;color:var(--muted);">@${acc.id}</div>
+        <div style="min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            ${acc.name||acc.id}
+            ${isMe ? '<span class="badge badge-gray" style="font-size:9.5px;">나</span>' : ''}
+            ${isAccAdmin ? '<span class="badge badge-purple" style="font-size:9.5px;">관리자</span>' : `<span class="badge ${titleBadge}" style="font-size:9.5px;">${acc.title||'기타'}</span>`}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;">@${acc.id} · 권한 ${permCount}개</div>
         </div>
-        <span class="badge ${ROLE_COLOR[acc.role]||'badge-gray'}" style="font-size:10px;">${ROLE_LABEL[acc.role]||acc.role}</span>
-        ${acc.id === _currentUser?.id ? '<span class="badge badge-amber" style="font-size:10px;">나</span>' : ''}
       </div>
-      ${isOwner && acc.id !== _currentUser?.id ? `
-        <div style="display:flex;gap:6px;">
+      ${isAdmin && !isMe ? `
+        <div style="display:flex;gap:5px;flex-shrink:0;">
           <button class="btn btn-xs btn-ghost" onclick="openEditAccountModal('${acc.id}')">수정</button>
-          <button class="btn btn-xs btn-danger" onclick="deleteAccount('${acc.id}')">삭제</button>
+          ${!isAccAdmin ? `<button class="btn btn-xs btn-danger" onclick="deleteAccount('${acc.id}')">삭제</button>` : ''}
         </div>` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 let _editingAccountId = null;
@@ -4825,10 +4944,13 @@ let _editingAccountId = null;
 function openAddAccountModal() {
   _editingAccountId = null;
   document.getElementById('accountModalTitle').textContent = '계정 추가';
+  document.getElementById('accModalSubtitle').textContent = '새 계정을 만듭니다';
   ['accName','accId','accPw'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('accRole').value = 'staff';
   document.getElementById('accId').disabled = false;
+  document.getElementById('accTitle').value = '강사';
+  _applyPermTemplate('강사');
   document.getElementById('accountModal').classList.add('open');
+  setTimeout(() => document.getElementById('accName').focus(), 100);
 }
 
 function openEditAccountModal(id) {
@@ -4836,12 +4958,26 @@ function openEditAccountModal(id) {
   if (!acc) return;
   _editingAccountId = id;
   document.getElementById('accountModalTitle').textContent = '계정 수정';
-  document.getElementById('accName').value = acc.name || '';
-  document.getElementById('accId').value = acc.id;
-  document.getElementById('accId').disabled = true; // 아이디 변경 불가
-  document.getElementById('accPw').value = '';
-  document.getElementById('accRole').value = acc.role || 'staff';
+  document.getElementById('accModalSubtitle').textContent = `@${acc.id} 계정을 수정합니다`;
+  document.getElementById('accName').value  = acc.name || '';
+  document.getElementById('accId').value    = acc.id;
+  document.getElementById('accId').disabled = true;
+  document.getElementById('accPw').value    = '';
+  const knownTitles = ['원장','실장','강사'];
+  if (knownTitles.includes(acc.title)) {
+    document.getElementById('accTitle').value = acc.title;
+    document.getElementById('accTitleCustom').style.display = 'none';
+  } else {
+    document.getElementById('accTitle').value = '기타';
+    document.getElementById('accTitleCustom').value = acc.title || '';
+    document.getElementById('accTitleCustom').style.display = '';
+  }
+  PERM_ALL.forEach(p => {
+    const cb = document.getElementById('perm_'+p);
+    if (cb) cb.checked = acc.role === 'admin' ? true : (acc.permissions||[]).includes(p);
+  });
   document.getElementById('accountModal').classList.add('open');
+  setTimeout(() => document.getElementById('accName').focus(), 100);
 }
 
 function closeAccountModal() {
@@ -4849,30 +4985,48 @@ function closeAccountModal() {
   _editingAccountId = null;
 }
 
-async function saveAccount() {
-  const name = document.getElementById('accName').value.trim();
-  const id   = document.getElementById('accId').value.trim();
-  const pw   = document.getElementById('accPw').value;
-  const role = document.getElementById('accRole').value;
+function _applyPermTemplate(title) {
+  const tpl = PERM_TEMPLATES[title] || [];
+  PERM_ALL.forEach(p => {
+    const cb = document.getElementById('perm_'+p);
+    if (cb) cb.checked = tpl.includes(p);
+  });
+}
 
+function onTitleChange(val) {
+  const customEl = document.getElementById('accTitleCustom');
+  if (customEl) customEl.style.display = val === '기타' ? '' : 'none';
+  if (PERM_TEMPLATES[val]) _applyPermTemplate(val);
+}
+
+function _getAccTitle() {
+  const sel = document.getElementById('accTitle');
+  if (sel.value === '기타') return document.getElementById('accTitleCustom').value.trim() || '기타';
+  return sel.value;
+}
+
+async function saveAccount() {
+  const name  = document.getElementById('accName').value.trim();
+  const id    = document.getElementById('accId').value.trim();
+  const pw    = document.getElementById('accPw').value;
+  const title = _getAccTitle();
+  const perms = PERM_ALL.filter(p => document.getElementById('perm_'+p)?.checked);
   if (!name) { toast('이름을 입력해주세요.', true); return; }
   if (!id)   { toast('아이디를 입력해주세요.', true); return; }
-
   if (_editingAccountId) {
-    // 수정
     const acc = (db.auth.accounts||[]).find(a=>a.id===_editingAccountId);
     if (!acc) return;
-    acc.name = name;
-    acc.role = role;
-    if (pw) acc.pw = await sha256(pw); // 비밀번호 입력 시만 변경
+    acc.name  = name;
+    acc.title = title;
+    if (acc.role !== 'admin') acc.permissions = perms;
+    if (pw) acc.pw = await sha256(pw);
     toast('계정이 수정되었습니다.');
   } else {
-    // 추가
     if (!pw) { toast('비밀번호를 입력해주세요.', true); return; }
     if ((db.auth.accounts||[]).some(a=>a.id===id)) { toast('이미 사용 중인 아이디입니다.', true); return; }
     if (!db.auth.accounts) db.auth.accounts = [];
-    db.auth.accounts.push({ id, name, pw: await sha256(pw), role });
-    toast('계정이 추가되었습니다.');
+    db.auth.accounts.push({ id, name, title, pw: await sha256(pw), role:'staff', permissions: perms });
+    toast(`'${name}' 계정이 추가되었습니다.`);
   }
   markDirty('auth');
   saveDb();
@@ -4883,6 +5037,7 @@ async function saveAccount() {
 function deleteAccount(id) {
   if (id === _currentUser?.id) { toast('현재 로그인 계정은 삭제할 수 없습니다.', true); return; }
   const acc = (db.auth.accounts||[]).find(a=>a.id===id);
+  if (acc?.role === 'admin') { toast('관리자 계정은 삭제할 수 없습니다.', true); return; }
   if (!confirm(`'${acc?.name||id}' 계정을 삭제하시겠습니까?`)) return;
   db.auth.accounts = (db.auth.accounts||[]).filter(a=>a.id!==id);
   markDirty('auth');
@@ -4894,7 +5049,7 @@ function deleteAccount(id) {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.2';
+const CURRENT_SW_VERSION = 'v1.0-build1.5';
 
 async function checkVersionAndReload() {
   try {
