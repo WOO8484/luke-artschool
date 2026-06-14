@@ -331,6 +331,7 @@ body {
 /* GRID LAYOUTS */
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: stretch; }
 .two-col > * { min-height: 0; }
+.two-col > .card { height: 100%; box-sizing: border-box; }
 .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 
 /* BUTTONS */
@@ -1364,7 +1365,7 @@ input, select, textarea, button { -webkit-appearance: none; }
         <div class="two-col" style="align-items:stretch;">
 
           <!-- 학원 정보 카드 -->
-          <div class="card" style="display:flex;flex-direction:column;align-self:stretch;">
+          <div class="card" style="display:flex;flex-direction:column;">
             <div class="card-header"><div class="card-title">학원 정보</div></div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>학원 이름</strong><span>상단 배지와 알림 문구에 반영됩니다</span></div>
@@ -1404,7 +1405,7 @@ input, select, textarea, button { -webkit-appearance: none; }
           </div>
 
           <!-- 데이터 관리 카드 -->
-          <div class="card" style="display:flex;flex-direction:column;align-self:stretch;">
+          <div class="card" style="display:flex;flex-direction:column;">
             <div class="card-header">
               <div class="card-title">데이터 관리</div>
             </div>
@@ -2900,7 +2901,7 @@ function renderMembers() {
       <td style="font-size:13px;color:var(--muted);">${m.phone||'-'}</td>
       <td style="font-size:13px;">${m.grade||'-'}</td>
       <td><span class="badge badge-purple">${m.course}</span></td>
-      <td><span class="class-chip"><span class="ti ti-calendar-repeat" style="font-size:11px;"><svg viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 8-8 8 8 0 0 1 8 8v2"/><path d="M4 11l3-3-3-3M20 11l-3 3 3 3"/><path d="M4 19v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>${(()=>{try{return classLabel(m)}catch(e){return '-'}})()}</span><div style="font-size:10.5px;color:var(--muted);margin-top:2px;">월 약 ${(()=>{try{return getMonthlyTarget(m)}catch(e){return 0}})()}회</div></td>
+      <td><span class="class-chip">${(()=>{try{return classLabel(m)}catch(e){return '-'}})()}</span><div style="font-size:10.5px;color:var(--muted);margin-top:2px;">월 약 ${(()=>{try{return getMonthlyTarget(m)}catch(e){return 0}})()}회</div></td>
       <td style="font-size:13px;font-weight:600;">${(m.fee||0).toLocaleString()}원</td>
       <td style="font-size:12px;color:var(--muted);">${m.startDate||'-'}</td>
       <td style="font-size:12px;color:var(--muted);">${m.withdrawDate||'-'}</td>
@@ -3732,9 +3733,9 @@ function setAtt(date,mid,status){
 // ═══════════════════════════════════
 function changeAttDate(delta) {
   const input = document.getElementById('attDate');
-  const cur = input.value ? new Date(input.value) : new Date();
+  const cur = input.value ? new Date(input.value + 'T12:00:00+09:00') : kstDate();
   cur.setDate(cur.getDate() + delta);
-  input.value = cur.toISOString().slice(0,10);
+  input.value = cur.toISOString().slice(0, 10);
   renderAttendance();
 }
 
