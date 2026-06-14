@@ -1060,7 +1060,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.6</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.7</div>
 
   </div>
 </div>
@@ -1203,7 +1203,7 @@ select { -webkit-appearance: auto; }
                 <option value="active">재원</option>
                 <option value="withdrawn">탈퇴</option>
               </select>
-              <button class="btn btn-primary btn-sm" onclick="openMemberModal()">+ 회원 등록</button>
+              <button id="btnRegMember" class="btn btn-primary btn-sm" onclick="openMemberModal()">+ 회원 등록</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -1240,7 +1240,7 @@ select { -webkit-appearance: auto; }
           <div class="card" style="margin-bottom:16px;">
             <div class="card-header">
               <div id="tuitionSummaryBar" class="flex-center gap-8 flex-wrap"></div>
-              <button class="btn btn-sm btn-ghost" onclick="markAllPaid()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 전체 납부처리</button>
+              <button id="btnAllPaid" class="btn btn-sm btn-ghost" onclick="markAllPaid()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 전체 납부처리</button>
             </div>
             <div id="tuitionGrid"></div>
           </div>
@@ -1297,7 +1297,7 @@ select { -webkit-appearance: auto; }
       <div id="page-materials" class="page">
         <div class="flex-between mb-12 flex-wrap gap-8">
           <div class="flex-center gap-8 flex-wrap">
-            <button class="btn btn-primary btn-sm" onclick="openMaterialModal()">+ 자재 등록</button>
+            <button id="btnRegMat" class="btn btn-primary btn-sm" onclick="openMaterialModal()">+ 자재 등록</button>
             <select class="form-input" id="matCategoryFilter" onchange="renderMaterials()" style="width:130px;">
               <option value="">전체 카테고리</option>
               <option value="물감">물감</option><option value="붓">붓</option>
@@ -1379,15 +1379,15 @@ select { -webkit-appearance: auto; }
                 <div class="card-title" style="margin-right:4px;">출석 체크</div>
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <button class="btn btn-xs btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
-                <button class="btn btn-xs btn-ghost" onclick="setAllAtt('absent')" style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
-                <button class="btn btn-xs btn-ghost" onclick="setAllAtt(null)">초기화</button>
+                <button id="btnAttPresent" class="btn btn-xs btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
+                <button id="btnAttAbsent" class="btn btn-xs btn-ghost" onclick="setAllAtt('absent')" style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
+                <button id="btnAttReset" class="btn btn-xs btn-ghost" onclick="setAllAtt(null)">초기화</button>
                 <div class="month-nav" style="gap:4px;">
                   <button class="month-nav-btn" onclick="changeAttDate(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
                   <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:110px;text-align:center;font-size:12px;padding:6px 4px;min-height:0;height:32px;">
                   <button class="month-nav-btn" onclick="changeAttDate(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
                 </div>
-                <button class="btn btn-xs btn-success" onclick="saveAtt()">저장</button>
+                <button id="btnAttSave" class="btn btn-xs btn-success" onclick="saveAtt()">저장</button>
               </div>
             </div>
             <div id="attList" style="flex:1;"></div>
@@ -1481,7 +1481,7 @@ select { -webkit-appearance: auto; }
             </div>
             <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:16px;">
               <input type="text" class="form-input" id="schoolNameInput" placeholder="학원 이름 입력" style="flex:1;">
-              <button class="btn btn-primary" onclick="saveSchoolName()">저장</button>
+              <button id="btnSaveSchool" class="btn btn-primary" onclick="saveSchoolName()">저장</button>
             </div>
             <div class="card-header" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border);"><div class="card-title">계정 관리</div></div>
             <div class="settings-row">
@@ -1576,7 +1576,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.6</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.7</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1694,7 +1694,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.6</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.7</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2547,6 +2547,7 @@ async function saveSnapshot() {
 
 // 이력 모달 열기
 async function openHistoryModal() {
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   document.getElementById('historyModal').classList.add('open');
   const listEl = document.getElementById('historyList');
 
@@ -3055,25 +3056,46 @@ async function doLogin() {
 function applyRoleUI() {
   const isAdmin = _currentUser?.role === 'admin';
 
-  // 설정 메뉴 — settings 권한 or 관리자만
-  const settingsNav = document.querySelector('[data-page="settings"]');
-  if (settingsNav) settingsNav.style.display = (isAdmin || hasPerm('settings') || hasPerm('backup')) ? '' : 'none';
+  // ── 헬퍼: 버튼 표시/숨김
+  function btn(id, visible) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = visible ? '' : 'none';
+  }
 
-  // 설정 페이지 내 데이터 관리 카드 — backup 권한
-  const settingsCard2 = document.getElementById('settingsCard2');
-  if (settingsCard2) settingsCard2.style.display = (isAdmin || hasPerm('backup')) ? '' : 'none';
-
-  // 네비 메뉴 접근 제어 (조회 권한이라도 있으면 보임)
+  // ── 1. 사이드바 메뉴 접근 제어
   const navMap = {
-    members:   hasPerm('members'),
-    tuition:   hasPerm('payments') || hasPerm('payments_view'),
-    materials: hasPerm('materials') || hasPerm('materials_view'),
-    attendance:hasPerm('attendance'),
+    members:   isAdmin || hasPerm('members'),
+    tuition:   isAdmin || hasPerm('payments') || hasPerm('payments_view'),
+    materials: isAdmin || hasPerm('materials') || hasPerm('materials_view'),
+    attendance:isAdmin || hasPerm('attendance'),
+    settings:  isAdmin || hasPerm('settings') || hasPerm('backup'),
   };
   Object.entries(navMap).forEach(([page, visible]) => {
     const nav = document.querySelector(`[data-page="${page}"]`);
-    if (nav) nav.style.display = (isAdmin || visible) ? '' : 'none';
+    if (nav) nav.style.display = visible ? '' : 'none';
   });
+
+  // ── 2. 설정 페이지 — 데이터 관리 카드
+  const settingsCard2 = document.getElementById('settingsCard2');
+  if (settingsCard2) settingsCard2.style.display = (isAdmin || hasPerm('backup')) ? '' : 'none';
+
+  // ── 3. 회원 관리 버튼
+  btn('btnRegMember', isAdmin || hasPerm('members'));
+
+  // ── 4. 원비 수납 버튼 (전체납부처리)
+  btn('btnAllPaid', isAdmin || hasPerm('payments'));
+
+  // ── 5. 자재 등록 버튼
+  btn('btnRegMat', isAdmin || hasPerm('materials'));
+
+  // ── 6. 학원 설정 저장 버튼
+  btn('btnSaveSchool', isAdmin || hasPerm('settings'));
+
+  // ── 7. 출결 저장/전체처리 버튼
+  const canAtt = isAdmin || hasPerm('attendance');
+  ['btnAttPresent','btnAttAbsent','btnAttReset','btnAttSave'].forEach(id => btn(id, canAtt));
+
+  // ── 8. attList 개별 버튼은 renderAttendance에서 처리 (동적 생성)
 }
 function doLogout() {
   if (!confirm('로그아웃 하시겠습니까?')) return;
@@ -3350,8 +3372,8 @@ function renderMembers() {
       <td>${statusBadge}</td>
       <td style="text-align:center;white-space:nowrap;">
         <button class="btn btn-sm btn-ghost" onclick="openMemberDetailModal('${m.id}')">상세</button>
-        <button class="btn btn-sm btn-outline" onclick="openMemberModal('${m.id}')" style="margin-left:3px;">수정</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteMember('${m.id}')" style="margin-left:3px;">삭제</button>
+        ${hasPerm('members') ? `<button class="btn btn-sm btn-outline" onclick="openMemberModal('${m.id}')" style="margin-left:3px;">수정</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMember('${m.id}')" style="margin-left:3px;">삭제</button>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -3362,6 +3384,7 @@ function renderMembers() {
 }
 
 function openMemberModal(id) {
+  if (!hasPerm('members') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   editMemberId = id||null;
   document.getElementById('memberModalTitle').textContent = id ? '회원 정보 수정' : '회원 등록';
   const m = id ? db.members.find(x=>x.id===id) : null;
@@ -3387,8 +3410,8 @@ function openMemberModal(id) {
 }
 function closeMemberModal() { document.getElementById('memberModal').classList.remove('open'); }
 function saveMember() {
+  if (!hasPerm('members') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const name = document.getElementById('mName').value.trim();
-  if (!name) { toast('이름을 입력해주세요.', true); return; }
   const status=document.getElementById('mStatus').value;
   const data = {
     name, phone:document.getElementById('mPhone').value.trim(),
@@ -3417,6 +3440,7 @@ function saveMember() {
   safeRender(renderMembers,'members'); safeRender(renderDashboard,'dashboard');
 }
 function deleteMember(id) {
+  if (!hasPerm('members') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if (!confirm('회원을 삭제하시겠습니까?')) return;
   db.members = db.members.filter(m=>m.id!==id);
   Object.keys(db.payments).forEach(k=>{ if(k.startsWith(id+'_')) delete db.payments[k]; });
@@ -3449,7 +3473,7 @@ function renderTuition() {
       active.map(m => {
         const k = m.id+'_'+currentTuitionMonth;
         const p = db.payments[k];
-        return `<div class="pay-card ${p?.paid?'paid':'unpaid'}" onclick="openTuitionModal('${m.id}')">
+        return `<div class="pay-card ${p?.paid?'paid':'unpaid'}" onclick="${(hasPerm('payments') || _currentUser?.role==='admin') ? `openTuitionModal('${m.id}')` : ''}">
           <div class="pc-name">${m.name}</div>
           <div class="pc-course">${m.course}</div>
           <div class="pc-amount">${(m.fee||0).toLocaleString()}원</div>
@@ -3485,18 +3509,27 @@ function changeMonth(d) {
   renderTuition();
 }
 function openTuitionModal(mid) {
+  if (!hasPerm('payments') && !hasPerm('payments_view') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const m=db.members.find(x=>x.id===mid);
   const k=mid+'_'+currentTuitionMonth;
   const p=db.payments[k];
   editTuitionKey=k;
-  document.getElementById('tuitionModalTitle').textContent=m.name+' 원비';
+  const canPay = hasPerm('payments') || _currentUser?.role === 'admin';
+  document.getElementById('tuitionModalTitle').textContent=m.name+' 원비'+(canPay?'':' (조회전용)');
   document.getElementById('tMember').value=m.name;
   document.getElementById('tMonth').value=currentTuitionMonth.replace('-','년 ')+'월';
   document.getElementById('tAmount').value=p?.amount||m.fee||'';
   document.getElementById('tDate').value=p?.date||kstDateStr();
   document.getElementById('tPayMethod').value=p?.payMethod||'현금';
   document.getElementById('tMemo').value=p?.memo||'';
-  document.getElementById('tUnpaidBtn').style.display=p?.paid?'inline-flex':'none';
+  // 조회 전용이면 수납/미납 버튼 숨김, 입력 비활성화
+  ['tAmount','tDate','tPayMethod','tMemo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = !canPay;
+  });
+  document.getElementById('tUnpaidBtn').style.display = (p?.paid && canPay) ? 'inline-flex' : 'none';
+  const saveBtn = document.querySelector('#tuitionModal .btn-success');
+  if (saveBtn) saveBtn.style.display = canPay ? '' : 'none';
   document.getElementById('tuitionModal').classList.add('open');
 }
 function closeTuitionModal() { document.getElementById('tuitionModal').classList.remove('open'); }
@@ -3590,16 +3623,16 @@ function renderUnpaid() {
           <div style="font-weight:700;font-size:13px;color:${isLong?'var(--amber)':'var(--coral)'};">${unpaidAmt.toLocaleString()}원</div>
           <div style="font-size:10.5px;color:var(--muted);">월 ${(m.fee||0).toLocaleString()}원 × ${months}개월</div>
         </div>
-        <button class="btn btn-sm btn-success" onclick="openTuitionModal('${m.id}')"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부처리</button>
         <button class="btn btn-sm btn-ghost" onclick="copyUnpaidMsg('${m.id}')" title="알림 문구 복사" style="padding:5px 8px;"><span class="ti ti-user" style="font-size:13px;"><svg viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2M16 3h2a2 2 0 0 1 2 2v3M9 9l3 3-3 3M13 12H3"/></svg></span></button>
+        ${(hasPerm('payments') || _currentUser?.role==='admin') ? `<button class="btn btn-sm btn-success" onclick="openTuitionModal('${m.id}')"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부처리</button>` : ''}
       </div>
     </div>`}).join('')}`;
 }
 
 // ── 미납 빠른 납부처리
 function quickPay(mid) {
+  if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const m = db.members.find(x=>x.id===mid);
-  const k = mid+'_'+currentTuitionMonth;
   const today = kstDateStr();
   db.payments[k] = {paid:true, amount:m.fee||0, date:today, payMethod:'현금', memo:''};
   saveDb(); safeRender(renderUnpaid,'unpaid'); safeRender(renderTuition,'tuition'); safeRender(renderDashboard,'dashboard');
@@ -3705,6 +3738,7 @@ function renderSettle() {
 }
 
 function saveTuition() {
+  if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   db.payments[editTuitionKey]={paid:true,amount:parseInt(document.getElementById('tAmount').value)||0,date:document.getElementById('tDate').value,payMethod:document.getElementById('tPayMethod').value,memo:document.getElementById('tMemo').value.trim(),by:_currentUser?.name||'알 수 없음'};
   saveDb(); closeTuitionModal();
   safeRender(renderTuition,'tuition');
@@ -3713,6 +3747,7 @@ function saveTuition() {
   toast('납부 처리되었습니다.');
 }
 function markUnpaid() {
+  if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if(!confirm('미납 처리하시겠습니까?')) return;
   delete db.payments[editTuitionKey];
   saveDb(); closeTuitionModal();
@@ -3722,6 +3757,7 @@ function markUnpaid() {
   toast('미납으로 변경되었습니다.');
 }
 function markAllPaid() {
+  if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if(!confirm(currentTuitionMonth.replace('-','년 ')+'월 전체 재원 회원을 납부 처리할까요?')) return;
   const today=kstDateStr();
   db.members.filter(m=>m.status==='active').forEach(m=>{
@@ -3769,15 +3805,18 @@ function renderMaterials() {
       <td style="font-size:13px;">${m.price?(m.price.toLocaleString()+'원'):'-'}</td>
       <td><span class="badge ${isLow?'badge-coral':'badge-teal'}">${isLow?'⚠ 부족':'정상'}</span></td>
       <td style="text-align:center;white-space:nowrap;">
+        ${(hasPerm('materials') || _currentUser?.role==='admin') ? `
         <button class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','add')" style="color:var(--teal);border-color:var(--teal);">입고</button>
         <button class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','use')" style="color:var(--coral);border-color:var(--coral);margin-left:3px;">사용</button>
         <button class="btn btn-xs btn-outline" onclick="openMaterialModal('${m.id}')" style="margin-left:3px;">수정</button>
         <button class="btn btn-xs btn-danger" onclick="deleteMaterial('${m.id}')" style="margin-left:3px;">삭제</button>
+        ` : '<span style="font-size:11px;color:var(--muted-2);">조회만</span>'}
       </td>
     </tr>`;
   }).join('');
 }
 function openMaterialModal(id) {
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   editMaterialId=id||null;
   document.getElementById('materialModalTitle').textContent=id?'자재 수정':'자재 등록';
   const m=id?db.materials.find(x=>x.id===id):null;
@@ -3800,6 +3839,7 @@ function openMaterialModal(id) {
 }
 function closeMaterialModal(){document.getElementById('materialModal').classList.remove('open');}
 function saveMaterial(){
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const name=document.getElementById('matName').value.trim();
   if(!name){toast('자재명을 입력해주세요.',true);return;}
   let cat=document.getElementById('matCat').value;
@@ -3846,6 +3886,7 @@ function recalculateAllStock() {
 }
 
 function deleteMaterial(id) {
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if (!confirm('삭제하시겠습니까?\n관련 입출고 이력도 함께 삭제됩니다.')) return;
   db.materials = db.materials.filter(m => m.id !== id);
   // 고아 로그 정리 — 삭제된 자재의 이력 함께 제거
@@ -3870,6 +3911,7 @@ function openMatUseModal(id, type='use'){
 }
 function closeMatUseModal(){document.getElementById('matUseModal').classList.remove('open');}
 function confirmMatUse(){
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const qty=parseInt(document.getElementById('matUseQty').value)||1;
   const type=document.getElementById('matUseType').value;
   const memo=document.getElementById('matUseMemo').value.trim();
@@ -3941,8 +3983,10 @@ function renderMatLog() {
     <td style="font-size:12px;color:var(--muted);">${l.by||'-'}</td>
     <td style="font-size:12px;color:var(--muted);">${l.memo||'-'}</td>
     <td style="text-align:center;white-space:nowrap;">
+      ${(hasPerm('materials') || _currentUser?.role==='admin') ? `
       <button class="btn btn-xs btn-outline" onclick="openLogEditModal('${l.id}')">수정</button>
       <button class="btn btn-xs btn-danger" onclick="deleteLog('${l.id}')" style="margin-left:3px;">삭제</button>
+      ` : '-'}
     </td>
   </tr>`).join('');
 }
@@ -3951,6 +3995,7 @@ function renderMatLog() {
 let editLogId = null;
 
 function openLogEditModal(id) {
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const log = db.stockLog.find(l => l.id === id);
   if (!log) return;
   editLogId = id;
@@ -3996,6 +4041,7 @@ function saveLogEdit() {
 
 // ── 입출고 이력 삭제
 function deleteLog(id) {
+  if (!hasPerm('materials') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if (!confirm('이 이력을 삭제하시겠습니까?\n재고 수량에도 반영됩니다.')) return;
   const log = db.stockLog.find(l => l.id === id);
   if (!log) return;
@@ -4052,9 +4098,11 @@ function renderAttendance(){
           ${s==='present'?'<span class="badge badge-teal" style="font-size:10px;">출석</span>':s==='late'?'<span class="badge badge-amber" style="font-size:10px;">지각</span>':s==='absent'?'<span class="badge badge-coral" style="font-size:10px;">결석</span>':''}
         </div>
         <div class="att-btns">
+          ${(hasPerm('attendance') || _currentUser?.role==='admin') ? `
           <button data-status="present" onclick="setAtt('${dv}','${m.id}','present')" class="${cl('present')}">출석</button>
           <button data-status="late"    onclick="setAtt('${dv}','${m.id}','late')"    class="${cl('late')}">지각</button>
           <button data-status="absent"  onclick="setAtt('${dv}','${m.id}','absent')"  class="${cl('absent')}">결석</button>
+          ` : `<span style="font-size:11px;color:var(--muted-2);">${s||'미입력'}</span>`}
         </div>
       </div>`;
     }).join('');
@@ -4144,6 +4192,7 @@ function renderAttendance(){
   } catch(statErr) { console.error('attStats 오류:', statErr); }
 }
 function setAtt(date,mid,status){
+  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   // 1. db 업데이트
   if(!db.attendance[date]) db.attendance[date]={};
   const prev = db.attendance[date][mid];
@@ -4189,6 +4238,7 @@ function changeAttDate(delta) {
 // 출결 — 전체 일괄 처리
 // ═══════════════════════════════════
 function setAllAtt(status) {
+  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const dv = document.getElementById('attDate').value;
   if (!dv) { toast('날짜를 먼저 선택해주세요.', true); return; }
   const active = db.members.filter(m => m.status === 'active');
@@ -4408,6 +4458,7 @@ function applySchoolName() {
   document.title = name + ' 관리시스템';
 }
 function saveSchoolName() {
+  if (!hasPerm('settings') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const val = document.getElementById('schoolNameInput').value.trim();
   if (!val) { toast('학원 이름을 입력해주세요.', true); return; }
   if (!db.meta) db.meta = {};
@@ -4677,12 +4728,16 @@ function renderMemberTrendChart() {
 }
 
 
-function saveAtt(){saveDb();toast('출석 정보가 저장되었습니다.');}
+function saveAtt(){
+  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  saveDb();toast('출석 정보가 저장되었습니다.');
+}
 
 // ═══════════════════════════════════
 // DATA I/O
 // ═══════════════════════════════════
 function exportData(){
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const d = kstDateStr();
   // 날짜 비교를 위해 타임스탬프 포함
   const exportObj = Object.assign({}, db, { updatedAt: Date.now() });
@@ -4750,6 +4805,7 @@ async function confirmPwAction() {
 
 // ── 초기화 (비밀번호 확인)
 async function resetAll() {
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   openPwConfirmModal({
     title: '전체 데이터 초기화',
     desc: '모든 데이터가 영구 삭제됩니다',
@@ -4776,6 +4832,7 @@ async function resetAll() {
 
 // ── 데이터 불러오기 (비밀번호 확인)
 function importData(e) {
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); e.target.value=''; return; }
   const f = e.target.files[0]; if(!f) return;
   const reader = new FileReader();
   reader.onload = ev => {
@@ -5055,7 +5112,7 @@ function deleteAccount(id) {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.6';
+const CURRENT_SW_VERSION = 'v1.0-build1.7';
 
 async function checkVersionAndReload() {
   try {
