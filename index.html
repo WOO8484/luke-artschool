@@ -869,6 +869,24 @@ select { -webkit-appearance: auto; }
   .modal-header { margin-bottom: 16px; }
   .modal-footer { gap: 6px; }
 
+  /* 모달 footer sticky — 키보드 올라와도 버튼 항상 노출 */
+  .modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+    padding-bottom: 8px;
+    margin-bottom: -4px;
+    z-index: 1;
+  }
+
+  /* 탑바 고정 높이 제거 — 소형 폰에서 줄바꿈 대응 */
+  #topbar {
+    height: auto !important;
+    min-height: 52px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
   /* 월 네비 */
   .month-nav-label { font-size: 13px; min-width: 80px; }
 
@@ -1000,7 +1018,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.7</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.8</div>
 
   </div>
 </div>
@@ -2868,7 +2886,8 @@ function renderDashboard() {
   const todayPresent = Object.values(todayAtt).filter(v=>v==='present'||v==='late').length;
 
   const dashStatsEl = document.getElementById('dashStats'); if(!dashStatsEl) return;
-  dashStatsEl.style.gridTemplateColumns = '';
+  // 인라인 스타일 완전 제거 — CSS 미디어 쿼리에만 위임
+  dashStatsEl.removeAttribute('style');
   dashStatsEl.innerHTML = `
     <div class="stat-card" style="--clr:var(--purple-bg);">
       <div class="stat-icon" style="background:var(--purple-bg);color:var(--purple);"><span class="ti ti-users"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span></div>
