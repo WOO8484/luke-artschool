@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="루크학원">
+<meta name="theme-color" content="#6E4FD0">
+<meta name="description" content="루크미술학원 회원·원비·출결·자재 통합 관리">
+<link rel="manifest" href="./manifest.json">
 <!-- 캐시 방지 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -1040,7 +1044,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.0</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.1</div>
 
   </div>
 </div>
@@ -1550,7 +1554,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.0</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.1</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1578,7 +1582,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.0</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.1</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2840,10 +2844,32 @@ function toggleWithdrawDate() {
 // ═══════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════
-function doLogin() {
+// ── SHA-256 해싱 유틸리티 (Web Crypto API)
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── 저장된 비밀번호가 평문인지 확인 (해시는 64자 hex)
+function isHashed(pw) {
+  return typeof pw === 'string' && /^[0-9a-f]{64}$/.test(pw);
+}
+
+// ── 평문 비밀번호를 해시로 마이그레이션 (최초 1회)
+async function migratePwIfNeeded() {
+  if (!db.auth?.pw) return;
+  if (!isHashed(db.auth.pw)) {
+    db.auth.pw = await sha256(db.auth.pw);
+    markDirty('auth');
+    saveDb();
+  }
+}
+
+async function doLogin() {
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPw').value;
-  if (id === db.auth.id && pw === db.auth.pw) {
+  const hashed = await sha256(pw);
+  if (id === db.auth.id && hashed === db.auth.pw) {
     const loginScreen = document.getElementById('loginScreen');
     const appShell = document.getElementById('appShell');
     // 로그인 화면 완전히 숨기기 (hidden + display:none 이중 처리)
@@ -2883,14 +2909,15 @@ function doLogout() {
   appShell.classList.remove('visible');
   appShell.style.visibility = '';
 }
-function changePw() {
+async function changePw() {
   const cur = document.getElementById('pwCurrent').value;
   const nw  = document.getElementById('pwNew').value;
   const cf  = document.getElementById('pwConfirm').value;
-  if (cur !== db.auth.pw) { toast('현재 비밀번호가 올바르지 않습니다.', true); return; }
+  const curHashed = await sha256(cur);
+  if (curHashed !== db.auth.pw) { toast('현재 비밀번호가 올바르지 않습니다.', true); return; }
   if (!nw) { toast('새 비밀번호를 입력하세요.', true); return; }
   if (nw !== cf) { toast('새 비밀번호가 일치하지 않습니다.', true); return; }
-  db.auth.pw = nw;
+  db.auth.pw = await sha256(nw);
   markDirty('auth'); // Firebase auth 섹션 동기화
   saveDb();
   ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
@@ -4511,9 +4538,10 @@ function closePwConfirmModal() {
   _pwConfirmCallback = null;
 }
 
-function confirmPwAction() {
+async function confirmPwAction() {
   const pw = document.getElementById('pwConfirmInput').value;
-  if(pw !== db.auth.pw) {
+  const hashed = await sha256(pw);
+  if(hashed !== db.auth.pw) {
     document.getElementById('pwConfirmError').style.display = 'block';
     document.getElementById('pwConfirmInput').value = '';
     document.getElementById('pwConfirmInput').focus();
@@ -4677,7 +4705,7 @@ function renderAutoLoginToggle() {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.0';
+const CURRENT_SW_VERSION = 'v1.0-build1.1';
 
 async function checkVersionAndReload() {
   try {
@@ -4715,6 +4743,7 @@ if('serviceWorker' in navigator) {
 
     // 2. 자동 로그인 체크
     loadDb();
+    await migratePwIfNeeded(); // 평문 비밀번호 → SHA-256 해시 자동 마이그레이션
     const autoLoggedIn = checkAutoLogin();
 
     // 3. SW 등록
@@ -4736,8 +4765,9 @@ if('serviceWorker' in navigator) {
   });
 } else {
   // SW 미지원 브라우저
-  window.addEventListener('load', () => {
+  window.addEventListener('load', async () => {
     loadDb();
+    await migratePwIfNeeded();
     checkAutoLogin();
   });
 }
