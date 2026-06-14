@@ -979,7 +979,7 @@ input, select, textarea, button { -webkit-appearance: none; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.0</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.1</div>
 
   </div>
 </div>
@@ -1296,25 +1296,25 @@ input, select, textarea, button { -webkit-appearance: none; }
           <!-- 출석 체크 -->
           <div style="display:table-cell;vertical-align:top;width:50%;padding-right:8px;">
           <div class="card" style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
-            <div class="card-header">
-              <div>
-                <div style="display:flex;align-items:center;gap:8px;">
+            <div class="card-header" style="flex-wrap:wrap;gap:10px;">
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                   <div class="card-title">출석 체크</div>
                   <div class="card-subtitle" id="attDateLabel"></div>
                 </div>
-                <div class="flex-center gap-6" style="margin-top:4px;">
+                <div class="flex-center gap-6" style="margin-top:6px;flex-wrap:wrap;">
                   <button class="btn btn-xs btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
                   <button class="btn btn-xs btn-ghost" onclick="setAllAtt('absent')" style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
                   <button class="btn btn-xs btn-ghost" onclick="setAllAtt(null)">초기화</button>
                 </div>
               </div>
-              <div class="flex-center gap-8">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
                 <div class="month-nav">
                   <button class="month-nav-btn" onclick="changeAttDate(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
-                  <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:130px;text-align:center;font-size:13px;">
+                  <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:120px;text-align:center;font-size:12px;">
                   <button class="month-nav-btn" onclick="changeAttDate(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
                 </div>
-                <button class="btn btn-success btn-sm" onclick="saveAtt()">저장</button>
+                <button class="btn btn-success btn-sm" onclick="saveAtt()" style="width:100%;">저장</button>
               </div>
             </div>
             <div id="attList" style="flex:1;"></div>
@@ -4060,14 +4060,17 @@ function renderBirthdayAlert() {
   }
   el.style.display = 'block';
   el.innerHTML = (todayBirthdays.length
-    ? `<div style="background:var(--amber-bg);border:1px solid #F0C060;border-radius:var(--r-md);padding:10px 14px;margin-bottom:8px;">
-        <span style="font-size:13px;font-weight:700;color:var(--amber);">🎂 오늘 생일</span>
-        <span style="margin-left:8px;font-size:13px;">${todayBirthdays.map(m=>m.name).join(', ')}</span>
+    ? `<div style="background:linear-gradient(135deg,#FFF8E7,#FFF0C0);border:2px solid var(--amber);border-radius:var(--r-md);padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:22px;">🎂</span>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--amber);">오늘 생일이에요!</div>
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-top:2px;">${todayBirthdays.map(m=>m.name).join(', ')}</div>
+        </div>
       </div>` : '')
   + (monthBirthdays.length
-    ? `<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;">
-        <span style="font-size:12px;color:var(--muted);font-weight:600;">이달 생일 </span>
-        ${monthBirthdays.map(m=>`<span style="font-size:12px;margin-right:10px;">${m.name} <span style="color:var(--muted);">(${m.birthday.slice(5).replace('-','/')})</span></span>`).join('')}
+    ? `<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;">🎁 이달 생일</span>
+        ${monthBirthdays.map(m=>`<span style="font-size:12px;background:var(--purple-bg);color:var(--purple);padding:2px 8px;border-radius:99px;font-weight:600;">${m.name} <span style="font-weight:400;opacity:0.8;">${m.birthday.slice(5).replace('-','/')}</span></span>`).join('')}
       </div>` : '');
 }
 
