@@ -979,7 +979,7 @@ input, select, textarea, button { -webkit-appearance: none; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.2</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.3</div>
 
   </div>
 </div>
@@ -1299,7 +1299,6 @@ input, select, textarea, button { -webkit-appearance: none; }
             <div class="card-header" style="flex-wrap:wrap;gap:8px;align-items:center;">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1;">
                 <div class="card-title" style="margin-right:4px;">출석 체크</div>
-                <div class="card-subtitle" id="attDateLabel"></div>
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                 <button class="btn btn-xs btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
@@ -2811,7 +2810,7 @@ function renderAll() {
   applySchoolName();
   const todayEl = document.getElementById('todayInfo');
   if(todayEl) todayEl.textContent = kstDate().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
-  // 출석부 날짜 기본값 — 항상 오늘(KST)로 설정
+  // 출석부 날짜 — 항상 오늘(KST)로 초기화
   const attInput = document.getElementById('attDate');
   if(attInput) attInput.value = kstDateStr();
   safeRender(renderDashboard,  'dashboard');
@@ -3638,7 +3637,7 @@ function renderAttendance(){
     if(btnEl) btnEl.classList.toggle('active',t==='daily');
   });
   const dv=document.getElementById('attDate').value;
-  document.getElementById('attDateLabel').textContent=dv?dv+' 출석부':'';
+  // attDateLabel 제거됨
   const active=db.members.filter(m=>m.status==='active').sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const att=db.attendance[dv]||{};
   const attEl=document.getElementById('attList');
