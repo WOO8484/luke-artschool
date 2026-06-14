@@ -1040,7 +1040,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.6</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.7</div>
 
   </div>
 </div>
@@ -1493,7 +1493,7 @@ select { -webkit-appearance: auto; }
                 <span>새 비밀번호를 설정합니다</span>
               </div>
             </div>
-            <div style="margin-top:12px;" class="form-grid" style="grid-template-columns:1fr;">
+            <div class="form-grid" style="margin-top:12px;grid-template-columns:1fr;">
               <div class="form-group full">
                 <label class="form-label">현재 비밀번호</label>
                 <input type="password" class="form-input" id="pwCurrent" placeholder="현재 비밀번호">
@@ -4697,6 +4697,14 @@ async function checkVersionAndReload() {
     const remoteVersion = match[1];
     if(remoteVersion !== CURRENT_SW_VERSION) {
       console.log(`새 버전 감지: ${CURRENT_SW_VERSION} → ${remoteVersion}`);
+
+      // 무한 새로고침 방지 — 이미 새로고침 한 번 했으면 중단
+      if(sessionStorage.getItem('sw_reloaded') === remoteVersion) {
+        console.warn('이미 버전 업데이트 새로고침이 완료되었습니다. 무한 루프 방지.');
+        return;
+      }
+      sessionStorage.setItem('sw_reloaded', remoteVersion);
+
       // SW 캐시 삭제 후 새로고침
       if('caches' in window) {
         const keys = await caches.keys();
