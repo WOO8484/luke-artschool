@@ -1356,8 +1356,10 @@ input, select, textarea, button { -webkit-appearance: none; }
           </div>
         </div>
 
-        <div class="two-col">
-          <div class="card">
+        <div class="two-col" style="align-items:stretch;">
+
+          <!-- 학원 정보 카드 -->
+          <div class="card" style="display:flex;flex-direction:column;">
             <div class="card-header"><div class="card-title">학원 정보</div></div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>학원 이름</strong><span>상단 배지와 알림 문구에 반영됩니다</span></div>
@@ -1395,8 +1397,12 @@ input, select, textarea, button { -webkit-appearance: none; }
               <button class="btn btn-primary" style="margin-top:4px;" onclick="changePw()">비밀번호 변경</button>
             </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">데이터 관리</div></div>
+
+          <!-- 데이터 관리 카드 -->
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-header">
+              <div class="card-title">데이터 관리</div>
+            </div>
 
             <!-- 버전 이력 복구 -->
             <div class="settings-row">
@@ -1406,7 +1412,6 @@ input, select, textarea, button { -webkit-appearance: none; }
               </div>
               <button class="btn btn-sm btn-outline" onclick="openHistoryModal()" style="color:var(--amber);border-color:var(--amber);">🕐 복구</button>
             </div>
-
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>수동 백업</strong>
@@ -1428,72 +1433,93 @@ input, select, textarea, button { -webkit-appearance: none; }
               </div>
               <button class="btn btn-sm btn-danger" onclick="resetAll()">초기화</button>
             </div>
-          </div>
-        </div>
 
-        <!-- 업데이트 이력 카드 -->
-        <div class="card" style="margin-top:16px;">
-          <div class="card-header">
-            <div>
-              <div class="card-title">📋 프로그램 업데이트 이력</div>
-              <div class="card-subtitle">버전별 변경 내용을 확인하세요</div>
-            </div>
-            <div style="background:var(--purple-bg);color:var(--purple);padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;">현재 v03</div>
-          </div>
-          <div id="updateHistoryList">
+            <!-- 구분선 -->
+            <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
 
-            <!-- v03 -->
-            <div style="padding:14px 0;border-bottom:1px solid var(--border);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <span style="background:var(--purple);color:#fff;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">v03</span>
-                <span style="font-size:12px;color:var(--muted);">2025년 현재</span>
-                <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
+            <!-- 프로그램 버전 -->
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <strong>프로그램 버전</strong>
+                <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+                  <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v03</span>
+                  <span style="background:var(--teal-bg);color:var(--teal);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
+                </span>
               </div>
-              <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;">
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;">✓</span>Firebase 항목별 분리 저장 — 동시 수정 충돌 방지</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;">✓</span>아이패드 반응형 UI 최적화 (터치 영역 확대, 오버레이 사이드바)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;">✓</span>Safe Area 지원 (홈바 영역 침범 방지)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;">✓</span>GitHub Pages 배포 대응 (index.html)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;">✓</span>프로그램 업데이트 이력 페이지 추가</li>
-              </ul>
+              <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
             </div>
-
-            <!-- v02 -->
-            <div style="padding:14px 0;border-bottom:1px solid var(--border);">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <span style="background:var(--purple-bg);color:var(--purple);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">v02</span>
-                <span style="font-size:12px;color:var(--muted);">아이패드 대응</span>
-              </div>
-              <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;">
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;">✓</span>모바일 / 태블릿 반응형 레이아웃 적용</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;">✓</span>햄버거 메뉴 (오버레이 사이드바) 추가</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;">✓</span>사파리 호환성 개선 (-webkit 설정)</li>
-              </ul>
-            </div>
-
-            <!-- v01 -->
-            <div style="padding:14px 0;">
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">v01</span>
-                <span style="font-size:12px;color:var(--muted);">최초 출시</span>
-              </div>
-              <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;">
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>회원 관리 (등록 / 수정 / 탈퇴)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>원비 관리 (납부 / 미납 / 결제 통계)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>출결 관리 (일별 / 달력 / 출석률 순위)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>자재 관리 (재고 / 입출고 이력)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>Firebase 클라우드 실시간 동기화</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>버전 이력 복구 (최근 10개 스냅샷)</li>
-                <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;">✓</span>대시보드 통계 / 차트</li>
-              </ul>
-            </div>
-
           </div>
+
         </div>
         </div>
 
     </div><!-- /content -->
   </div><!-- /mainArea -->
+
+<!-- 업데이트 이력 모달 -->
+<div class="modal-overlay" id="updateHistoryModal">
+  <div class="modal" style="width:560px;max-height:85vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:var(--purple-bg);"><span style="font-size:20px;">📋</span></div>
+      <div class="modal-title">업데이트 이력</div>
+      <button class="modal-close" onclick="closeUpdateHistoryModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+
+    <!-- v03 -->
+    <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v03</span>
+        <span style="font-size:12px;color:var(--muted);">2025년</span>
+        <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>Firebase 항목별 분리 저장 — 동시 수정 충돌 방지</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>아이패드 반응형 UI 최적화 (터치 영역 확대, 오버레이 사이드바)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>Safe Area 지원 (홈바 영역 침범 방지)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>GitHub Pages 배포 대응 (index.html)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>업데이트 이력 팝업 추가</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>설정 페이지 학원정보 / 데이터관리 카드 높이 통일</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>버그 수정 — importData / resetAll / restoreSnapshot Firebase 미반영 수정</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>버그 수정 — doLogout / disconnectFirebase SSE 종료 처리 개선</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>버그 수정 — 타임스탬프 선저장 오류 수정 (Firebase 실패 시 데이터 오염 방지)</li>
+      </ul>
+    </div>
+
+    <!-- v02 -->
+    <div style="padding:16px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="background:var(--purple-bg);color:var(--purple);padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v02</span>
+        <span style="font-size:12px;color:var(--muted);">아이패드 대응</span>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;font-weight:600;">✓</span>모바일 / 태블릿 반응형 레이아웃 적용</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;font-weight:600;">✓</span>햄버거 메뉴 (오버레이 사이드바) 추가</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--purple-3);flex-shrink:0;font-weight:600;">✓</span>사파리 호환성 개선 (-webkit 설정)</li>
+      </ul>
+    </div>
+
+    <!-- v01 -->
+    <div style="padding:16px 0;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="background:var(--bg-2);color:var(--muted);padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v01</span>
+        <span style="font-size:12px;color:var(--muted);">최초 출시</span>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>회원 관리 (등록 / 수정 / 탈퇴)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>원비 관리 (납부 / 미납 / 결제 통계)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>출결 관리 (일별 / 달력 / 출석률 순위)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>자재 관리 (재고 / 입출고 이력)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>Firebase 클라우드 실시간 동기화</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>버전 이력 복구 (최근 10개 스냅샷)</li>
+        <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted);flex-shrink:0;font-weight:600;">✓</span>대시보드 통계 / 차트</li>
+      </ul>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeUpdateHistoryModal()">닫기</button>
+    </div>
+  </div>
+</div>
 
 <!-- 버전 이력 복구 모달 -->
 <div class="modal-overlay" id="historyModal">
@@ -2158,6 +2184,21 @@ async function openHistoryModal() {
 function closeHistoryModal() {
   document.getElementById('historyModal').classList.remove('open');
 }
+
+function openUpdateHistoryModal() {
+  document.getElementById('updateHistoryModal').classList.add('open');
+}
+function closeUpdateHistoryModal() {
+  document.getElementById('updateHistoryModal').classList.remove('open');
+}
+
+// 오버레이 클릭 시 업데이트 이력 모달 닫기
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('updateHistoryModal');
+  if(modal && modal.classList.contains('open') && e.target === modal) {
+    closeUpdateHistoryModal();
+  }
+});
 
 // 스냅샷으로 복구
 async function restoreSnapshot(index) {
