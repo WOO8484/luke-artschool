@@ -1040,7 +1040,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.5</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.6</div>
 
   </div>
 </div>
@@ -2562,6 +2562,10 @@ async function restoreSnapshot(index) {
         if(!db.meta)            db.meta       = {};
         if(!db.meta.customCats) db.meta.customCats = [];
         markAllDirty();
+        // ★ 복구 직후 타임스탬프 강제 최신화 — SSE가 클라우드 데이터로 롤백하는 것 방지
+        const nowTs = Date.now();
+        _storage.setItem('luke_local_ts', nowTs.toString());
+        _fbIgnoreUntil = nowTs + 5000; // 5초간 SSE 수신 차단
         saveDb(); renderAll();
         closeHistoryModal();
         toast('복구되었습니다! (' + snap.label + ')');
@@ -4546,6 +4550,10 @@ async function resetAll() {
       const schoolName = db.meta?.schoolName || '';
       db = { members:[], payments:{}, materials:[], attendance:{}, stockLog:[], auth, meta:{v:2, schoolName} };
       markAllDirty();
+      // ★ 초기화 직후 타임스탬프 강제 최신화 — SSE 롤백 방지
+      const nowTs = Date.now();
+      _storage.setItem('luke_local_ts', nowTs.toString());
+      _fbIgnoreUntil = nowTs + 5000;
       saveDb(); renderAll(); toast('초기화되었습니다.');
     }
   });
@@ -4611,6 +4619,10 @@ function importData(e) {
           if(!db.meta.customCats) db.meta.customCats = [];
           try { recalculateAllStock(); } catch(e){}
           markAllDirty();
+          // ★ 불러오기 직후 타임스탬프 강제 최신화 — SSE가 클라우드 데이터로 롤백하는 것 방지
+          const nowTs = Date.now();
+          _storage.setItem('luke_local_ts', nowTs.toString());
+          _fbIgnoreUntil = nowTs + 5000; // 5초간 SSE 수신 차단
           saveDb(); renderAll();
           toast(backupFirst ? '백업 후 데이터를 불러왔습니다.' : '데이터를 불러왔습니다.');
         }
