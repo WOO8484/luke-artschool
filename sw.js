@@ -1,8 +1,12 @@
 // ══════════════════════════════════════════════════════
 // 루크미술학원 관리시스템 — Service Worker
-// 버전을 올릴 때마다 CACHE_VERSION 숫자만 바꾸면 됩니다
+//
+// 버전 규칙:
+//   CACHE_VERSION 앞부분(v1.0) → 메이저 업데이트 시 변경
+//   CACHE_VERSION 뒷부분(build1.0) → 마이너 패치 시 변경
+//   index.html의 CURRENT_SW_VERSION과 항상 동일하게 유지
 // ══════════════════════════════════════════════════════
-const CACHE_VERSION = 'luke-v2.9';
+const CACHE_VERSION = 'v1.0-build1.0';
 const CACHE_FILES = [
   './',
   './index.html'
