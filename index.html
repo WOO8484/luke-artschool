@@ -422,6 +422,8 @@ tbody tr:hover td { background: var(--bg); }
   backdrop-filter: blur(4px);
 }
 .modal-overlay.open { display: flex; }
+/* 비밀번호 확인 모달은 항상 최상단 (historyModal 위) */
+#pwConfirmModal { z-index: 600; }
 .modal {
   background: var(--surface);
   border-radius: var(--r-xl);
@@ -1040,7 +1042,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.7</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 3.8</div>
 
   </div>
 </div>
@@ -2539,6 +2541,9 @@ async function restoreSnapshot(index) {
     else                { dateMsg = '동일한 시점의 데이터입니다.'; }
   }
 
+  // historyModal 먼저 닫기 — pwConfirmModal이 뒤에 가려지지 않도록
+  closeHistoryModal();
+
   openPwConfirmModal({
     title: '버전 이력 복구',
     desc: '선택한 시점의 데이터로 되돌립니다',
@@ -2567,7 +2572,6 @@ async function restoreSnapshot(index) {
         _storage.setItem('luke_local_ts', nowTs.toString());
         _fbIgnoreUntil = nowTs + 5000; // 5초간 SSE 수신 차단
         saveDb(); renderAll();
-        closeHistoryModal();
         toast('복구되었습니다! (' + snap.label + ')');
       } catch(e) {
         toast('복구 실패: ' + e.message, true);
