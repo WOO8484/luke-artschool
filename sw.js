@@ -8,6 +8,9 @@ const CACHE_FILES = [
   './index.html'
 ];
 
+// Google Fonts 캐시 전용 이름 (별도 관리 — 버전 업해도 유지)
+const FONT_CACHE = 'luke-fonts-v1';
+
 // ── 설치: 새 버전 캐시 저장
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -23,7 +26,7 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys =>
       Promise.all(
         keys
-          .filter(key => key !== CACHE_VERSION)
+          .filter(key => key !== CACHE_VERSION && key !== FONT_CACHE)
           .map(key => caches.delete(key))
       )
     ).then(() => self.clients.claim()) // 즉시 모든 탭에 적용
@@ -32,21 +35,39 @@ self.addEventListener('activate', event => {
 
 // ── fetch: 네트워크 우선 → 실패 시 캐시 (항상 최신 버전 우선)
 self.addEventListener('fetch', event => {
+
+  // Google Fonts — 캐시 우선 (오프라인에서도 폰트 유지)
+  if(event.request.url.includes('fonts.googleapis.com') ||
+     event.request.url.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.open(FONT_CACHE).then(cache =>
+        cache.match(event.request).then(cached => {
+          if(cached) return cached;
+          return fetch(event.request).then(res => {
+            cache.put(event.request, res.clone());
+            return res;
+          });
+        })
+      ).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   // index.html은 항상 네트워크에서 먼저 가져옴 (최신 버전 보장)
   if(event.request.url.includes('index.html') || event.request.url.endsWith('/')) {
     event.respondWith(
       fetch(event.request)
         .then(res => {
-          // 새 버전을 캐시에도 저장
           const resClone = res.clone();
           caches.open(CACHE_VERSION).then(cache => cache.put(event.request, resClone));
           return res;
         })
         .catch(() => {
-          // 오프라인 시 캐시에서 명시적으로 index.html 반환
+          // 오프라인 시 캐시에서 반환 — 경로 우선순위대로 시도
           return caches.match('./index.html')
-            || caches.match('/')
-            || caches.match(event.request);
+            || caches.match('/index.html')
+            || caches.match('./')
+            || caches.match('/');
         })
     );
     return;
@@ -55,7 +76,9 @@ self.addEventListener('fetch', event => {
   // 나머지 리소스는 캐시 우선 → 없으면 네트워크
   event.respondWith(
     caches.match(event.request)
-      .then(cached => cached || fetch(event.request).catch(() => caches.match('./index.html')))
+      .then(cached => cached || fetch(event.request)
+        .catch(() => caches.match('./index.html') || caches.match('/index.html'))
+      )
   );
 });
 
