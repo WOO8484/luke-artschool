@@ -2,7 +2,7 @@
 // 루크미술학원 관리시스템 — Service Worker
 // 버전을 올릴 때마다 CACHE_VERSION 숫자만 바꾸면 됩니다
 // ══════════════════════════════════════════════════════
-const CACHE_VERSION = 'luke-v1.8';
+const CACHE_VERSION = 'luke-v1.9';
 const CACHE_FILES = [
   './',
   './index.html'

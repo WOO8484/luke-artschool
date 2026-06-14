@@ -978,6 +978,8 @@ input, select, textarea, button { -webkit-appearance: none; }
     </div>
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
+    <!-- 임시 버전 표기 (확인용) -->
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.8</div>
 
   </div>
 </div>
@@ -1393,10 +1395,12 @@ input, select, textarea, button { -webkit-appearance: none; }
           </div>
         </div>
 
-        <div class="two-col">
+        <div style="display:table;width:100%;table-layout:fixed;border-spacing:0;border-collapse:separate;">
+          <div style="display:table-row;">
 
           <!-- 학원 정보 카드 -->
-          <div class="card" id="settingsCard1">
+          <div id="settingsCard1" style="display:table-cell;vertical-align:top;width:50%;padding-right:8px;">
+          <div class="card" style="height:100%;box-sizing:border-box;">
             <div class="card-header"><div class="card-title">학원 정보</div></div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>학원 이름</strong><span>상단 배지와 알림 문구에 반영됩니다</span></div>
@@ -1434,9 +1438,11 @@ input, select, textarea, button { -webkit-appearance: none; }
               <button class="btn btn-primary" style="margin-top:4px;" onclick="changePw()">비밀번호 변경</button>
             </div>
           </div>
+          </div><!-- /settingsCard1 table-cell -->
 
           <!-- 데이터 관리 카드 -->
-          <div class="card" id="settingsCard2">
+          <div id="settingsCard2" style="display:table-cell;vertical-align:top;width:50%;padding-left:8px;">
+          <div class="card" style="height:100%;box-sizing:border-box;">
             <div class="card-header">
               <div class="card-title">데이터 관리</div>
             </div>
@@ -1486,8 +1492,10 @@ input, select, textarea, button { -webkit-appearance: none; }
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
             </div>
           </div>
+          </div><!-- /settingsCard2 table-cell -->
 
-        </div>
+          </div><!-- /table-row -->
+        </div><!-- /table wrapper -->
         </div>
 
     </div><!-- /content -->
