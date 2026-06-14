@@ -1129,7 +1129,7 @@ input, select, textarea, button { -webkit-appearance: none; }
           <div class="table-wrap">
             <table>
               <thead><tr>
-                <th>이름</th><th>연락처</th><th>학년/나이</th><th>수강과정</th><th>수업일수</th><th>월 원비</th><th>등록일</th><th>탈퇴일</th><th>상태</th><th style="text-align:center;">관리</th>
+                <th>이름</th><th>연락처</th><th>학년/나이</th><th>수강과정</th><th>수업일수</th><th>원비/등록일</th><th>상태</th><th style="text-align:center;">관리</th>
               </tr></thead>
               <tbody id="memberTableBody"></tbody>
             </table>
@@ -1291,9 +1291,11 @@ input, select, textarea, button { -webkit-appearance: none; }
           <button class="tuition-tab" id="atab-rank" onclick="switchAttTab('rank')">🏅 출석률 순위</button>
         </div>
         <div id="att-tab-daily">
-        <div class="two-col" style="align-items:stretch;">
+        <div style="display:table;width:100%;table-layout:fixed;border-spacing:0;">
+          <div style="display:table-row;">
           <!-- 출석 체크 -->
-          <div class="card" style="display:flex;flex-direction:column;">
+          <div style="display:table-cell;vertical-align:top;width:50%;padding-right:8px;">
+          <div class="card" style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
             <div class="card-header">
               <div>
                 <div style="display:flex;align-items:center;gap:8px;">
@@ -1317,15 +1319,19 @@ input, select, textarea, button { -webkit-appearance: none; }
             </div>
             <div id="attList" style="flex:1;"></div>
           </div>
+          </div>
           <!-- 수업일수 진행률 -->
-          <div class="card" style="display:flex;flex-direction:column;">
+          <div style="display:table-cell;vertical-align:top;width:50%;padding-left:8px;">
+          <div class="card" style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;">
             <div class="card-header">
               <div class="card-title">이달 수업 현황</div>
               <div class="card-subtitle" id="attStatsMonthLabel"></div>
             </div>
             <div id="attStats" style="flex:1;overflow-y:auto;"></div>
           </div>
-        </div>
+          </div>
+          </div><!-- /table-row -->
+        </div><!-- /table -->
         </div><!-- /att-tab-daily -->
         <!-- 달력 뷰 -->
         <div id="att-tab-calendar" style="display:none;">
@@ -2957,9 +2963,10 @@ function renderMembers() {
       <td style="font-size:13px;">${m.grade||'-'}</td>
       <td><span class="badge badge-purple">${m.course}</span></td>
       <td style="text-align:center;"><span class="class-chip">${(()=>{try{return classLabel(m)}catch(e){return '-'}})()}</span><div style="font-size:10.5px;color:var(--muted);margin-top:3px;">월 약 ${(()=>{try{return getMonthlyTarget(m)}catch(e){return 0}})()}회</div></td>
-      <td style="font-size:13px;font-weight:600;text-align:center;">${(m.fee||0).toLocaleString()}원</td>
-      <td style="font-size:12px;color:var(--muted);">${m.startDate||'-'}</td>
-      <td style="font-size:12px;color:var(--muted);">${m.withdrawDate||'-'}</td>
+      <td style="font-size:13px;font-weight:600;text-align:center;">
+        <div>${(m.fee||0).toLocaleString()}원</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:2px;">${m.startDate||'-'}</div>
+      </td>
       <td>${statusBadge}</td>
       <td style="text-align:center;white-space:nowrap;">
         <button class="btn btn-sm btn-ghost" onclick="openMemberDetailModal('${m.id}')">상세</button>
