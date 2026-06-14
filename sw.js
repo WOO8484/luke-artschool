@@ -2,7 +2,7 @@
 // 루크미술학원 관리시스템 — Service Worker
 // 버전을 올릴 때마다 CACHE_VERSION 숫자만 바꾸면 됩니다
 // ══════════════════════════════════════════════════════
-const CACHE_VERSION = 'luke-v2.5';
+const CACHE_VERSION = 'luke-v2.6';
 const CACHE_FILES = [
   './',
   './index.html'
@@ -42,15 +42,20 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_VERSION).then(cache => cache.put(event.request, resClone));
           return res;
         })
-        .catch(() => caches.match(event.request)) // 오프라인 시 캐시 사용
+        .catch(() => {
+          // 오프라인 시 캐시에서 명시적으로 index.html 반환
+          return caches.match('./index.html')
+            || caches.match('/')
+            || caches.match(event.request);
+        })
     );
     return;
   }
 
-  // 나머지 리소스는 캐시 우선
+  // 나머지 리소스는 캐시 우선 → 없으면 네트워크
   event.respondWith(
     caches.match(event.request)
-      .then(cached => cached || fetch(event.request))
+      .then(cached => cached || fetch(event.request).catch(() => caches.match('./index.html')))
   );
 });
 
