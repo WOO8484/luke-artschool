@@ -671,7 +671,7 @@ tbody tr:hover td { background: var(--bg); }
    사파리 / 아이패드 기본 설정
 ════════════════════════════════════════ */
 /* 사파리 기본 스타일 초기화 — number/select는 제외 (iOS 키패드 오작동 방지) */
-input:not([type="number"]), textarea, button { -webkit-appearance: none; }
+input:not([type="number"]):not([type="checkbox"]):not([type="radio"]), textarea, button { -webkit-appearance: none; }
 select { -webkit-appearance: auto; }
 * { -webkit-tap-highlight-color: transparent; }
 
@@ -1062,7 +1062,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.8</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.9</div>
 
   </div>
 </div>
@@ -1578,7 +1578,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.8</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.9</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1696,7 +1696,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.8</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.9</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -5120,7 +5120,7 @@ function deleteAccount(id) {
 // ══════════════════════════════════════════
 // 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.8';
+const CURRENT_SW_VERSION = 'v1.0-build1.9';
 
 async function checkVersionAndReload() {
   try {
