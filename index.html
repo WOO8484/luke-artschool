@@ -979,7 +979,7 @@ input, select, textarea, button { -webkit-appearance: none; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.3</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.4</div>
 
   </div>
 </div>
@@ -1059,7 +1059,6 @@ input, select, textarea, button { -webkit-appearance: none; }
       </div>
       <div class="tb-right">
         <div class="tb-date" id="todayInfo"></div>
-        <div class="tb-badge" id="tbBadge">루크미술학원</div>
       </div>
     </div>
 
@@ -2809,7 +2808,15 @@ function safeRender(fn, name) {
 function renderAll() {
   applySchoolName();
   const todayEl = document.getElementById('todayInfo');
-  if(todayEl) todayEl.textContent = kstDate().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  if(todayEl) {
+    const d = kstDate();
+    const days = ['일','월','화','수','목','금','토'];
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth() + 1;
+    const day = d.getUTCDate();
+    const w = days[d.getUTCDay()];
+    todayEl.textContent = `${y}년 ${m}월 ${day}일 ${w}`;
+  }
   // 출석부 날짜 — 항상 오늘(KST)로 초기화
   const attInput = document.getElementById('attDate');
   if(attInput) attInput.value = kstDateStr();
