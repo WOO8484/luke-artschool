@@ -557,6 +557,28 @@ tbody tr:hover td { background: var(--bg); }
 #fileInput { display: none; }
 
 /* SETTINGS PAGE */
+/* TOGGLE SWITCH */
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 44px; height: 24px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: var(--border-2); border-radius: 99px;
+  transition: background 0.2s;
+}
+.toggle-slider:before {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; border-radius: 50%;
+  left: 3px; top: 3px; background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--purple); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+/* SETTINGS ROW */
 .settings-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 0; border-bottom: 1px solid var(--border);
@@ -1018,7 +1040,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.8</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.9</div>
 
   </div>
 </div>
@@ -1454,6 +1476,16 @@ select { -webkit-appearance: auto; }
                 <strong>관리자 아이디</strong>
                 <span id="settingsIdDisplay"></span>
               </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-info">
+                <strong>자동 로그인</strong>
+                <span>앱 재실행 시 로그인 유지</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="autoLoginToggle" onchange="toggleAutoLogin(this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
@@ -2732,6 +2764,7 @@ function doLogin() {
     document.getElementById('sbAvatar').textContent = id.charAt(0).toUpperCase();
     document.getElementById('settingsIdDisplay').textContent = id;
     renderAll();
+    saveLoginSession(id); // 자동 로그인 세션 저장
     // 로그인 후 Firebase 자동 연결
     setTimeout(autoReconnectFirebase, 400);
   } else {
@@ -2748,6 +2781,7 @@ function doLogout() {
     _fbEventSource = null;
   }
   clearTimeout(_fbSyncTimer); clearTimeout(_fbRetryTimer);
+  clearLoginSession(); // 자동 로그인 세션 삭제
   document.getElementById('loginId').value = '';
   document.getElementById('loginPw').value = '';
   document.getElementById('loginError').textContent = '';
@@ -2862,10 +2896,11 @@ function renderAll() {
   safeRender(renderAttendance, 'attendance');
   // 설정 카드 높이 맞추기 (렌더 후 실행)
   setTimeout(matchSettingsCardHeight, 50);
+  // 자동 로그인 토글 상태 반영
+  renderAutoLoginToggle();
 }
 
-loadDb();
-// auto-login check not needed — show login screen always on open
+// loadDb는 앱 시작 시 SW load 이벤트에서 호출됨
 
 // ═══════════════════════════════════
 // DASHBOARD
@@ -4396,6 +4431,78 @@ async function resetAll(){
   saveDb();renderAll();toast('초기화되었습니다.');
 }
 
+// ══════════════════════════════════════════
+// 자동 로그인
+// ══════════════════════════════════════════
+const AUTO_LOGIN_KEY = 'luke_auto_login';
+const AUTO_LOGIN_SESSION = 'luke_session';
+
+function isAutoLoginEnabled() {
+  return _storage.getItem(AUTO_LOGIN_KEY) === 'true';
+}
+function toggleAutoLogin(enabled) {
+  _storage.setItem(AUTO_LOGIN_KEY, enabled ? 'true' : 'false');
+  if(!enabled) _storage.removeItem(AUTO_LOGIN_SESSION);
+  toast(enabled ? '자동 로그인이 켜졌습니다.' : '자동 로그인이 꺼졌습니다.');
+}
+function saveLoginSession(id) {
+  if(isAutoLoginEnabled()) {
+    _storage.setItem(AUTO_LOGIN_SESSION, id);
+  }
+}
+function clearLoginSession() {
+  _storage.removeItem(AUTO_LOGIN_SESSION);
+}
+function checkAutoLogin() {
+  if(!isAutoLoginEnabled()) return false;
+  const id = _storage.getItem(AUTO_LOGIN_SESSION);
+  if(!id) return false;
+  // 자동 로그인 실행
+  const loginScreen = document.getElementById('loginScreen');
+  const appShell    = document.getElementById('appShell');
+  loginScreen.classList.add('hidden');
+  loginScreen.style.display = 'none';
+  appShell.classList.add('visible');
+  appShell.style.visibility = 'visible';
+  document.getElementById('sbUserName').textContent = id;
+  document.getElementById('sbAvatar').textContent   = id.charAt(0).toUpperCase();
+  document.getElementById('settingsIdDisplay').textContent = id;
+  renderAll();
+  setTimeout(autoReconnectFirebase, 400);
+  return true;
+}
+function renderAutoLoginToggle() {
+  const toggle = document.getElementById('autoLoginToggle');
+  if(toggle) toggle.checked = isAutoLoginEnabled();
+}
+
+// ══════════════════════════════════════════
+// 버전 체크 — 앱 시작 시 sw.js 버전 확인 후 새 버전이면 새로고침
+// ══════════════════════════════════════════
+const CURRENT_SW_VERSION = 'luke-v2.9';
+
+async function checkVersionAndReload() {
+  try {
+    const res = await fetch('./sw.js?t=' + Date.now(), { cache: 'no-store' });
+    if(!res.ok) return;
+    const text = await res.text();
+    const match = text.match(/CACHE_VERSION\s*=\s*['"]([^'"]+)['"]/);
+    if(!match) return;
+    const remoteVersion = match[1];
+    if(remoteVersion !== CURRENT_SW_VERSION) {
+      console.log(`새 버전 감지: ${CURRENT_SW_VERSION} → ${remoteVersion}`);
+      // SW 캐시 삭제 후 새로고침
+      if('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      window.location.reload(true);
+    }
+  } catch(e) {
+    console.warn('버전 체크 실패:', e.message);
+  }
+}
+
 // 창 크기 변경 시 설정 카드 높이 재조정
 window.addEventListener('resize', () => {
   clearTimeout(window._resizeTimer);
@@ -4404,10 +4511,17 @@ window.addEventListener('resize', () => {
 
 // ── Service Worker 등록 (캐시 자동 업데이트)
 if('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', async () => {
+    // 1. 버전 체크 먼저 (새 버전 있으면 새로고침)
+    await checkVersionAndReload();
+
+    // 2. 자동 로그인 체크
+    loadDb();
+    const autoLoggedIn = checkAutoLogin();
+
+    // 3. SW 등록
     navigator.serviceWorker.register('./sw.js')
       .then(reg => {
-        // 새 버전 감지 시 즉시 활성화
         reg.addEventListener('updatefound', () => {
           const newWorker = reg.installing;
           newWorker.addEventListener('statechange', () => {
@@ -4421,6 +4535,12 @@ if('serviceWorker' in navigator) {
         });
       })
       .catch(err => console.warn('SW 등록 실패:', err));
+  });
+} else {
+  // SW 미지원 브라우저
+  window.addEventListener('load', () => {
+    loadDb();
+    checkAutoLogin();
   });
 }
 </script>
