@@ -1876,6 +1876,8 @@ function saveDb() {
   _fbIgnoreUntil = Date.now() + 5000;
   // Firebase 동기화 — _fbEventSource 연결된 경우만
   if(_fbEventSource) {
+    // dirty 섹션 없으면 전체로 처리
+    if(_dirtysections.size === 0) markAllDirty();
     clearTimeout(_fbSyncTimer);
     setFbStatus('syncing', '');
     _fbSyncTimer = setTimeout(async () => {
@@ -1913,6 +1915,18 @@ function saveDb() {
 const FB_BASE = 'https://luke-artschool-76afb-default-rtdb.asia-southeast1.firebasedatabase.app';
 const FB_PATH = '/artschool/data.json';
 const FB_URL  = FB_BASE + FB_PATH;
+
+// 항목별 경로 (충돌 방지용 분리 저장)
+const FB_SECTIONS = {
+  members:    FB_BASE + '/artschool/sections/members.json',
+  payments:   FB_BASE + '/artschool/sections/payments.json',
+  materials:  FB_BASE + '/artschool/sections/materials.json',
+  attendance: FB_BASE + '/artschool/sections/attendance.json',
+  stockLog:   FB_BASE + '/artschool/sections/stockLog.json',
+  meta:       FB_BASE + '/artschool/sections/meta.json',
+  auth:       FB_BASE + '/artschool/sections/auth.json',
+  ts:         FB_BASE + '/artschool/sections/ts.json',
+};
 
 let _fbEventSource     = null;
 let _skipNextSnapshot  = false;
@@ -2104,59 +2118,118 @@ async function restoreSnapshot(index) {
   }
 }
 
+// ── 변경된 섹션만 추적
+let _dirtysections = new Set();
+function markDirty(section) { _dirtysections.add(section); }
+
+// saveDb 호출 시 어떤 섹션이 변경됐는지 감지해서 dirty 표시
+// (기본은 전체, 특정 함수에서 명시적으로 호출 가능)
+function markAllDirty() {
+  ['members','payments','materials','attendance','stockLog','meta','auth'].forEach(s => _dirtysections.add(s));
+}
+
 async function pushToFirebase() {
   const now = Date.now();
   _fbIgnoreUntil = now + 3000;
-  await fbPut({
-    data: JSON.stringify(db),
-    updatedAt: now,
-    updatedBy: document.getElementById('sbUserName')?.textContent || 'admin'
-  });
-  // 로컬 타임스탬프도 동기화
+  const user = document.getElementById('sbUserName')?.textContent || 'admin';
+
+  // dirty 섹션이 없으면 전체 저장
+  if(_dirtysections.size === 0) markAllDirty();
+
+  const sections = Array.from(_dirtysections);
+  _dirtysections.clear();
+
+  // 섹션별 병렬 저장
+  await Promise.all(sections.map(async sec => {
+    const url = FB_SECTIONS[sec];
+    if(!url) return;
+    const payload = { data: JSON.stringify(db[sec] ?? null), updatedAt: now, updatedBy: user };
+    const res = await fetchWithTimeout(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }, 10000);
+    if(!res.ok) throw new Error('HTTP ' + res.status + ' (' + sec + ')');
+  }));
+
+  // 타임스탬프 기록 (충돌 감지용)
+  await fetchWithTimeout(FB_SECTIONS.ts, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ updatedAt: now, updatedBy: user })
+  }, 5000).catch(()=>{});
+
   _storage.setItem('luke_local_ts', now.toString());
-  // 스냅샷 저장 (초기화 직후는 건너뜀)
+
+  // 레거시 전체 경로도 유지 (구버전 호환)
+  fbPut({ data: JSON.stringify(db), updatedAt: now, updatedBy: user }).catch(()=>{});
+
   if(_skipNextSnapshot) { _skipNextSnapshot = false; }
   else { saveSnapshot().catch(e => console.warn('스냅샷:', e.message)); }
 }
 
-// ── 실시간 리스너 (Server-Sent Events)
+// ── 실시간 리스너 (Server-Sent Events) — 섹션별
 function startFirebaseListener() {
-  if(_fbEventSource) { _fbEventSource.close(); _fbEventSource = null; }
+  // 기존 리스너 전부 종료
+  if(_fbEventSource) {
+    if(Array.isArray(_fbEventSource)) _fbEventSource.forEach(s=>s.close());
+    else _fbEventSource.close();
+    _fbEventSource = null;
+  }
+
+  const myName = () => document.getElementById('sbUserName')?.textContent || 'admin';
+  let _sseErrorCount = 0;
+
+  // 타임스탬프 경로만 리스닝 — 변경 감지 후 변경된 섹션만 fetch
   try {
-    _fbEventSource = new EventSource(FB_URL);
-    _fbEventSource.addEventListener('put', e => {
-      if(Date.now() < _fbIgnoreUntil) return; // 내가 쓴 직후 무시
+    const tsSource = new EventSource(FB_SECTIONS.ts);
+    tsSource.addEventListener('put', async e => {
+      if(Date.now() < _fbIgnoreUntil) return;
       try {
         const msg = JSON.parse(e.data);
-        const remote = msg.data; // SSE put 이벤트의 data 필드
+        const remote = msg.data;
         if(!remote) return;
-        const remoteDb = typeof remote.data === 'string' ? JSON.parse(remote.data) : null;
-        if(!remoteDb) return;
         const updatedBy = remote.updatedBy || '다른 사용자';
-        const myName = document.getElementById('sbUserName')?.textContent || 'admin';
-        if(updatedBy === myName) return;
-        // 타임스탬프 비교 — 로컬이 더 최신이면 무시
-        const localTs = parseInt(_storage.getItem('luke_local_ts') || '0');
+        if(updatedBy === myName()) return;
+        const localTs  = parseInt(_storage.getItem('luke_local_ts') || '0');
         const remoteTs = remote.updatedAt || 0;
-        if(localTs > remoteTs) return;
-        db = remoteDb;
-        if(!db.attendance)      db.attendance = {};
-        if(!db.stockLog)        db.stockLog   = [];
-        if(!db.auth)            db.auth       = {id:'admin',pw:'1234'};
-        if(!db.meta)            db.meta       = {};
-        if(!db.meta.customCats) db.meta.customCats = [];
+        if(localTs >= remoteTs) return;
+
+        // 변경된 섹션들을 병렬로 fetch
+        const changed = [];
+        await Promise.all(['members','payments','materials','attendance','stockLog','meta'].map(async sec => {
+          try {
+            const res = await fetchWithTimeout(FB_SECTIONS[sec], {}, 8000);
+            if(!res.ok) return;
+            const json = await res.json();
+            if(!json) return;
+            const secTs = json.updatedAt || 0;
+            if(secTs > localTs) {
+              // 해당 섹션만 교체
+              const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
+              if(secData !== null && secData !== undefined) {
+                db[sec] = secData;
+                changed.push(sec);
+              }
+            }
+          } catch(e) { console.warn('섹션 fetch 실패:', sec, e.message); }
+        }));
+
+        if(changed.length === 0) return;
+
+        // 로컬 갱신
         _storage.setItem('luke_artschool_v2', JSON.stringify(db));
+        _storage.setItem('luke_local_ts', remoteTs.toString());
         renderAll();
-        const t = remote.updatedAt ? new Date(remote.updatedAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) : '';
+        const t = new Date(remoteTs).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
         setFbStatus('online', '동기화됨 · ' + updatedBy + ' · ' + t);
-        toast(updatedBy + '의 변경사항이 동기화되었습니다.');
+        toast(updatedBy + '의 변경사항이 동기화되었습니다. (' + changed.join(', ') + ')');
       } catch(err) { console.warn('SSE 파싱 오류:', err); }
     });
-    let _sseErrorCount = 0;
-    _fbEventSource.onerror = () => {
+
+    tsSource.onerror = () => {
       _sseErrorCount++;
       if(_sseErrorCount >= 3) {
-        // 3회 이상 오류면 완전 재연결
         _sseErrorCount = 0;
         setFbStatus('error', '');
         setTimeout(autoReconnectFirebase, 3000);
@@ -2164,9 +2237,12 @@ function startFirebaseListener() {
         setFbStatus('error', '');
       }
     };
-    _fbEventSource.onopen = () => {
+    tsSource.onopen = () => {
+      _sseErrorCount = 0;
       setFbStatus('online', '클라우드 연결됨');
     };
+
+    _fbEventSource = tsSource;
   } catch(e) {
     console.warn('SSE 시작 실패:', e);
   }
@@ -2176,17 +2252,25 @@ function startFirebaseListener() {
 async function autoReconnectFirebase() {
   setFbStatus('syncing', '연결 중...');
   try {
-
     if (!_fbSessionLoaded) {
-      // ── 최초 연결: 클라우드 ↔ 로컬 타임스탬프 비교 후 동기화
-      const remote = await fbGet();
+      // 최초 연결: 타임스탬프 비교 후 동기화
+      const tsRes = await fetchWithTimeout(FB_SECTIONS.ts, {}, 8000).catch(()=>null);
+      const tsData = tsRes?.ok ? await tsRes.json().catch(()=>null) : null;
       const localTs  = parseInt(_storage.getItem('luke_local_ts') || '0');
-      const remoteTs = remote?.updatedAt || 0;
+      const remoteTs = tsData?.updatedAt || 0;
 
-      if (remote && remote.data && remoteTs > localTs) {
-        // 클라우드가 더 최신 → 클라우드 데이터로 교체
-        const remoteDb = JSON.parse(remote.data);
-        db = remoteDb;
+      if(tsData && remoteTs > localTs) {
+        // 클라우드가 더 최신 → 섹션별로 fetch해서 병합
+        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth'].map(async sec => {
+          try {
+            const res = await fetchWithTimeout(FB_SECTIONS[sec], {}, 8000);
+            if(!res.ok) return;
+            const json = await res.json();
+            if(!json) return;
+            const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
+            if(secData !== null && secData !== undefined) db[sec] = secData;
+          } catch(e) { console.warn('섹션 로드 실패:', sec); }
+        }));
         if(!db.attendance)      db.attendance = {};
         if(!db.stockLog)        db.stockLog   = [];
         if(!db.auth)            db.auth       = {id:'admin',pw:'1234'};
@@ -2196,17 +2280,14 @@ async function autoReconnectFirebase() {
         _storage.setItem('luke_local_ts', remoteTs.toString());
         renderAll();
       } else {
-        // 로컬이 최신 → 클라우드에 업로드
+        // 로컬이 최신 → 전체 섹션 업로드
+        markAllDirty();
         await pushToFirebase();
       }
       _fbSessionLoaded = true;
-
-    } else {
-      // ── 재연결: SSE 리스너만 재시작 (db 절대 덮어쓰지 않음)
-      // 세션 중 변경된 데이터는 이미 pushToFirebase로 클라우드에 올라가 있음
     }
 
-    // SSE 리스너 재시작 (초기 이벤트 3초 차단)
+    // SSE 리스너 재시작
     _fbIgnoreUntil = Date.now() + 3000;
     startFirebaseListener();
 
@@ -2222,18 +2303,16 @@ async function autoReconnectFirebase() {
     if(isPermission) {
       setFbStatus('error', 'Rules 설정 필요');
       toast('Firebase Rules를 설정해주세요.', true);
-      return; // Rules 오류는 재시도 불필요
+      return;
     }
     console.warn('Firebase 연결 실패:', e.message);
 
-    // 자동 재시도 (최대 10회)
     if(_fbRetryCount < FB_MAX_RETRY) {
       const delay = FB_RETRY_DELAYS[_fbRetryCount] || 60;
       _fbRetryCount++;
       let remaining = delay;
       setFbStatus('error', `연결 실패 — ${delay}초 후 재시도 (${_fbRetryCount}/${FB_MAX_RETRY})`);
 
-      // 카운트다운 표시
       clearTimeout(_fbRetryTimer);
       const countdown = setInterval(() => {
         remaining--;
