@@ -1081,7 +1081,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.2</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.3</div>
 
   </div>
 </div>
@@ -1399,8 +1399,8 @@ select { -webkit-appearance: auto; }
         <div id="att-tab-daily">
         <div class="two-col" style="align-items:stretch;">
           <!-- 출석 체크 -->
-          <div class="card" style="display:flex;flex-direction:column;">
-            <div class="card-header" style="flex-wrap:wrap;gap:8px;align-items:center;">
+          <div class="card" style="display:flex;flex-direction:column;min-height:400px;">
+            <div class="card-header" style="flex-wrap:wrap;gap:8px;align-items:center;flex-shrink:0;">
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1;">
                 <div class="card-title" style="margin-right:4px;">출석 체크</div>
               </div>
@@ -1419,7 +1419,7 @@ select { -webkit-appearance: auto; }
             <div id="attList" style="flex:1;"></div>
           </div>
           <!-- 수업일수 진행률 -->
-          <div class="card" style="display:flex;flex-direction:column;">
+          <div class="card" style="display:flex;flex-direction:column;min-height:400px;">
             <div class="card-header">
               <div class="card-title">이달 수업 현황</div>
               <div class="card-subtitle" id="attStatsMonthLabel"></div>
@@ -1521,9 +1521,9 @@ select { -webkit-appearance: auto; }
           </div>
 
           <div id="fbConfigSection">
-            <!-- 연결된 프로젝트 -->
+            <!-- 연결 상태 표시 -->
             <div class="form-group full" style="margin-bottom:14px;">
-              <label class="form-label">연결된 프로젝트</label>
+              <label class="form-label">연결 상태</label>
               <input type="text" class="form-input" id="fbConfigInput"
                 value="luke-artschool-76afb" readonly style="background:var(--bg);color:var(--muted);">
             </div>
@@ -1680,7 +1680,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.2</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.3</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2062,7 +2062,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.2</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.3</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2086,7 +2086,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.2</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.3</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -2438,7 +2438,7 @@ select { -webkit-appearance: auto; }
       </div>
       <div class="form-group">
         <label class="form-label">생일 🎂</label>
-        <input type="date" class="form-input" id="mBirthday">
+        <input type="date" class="form-input" id="mBirthday" style="width:100%;">
       </div>
       <div class="form-group">
         <label class="form-label">보호자 연락처</label>
@@ -3189,6 +3189,9 @@ async function restoreSnapshot(index) {
     else                { dateMsg = '동일한 시점의 데이터입니다.'; }
   }
 
+  // 이력 모달 먼저 닫고 비밀번호 확인 모달 열기
+  closeHistoryModal();
+
   openPwConfirmModal({
     title: '버전 이력 복구',
     desc: '선택한 시점의 데이터로 되돌립니다',
@@ -3418,7 +3421,7 @@ async function autoReconnectFirebase() {
     const btn = document.getElementById('fbDisconnectBtn');
     if(btn) btn.style.display = 'inline-flex';
     const inp = document.getElementById('fbConfigInput');
-    if(inp) inp.value = '✅ 연결됨 — luke-artschool-76afb';
+    if(inp) inp.value = '☁️ 클라우드 연결됨 — luke-artschool-76afb';
   } catch(e) {
     const isPermission = e.message.includes('403') || e.message.includes('PERMISSION');
     const isFileProtocol = location.protocol === 'file:';
@@ -6042,7 +6045,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build0.2';
+const CURRENT_SW_VERSION = 'v1.0-build0.3';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
