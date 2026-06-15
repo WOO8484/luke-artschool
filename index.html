@@ -1064,7 +1064,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.3</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.0</div>
 
   </div>
 </div>
@@ -1200,7 +1200,7 @@ select { -webkit-appearance: auto; }
             <div class="flex-center gap-8 flex-wrap">
               <div class="search-wrap" style="position:relative;">
                 <span class="ti ti-search" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted-2);pointer-events:none;line-height:1;z-index:1;"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="7"/><path d="m21 21-6-6"/></svg></span>
-                <input class="form-input" style="width:200px;padding-left:36px;" type="text" id="memberSearch" placeholder="이름 · 연락처" oninput="renderMembers()">
+                <input class="form-input" style="width:200px;padding-left:36px;" type="text" id="memberSearch" placeholder="이름 · 연락처 · 수강과정 · 메모" oninput="renderMembers()">
               </div>
               <select class="form-input" id="memberStatusFilter" onchange="renderMembers()" style="width:100px;">
                 <option value="">전체</option>
@@ -1373,6 +1373,7 @@ select { -webkit-appearance: auto; }
           <button class="tuition-tab active" id="atab-daily" onclick="switchAttTab('daily')">일별 출석 체크</button>
           <button class="tuition-tab" id="atab-calendar" onclick="switchAttTab('calendar')">📅 월별 달력</button>
           <button class="tuition-tab" id="atab-rank" onclick="switchAttTab('rank')">🏅 출석률 순위</button>
+          <button class="tuition-tab" id="atab-bulk" onclick="switchAttTab('bulk')">📋 날짜 범위 일괄</button>
         </div>
         <div id="att-tab-daily">
         <div class="two-col" style="align-items:stretch;">
@@ -1428,6 +1429,57 @@ select { -webkit-appearance: auto; }
           <div class="card">
             <div class="card-header"><div class="card-title">이달 출석률 순위</div><div class="card-subtitle" id="rankMonthLabel"></div></div>
             <div id="attRank"></div>
+          </div>
+        </div>
+
+        <!-- 날짜 범위 일괄 처리 탭 -->
+        <div id="att-tab-bulk" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">날짜 범위 일괄 처리</div><div class="card-subtitle">방학·휴강·공휴일 등 기간 전체를 한 번에 처리합니다</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+              <div class="form-group">
+                <label class="form-label">시작일</label>
+                <input type="date" class="form-input" id="bulkAttFrom">
+              </div>
+              <div class="form-group">
+                <label class="form-label">종료일</label>
+                <input type="date" class="form-input" id="bulkAttTo">
+              </div>
+            </div>
+            <div style="margin-bottom:16px;">
+              <label class="form-label">처리 유형</label>
+              <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypePresent')">
+                  <input type="radio" name="bulkAttType" id="bulkTypePresent" value="present" checked style="accent-color:var(--teal);">
+                  <span class="perm-label" style="color:var(--teal);">출석 처리</span>
+                </label>
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypeAbsent')">
+                  <input type="radio" name="bulkAttType" id="bulkTypeAbsent" value="absent" style="accent-color:var(--coral);">
+                  <span class="perm-label" style="color:var(--coral);">결석 처리</span>
+                </label>
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypeClear')">
+                  <input type="radio" name="bulkAttType" id="bulkTypeClear" value="clear" style="accent-color:var(--muted);">
+                  <span class="perm-label">기록 초기화</span>
+                </label>
+              </div>
+            </div>
+            <div style="margin-bottom:16px;">
+              <label class="form-label">대상 회원</label>
+              <div style="display:flex;gap:8px;margin-top:6px;">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;" onclick="document.getElementById('bulkTargetAll').checked=true">
+                  <input type="radio" name="bulkTarget" id="bulkTargetAll" value="all" checked>
+                  <span class="perm-label">전체 재원 회원</span>
+                </label>
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;" onclick="document.getElementById('bulkTargetSelect').checked=true">
+                  <input type="radio" name="bulkTarget" id="bulkTargetSelect" value="select">
+                  <span class="perm-label">회원 직접 선택</span>
+                </label>
+              </div>
+              <div id="bulkMemberSelect" style="display:none;margin-top:10px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-md);padding:8px;"></div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="applyBulkAtt()">일괄 적용</button>
           </div>
         </div>
       </div>
@@ -1494,6 +1546,14 @@ select { -webkit-appearance: auto; }
               <input type="text" class="form-input" id="schoolNameInput" placeholder="학원 이름 입력" style="flex:1;">
               <button id="btnSaveSchool" class="btn btn-primary" onclick="saveSchoolName()">저장</button>
             </div>
+            <div class="settings-row">
+              <div class="settings-row-info"><strong>원비 납부 마감일</strong><span>매월 며칠까지 납부해야 하는지 설정</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" class="form-input" id="payDueDayInput" min="1" max="31" placeholder="10" style="width:70px;text-align:center;">
+                <span style="font-size:13px;color:var(--muted);">일</span>
+                <button class="btn btn-sm btn-primary" onclick="savePayDueDay()">저장</button>
+              </div>
+            </div>
             <div class="card-header" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border);"><div class="card-title">계정 관리</div></div>
             <div class="settings-row">
               <div class="settings-row-info">
@@ -1558,6 +1618,13 @@ select { -webkit-appearance: auto; }
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
+                <strong>엑셀 내보내기</strong>
+                <span>회원·원비·출결·자재·통계 5개 시트</span>
+              </div>
+              <button class="btn btn-sm btn-outline" onclick="exportExcel()" style="color:var(--teal);border-color:var(--teal);">📊 내보내기</button>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-info">
                 <strong>수동 백업</strong>
                 <span>지금 즉시 JSON 파일로 저장합니다</span>
               </div>
@@ -1581,13 +1648,23 @@ select { -webkit-appearance: auto; }
             <!-- 구분선 -->
             <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
 
-            <!-- 프로그램 버전 -->
+            <!-- 활동 로그 -->
+            <div class="settings-row" style="margin-bottom:8px;">
+              <div class="settings-row-info">
+                <strong>관리자 활동 로그</strong>
+                <span>최근 500건의 주요 작업 이력</span>
+              </div>
+              <button class="btn btn-sm btn-outline" onclick="openActivityLogModal()">📋 로그 보기</button>
+            </div>
+
+            <!-- 구분선 -->
+            <div style="border-top:1px solid var(--border);margin:16px 0;"></div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.3</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.0</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1691,6 +1768,35 @@ select { -webkit-appearance: auto; }
   </div>
 </div>
 
+<!-- ══════════ 활동 로그 모달 ══════════ -->
+<div class="modal-overlay" id="activityLogModal">
+  <div class="modal" style="width:620px;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="modal-header" style="flex-shrink:0;">
+      <div>
+        <div class="modal-title">관리자 활동 로그</div>
+        <div class="card-subtitle" id="activityLogCount"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" class="form-input" id="activityLogSearch" placeholder="검색..." style="width:140px;" oninput="renderActivityLog()">
+        <button class="modal-close" onclick="closeActivityLogModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead style="position:sticky;top:0;background:var(--surface);z-index:1;">
+          <tr>
+            <th style="padding:8px 12px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">일시</th>
+            <th style="padding:8px 12px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">처리자</th>
+            <th style="padding:8px 12px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">작업</th>
+            <th style="padding:8px 12px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">상세</th>
+          </tr>
+        </thead>
+        <tbody id="activityLogBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- 업데이트 이력 모달 -->
 <div class="modal-overlay" id="updateHistoryModal">
   <div class="modal" style="width:600px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -1705,7 +1811,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.3</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.0</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -1727,25 +1833,37 @@ select { -webkit-appearance: auto; }
       <!-- ── 탭1: 업데이트 이력 ── -->
       <div id="uhPanel1">
 
+        <!-- v2.0 신규 기능 -->
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.0</span>
+            <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
+            <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>로그인 실패 5회 시 5분 자동 잠금</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 검색 범위 확장 — 이름·연락처 외 수강과정·메모·학년까지</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>수강 이력 관리 — 과정 변경 시 일시·처리자와 함께 자동 기록, 회원 상세에서 확인</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>원비 납부 마감일 설정 — 미납 목록에 D-day 자동 표시</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>출결 날짜 범위 일괄 처리 — 방학·휴강·공휴일 기간 출석/결석/초기화</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>관리자 활동 로그 — 회원 등록·원비 수납·출결 등 최근 500건 기록</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>엑셀 내보내기 — 회원·원비·출결·자재·월별통계 5개 시트 xlsx 파일</li>
+          </ul>
+        </div>
+
         <!-- v1.0 최초 출시 -->
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.3</span>
+            <span style="background:var(--ink-3);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
-            <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최초 출시</span>
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 통합 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화 (Firebase)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>다중 계정 — 관리자 · 원장 · 실장 · 강사 직책별 계정 생성</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>세분화된 권한 제어 — 8개 항목 개별 부여, 버튼·기능 단위까지 적용</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>권한별 대시보드 — 접근 가능한 통계·카드·차트만 표시</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>비밀번호 SHA-256 해싱 저장 (평문 저장 없음)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>세션 로그인 — 새로고침 시 유지, 탭 닫으면 자동 로그아웃</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>납부 · 입출고 이력에 처리자 이름 자동 기록</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>홈 화면 앱 추가 지원 — PWA (아이콘 · 오프라인 캐시)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>대시보드 통계 · 차트 · 생일 알림 · 장기결석 알림</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>앱 시작 시 자동 버전 체크 및 업데이트</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 통합 관리</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화 (Firebase)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>다중 계정 — 관리자·원장·실장·강사 직책별 계정 생성</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>8개 항목 개별 권한 제어 · 권한별 맞춤 대시보드</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>비밀번호 SHA-256 해싱 · 세션 로그인 · PWA 홈 화면 추가</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>납부·입출고 이력 처리자 기록 · 대시보드 통계·차트·알림</li>
           </ul>
         </div>
 
@@ -1783,7 +1901,8 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 수강 카테고리 분류 (커스텀 가능)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 회원별 상세 정보 — 연락처 / 등록일 / 메모</li>
             <li style="font-size:13px;color:var(--ink-3);">• 재원 / 탈퇴 회원 구분 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 이름 / 연락처 검색 및 필터</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 검색 범위 확장 — 이름·연락처·수강과정·메모·학년</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 수강 이력 관리 — 과정 변경 시 일시·처리자 자동 기록</li>
           </ul>
         </div>
 
@@ -1799,6 +1918,7 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 납부 방법 기록 (현금 / 계좌이체 / 카드)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 월별 총 수입 / 납부율 통계</li>
             <li style="font-size:13px;color:var(--ink-3);">• 미납자 목록 한눈에 확인</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 납부 마감일 설정 — 미납 목록 D-day 자동 표시</li>
             <li style="font-size:13px;color:var(--teal);">✓ 납부 이력에 처리자 이름 자동 기록</li>
           </ul>
         </div>
@@ -1815,6 +1935,7 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 달력 뷰 — 월간 출결 현황 시각화</li>
             <li style="font-size:13px;color:var(--ink-3);">• 출석률 순위 — 회원별 출석률 랭킹</li>
             <li style="font-size:13px;color:var(--ink-3);">• 기간별 출결 통계 요약</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 날짜 범위 일괄 처리 — 방학·휴강·공휴일 출석/결석/초기화</li>
           </ul>
         </div>
 
@@ -1849,6 +1970,7 @@ select { -webkit-appearance: auto; }
             <li style="font-size:13px;color:var(--ink-3);">• 직책 선택 시 권한 자동 템플릿 적용 (수정 가능)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 비밀번호 SHA-256 해싱 저장</li>
             <li style="font-size:13px;color:var(--ink-3);">• 세션 로그인 — 새로고침 유지, 탭 닫으면 자동 로그아웃</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 로그인 실패 5회 시 5분 자동 잠금</li>
           </ul>
         </div>
 
@@ -1861,11 +1983,13 @@ select { -webkit-appearance: auto; }
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:5px;padding-left:28px;">
             <li style="font-size:13px;color:var(--ink-3);">• Firebase 클라우드 실시간 동기화</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 학원 이름 설정</li>
-            <li style="font-size:13px;color:var(--ink-3);">• 데이터 백업 (JSON 파일 저장) / 복원</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 학원 이름 설정 · 원비 납부 마감일 설정</li>
+            <li style="font-size:13px;color:var(--ink-3);">• 데이터 백업 (JSON) / 복원</li>
             <li style="font-size:13px;color:var(--ink-3);">• 버전 이력 복구 (최근 10개 시점)</li>
             <li style="font-size:13px;color:var(--ink-3);">• 전체 데이터 초기화</li>
             <li style="font-size:13px;color:var(--ink-3);">• 자동 버전 체크 및 업데이트</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 엑셀 내보내기 — 회원·원비·출결·자재·통계 5개 시트</li>
+            <li style="font-size:13px;color:var(--teal);">✓ 관리자 활동 로그 — 최근 500건 작업 이력 조회</li>
           </ul>
         </div>
 
@@ -2265,8 +2389,25 @@ select { -webkit-appearance: auto; }
 const _storage = (() => {
   try { localStorage.setItem('_test','1'); localStorage.removeItem('_test'); return localStorage; }
   catch(e) {
+    // 개인정보보호 모드 등 localStorage 차단 시 인메모리 폴백
+    // ⚠️ 이 경우 새로고침/탭 닫으면 데이터가 초기화됩니다
+    console.warn('[루크] localStorage 사용 불가 — 인메모리 모드로 동작합니다. 탭을 닫으면 데이터가 유실될 수 있습니다.');
     const mem = {};
     return { getItem: k=>mem[k]||null, setItem:(k,v)=>{mem[k]=v;}, removeItem: k=>{delete mem[k];} };
+  }
+})();
+
+// localStorage 차단 여부 감지 후 경고 배너 표시
+(function checkStorageAvailable() {
+  try { localStorage.setItem('_test2','1'); localStorage.removeItem('_test2'); }
+  catch(e) {
+    // DOM 로드 후 배너 삽입
+    window.addEventListener('DOMContentLoaded', () => {
+      const banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#E74C3C;color:#fff;text-align:center;padding:10px 16px;font-size:13px;font-weight:600;';
+      banner.textContent = '⚠️ 저장소 사용 불가 (개인정보보호 모드): 탭을 닫으면 모든 데이터가 사라집니다. 일반 모드에서 사용해주세요.';
+      document.body.prepend(banner);
+    });
   }
 })();
 
@@ -2308,19 +2449,22 @@ function loadDb() {
   if (!db.materials)  db.materials  = [];
   if (!db.attendance) db.attendance = {};
   // ── auth 구조 마이그레이션: 구버전 { id, pw } → 신버전 { accounts: [...] }
-  if (!db.auth) db.auth = { accounts: [{ id:'admin', pw:'1234', name:'관리자', title:'관리자', role:'admin', permissions: PERM_ALL }] };
+  // ※ PERM_ALL은 아래 선언되므로 여기서는 직접 배열 사용 (호이스팅 방지)
+  const _ALL_PERMS = ['members','payments','payments_view','materials','materials_view','attendance','backup','settings'];
+  if (!db.auth) db.auth = { accounts: [{ id:'admin', pw:'1234', name:'관리자', title:'관리자', role:'admin', permissions: _ALL_PERMS }] };
   if (!db.auth.accounts) {
-    db.auth = { accounts: [{ id: db.auth.id || 'admin', pw: db.auth.pw || '1234', name: '관리자', title:'관리자', role: 'admin', permissions: PERM_ALL }] };
+    db.auth = { accounts: [{ id: db.auth.id || 'admin', pw: db.auth.pw || '1234', name: '관리자', title:'관리자', role: 'admin', permissions: _ALL_PERMS }] };
   }
   // ── 기존 계정에 permissions / title 필드 없으면 추가
   db.auth.accounts.forEach(acc => {
-    if (!acc.permissions) acc.permissions = acc.role === 'admin' || acc.role === 'owner' ? PERM_ALL : PERM_TEMPLATES['강사'];
-    if (!acc.title) acc.title = acc.role === 'admin' || acc.role === 'owner' ? '원장' : '강사';
+    if (!acc.permissions) acc.permissions = (acc.role === 'admin' || acc.role === 'owner') ? _ALL_PERMS : ['attendance'];
+    if (!acc.title) acc.title = (acc.role === 'admin' || acc.role === 'owner') ? '원장' : '강사';
     if (!acc.role) acc.role = 'staff';
   });
   if (!db.meta)       db.meta = {};
   if (!db.meta.customCats) db.meta.customCats = [];
   if (!db.stockLog) db.stockLog = [];
+  if (!db.activityLog) db.activityLog = [];
   // 로컬 타임스탬프 없으면 초기화
   if (!_storage.getItem('luke_local_ts')) _storage.setItem('luke_local_ts', '0');
   // 초기 로드 시 재고 재계산 — 이력 기반으로 재고 불일치 방지
@@ -2642,6 +2786,49 @@ function closeHistoryModal() {
   document.getElementById('historyModal').classList.remove('open');
 }
 
+// ══════════════════════════════════════════
+// 활동 로그
+// ══════════════════════════════════════════
+const ACTION_BADGE = {
+  '회원 등록':   'badge-teal',   '회원 수정':   'badge-purple',
+  '회원 삭제':   'badge-coral',  '원비 수납':   'badge-teal',
+  '미납 처리':   'badge-gray',   '전체 납부':   'badge-teal',
+  '자재 입출고': 'badge-amber',  '자재 등록':   'badge-purple',
+  '자재 삭제':   'badge-coral',  '출결 저장':   'badge-teal',
+  '일괄 출결':   'badge-amber',  '데이터 복원': 'badge-coral',
+  '계정 추가':   'badge-purple', '계정 수정':   'badge-gray',
+  '계정 삭제':   'badge-coral',  '엑셀 내보내기':'badge-teal',
+};
+
+function openActivityLogModal() {
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  document.getElementById('activityLogSearch').value = '';
+  renderActivityLog();
+  document.getElementById('activityLogModal').classList.add('open');
+}
+function closeActivityLogModal() {
+  document.getElementById('activityLogModal').classList.remove('open');
+}
+function renderActivityLog() {
+  const q = document.getElementById('activityLogSearch').value.toLowerCase().trim();
+  const logs = (db.activityLog || []).filter(l =>
+    !q || l.action.includes(q) || (l.detail||'').toLowerCase().includes(q) || (l.by||'').includes(q)
+  );
+  document.getElementById('activityLogCount').textContent = `총 ${logs.length}건`;
+  const tbody = document.getElementById('activityLogBody');
+  if (!logs.length) {
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state" style="padding:24px;">기록이 없습니다</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = logs.map(l => `
+    <tr style="border-bottom:1px solid var(--border-2);">
+      <td style="padding:8px 12px;font-size:11.5px;color:var(--muted);white-space:nowrap;">${l.date}<br><span style="font-size:10.5px;">${l.time||''}</span></td>
+      <td style="padding:8px 12px;font-size:12px;font-weight:600;">${l.by||'-'}</td>
+      <td style="padding:8px 12px;"><span class="badge ${ACTION_BADGE[l.action]||'badge-gray'}" style="font-size:10.5px;">${l.action}</span></td>
+      <td style="padding:8px 12px;font-size:12px;color:var(--muted);">${l.detail||'-'}</td>
+    </tr>`).join('');
+}
+
 function openUpdateHistoryModal() {
   document.getElementById('updateHistoryModal').classList.add('open');
   switchUhTab(1); // 열 때마다 이력 탭으로 초기화
@@ -2724,9 +2911,27 @@ async function restoreSnapshot(index) {
         db = restored;
         if(!db.attendance)      db.attendance = {};
         if(!db.stockLog)        db.stockLog   = [];
-        if(!db.auth)            db.auth       = {id:'admin', pw:'1234'};
         if(!db.meta)            db.meta       = {};
         if(!db.meta.customCats) db.meta.customCats = [];
+        // ★ auth 구조 보정 — 구버전 스냅샷 대응
+        if(!db.auth) db.auth = { accounts: [] };
+        if(!db.auth.accounts) db.auth = { accounts: [{ id: db.auth.id||'admin', pw: db.auth.pw||'1234', name:'관리자', title:'관리자', role:'admin', permissions: ['members','payments','payments_view','materials','materials_view','attendance','backup','settings'] }] };
+        // ★ 현재 로그인 계정 보존 — 복구 후 자기 자신이 잠기는 것 방지
+        if (_currentUser) {
+          const myId = _currentUser.id;
+          const existsInSnap = db.auth.accounts.some(a => a.id === myId);
+          if (!existsInSnap) {
+            // 현재 로컬 스토리지에서 현재 계정 원본 복원
+            const localDbStr = _storage.getItem('luke_artschool_v2');
+            if (localDbStr) {
+              try {
+                const localDb = JSON.parse(localDbStr);
+                const myAcc = (localDb.auth?.accounts || []).find(a => a.id === myId);
+                if (myAcc) db.auth.accounts.push(myAcc);
+              } catch(e) {}
+            }
+          }
+        }
         markAllDirty();
         // ★ 복구 직후 타임스탬프 강제 최신화 — SSE가 클라우드 데이터로 롤백하는 것 방지
         const nowTs = Date.now();
@@ -2819,7 +3024,7 @@ function startFirebaseListener() {
 
         // 변경된 섹션들을 병렬로 fetch
         const changed = [];
-        await Promise.all(['members','payments','materials','attendance','stockLog','meta'].map(async sec => {
+        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth'].map(async sec => {
           try {
             const res = await fetchWithTimeout(FB_SECTIONS[sec], {}, 8000);
             if(!res.ok) return;
@@ -2891,7 +3096,8 @@ async function autoReconnectFirebase() {
         }));
         if(!db.attendance)      db.attendance = {};
         if(!db.stockLog)        db.stockLog   = [];
-        if(!db.auth)            db.auth       = {id:'admin',pw:'1234'};
+        if(!db.auth)            db.auth       = { accounts: [{ id:'admin', pw:'1234', name:'관리자', title:'관리자', role:'admin', permissions: (typeof PERM_ALL!=='undefined'?PERM_ALL:['members','payments','payments_view','materials','materials_view','attendance','backup','settings']) }] };
+        if(!db.auth.accounts)   db.auth       = { accounts: [{ id: db.auth.id||'admin', pw: db.auth.pw||'1234', name:'관리자', title:'관리자', role:'admin', permissions: (typeof PERM_ALL!=='undefined'?PERM_ALL:['members','payments','payments_view','materials','materials_view','attendance','backup','settings']) }] };
         if(!db.meta)            db.meta       = {};
         if(!db.meta.customCats) db.meta.customCats = [];
         _storage.setItem('luke_artschool_v2', JSON.stringify(db));
@@ -2918,9 +3124,25 @@ async function autoReconnectFirebase() {
     if(inp) inp.value = '✅ 연결됨 — luke-artschool-76afb';
   } catch(e) {
     const isPermission = e.message.includes('403') || e.message.includes('PERMISSION');
+    const isFileProtocol = location.protocol === 'file:';
     if(isPermission) {
       setFbStatus('error', 'Rules 설정 필요');
-      toast('Firebase Rules를 설정해주세요.', true);
+      toast('Firebase Rules를 공개(read/write: true)로 설정하거나, 인증 규칙을 확인하세요.', true);
+      const diagEl = document.getElementById('fbDiagResult');
+      if(diagEl) {
+        diagEl.style.display = 'block';
+        diagEl.innerHTML = '❌ Firebase 권한 오류 (403)<br>→ Firebase 콘솔 → Realtime Database → Rules 탭에서<br><code>{ "rules": { ".read": true, ".write": true } }</code> 로 설정 후 게시하세요.<br>⚠️ 보안 주의: 실서비스에서는 반드시 인증 기반 Rules로 변경하세요.';
+      }
+      return;
+    }
+    if(isFileProtocol) {
+      setFbStatus('error', 'file:// 미지원');
+      toast('Firebase는 file:// 프로토콜에서 동작하지 않습니다. 웹서버(http://)를 통해 접속하세요.', true);
+      const diagEl = document.getElementById('fbDiagResult');
+      if(diagEl) {
+        diagEl.style.display = 'block';
+        diagEl.innerHTML = '⚠️ file:// 프로토콜 감지됨<br>Firebase REST API는 CORS 정책으로 인해 <b>file://</b> 에서 동작하지 않습니다.<br>→ 웹서버를 통해 접속하세요. (예: http://localhost 또는 실제 도메인)<br>로컬 테스트: <code>npx serve .</code> 또는 <code>python -m http.server</code>';
+      }
       return;
     }
     console.warn('Firebase 연결 실패:', e.message);
@@ -2967,9 +3189,12 @@ async function testFirebaseConnection() {
       const data = await res.text();
       lines.push('✅ 데이터 수신: ' + data.slice(0,80));
       lines.push('🎉 연결 성공! Rules 확인 완료');
+      lines.push('⚠️ 보안 주의: 현재 DB가 인증 없이 공개되어 있습니다.');
+      lines.push('→ 실서비스에서는 Firebase Auth 기반 Rules 적용을 권장합니다.');
     } else if(res.status === 401 || res.status === 403) {
-      lines.push('❌ 권한 오류: Rules 미설정 or 미게시');
-      lines.push('→ Firebase 콘솔에서 Rules 게시 확인');
+      lines.push('❌ 권한 오류 ('+res.status+'): Rules 미설정 또는 미게시');
+      lines.push('→ Firebase 콘솔 → Realtime Database → Rules 탭에서');
+      lines.push('→ { "rules": { ".read": true, ".write": true } } 로 설정 후 게시');
     } else {
       lines.push('❌ 오류: ' + res.status);
     }
@@ -2977,7 +3202,8 @@ async function testFirebaseConnection() {
     lines.push('❌ fetch 실패: ' + e.message);
     if(location.protocol === 'file:') {
       lines.push('⚠️ file:// 프로토콜에서 CORS 차단됨');
-      lines.push('→ 아래 해결 방법 확인 필요');
+      lines.push('→ 웹서버(http://)를 통해 접속하세요.');
+      lines.push('→ 로컬 테스트: npx serve . 또는 python -m http.server');
     }
   }
 
@@ -3049,6 +3275,20 @@ const PERM_TEMPLATES = {
 };
 
 // 권한 체크 헬퍼
+// ── 활동 로그 기록 헬퍼 (최대 500건 유지)
+function logActivity(action, detail = '') {
+  if (!db.activityLog) db.activityLog = [];
+  db.activityLog.unshift({
+    id: 'AL' + Date.now(),
+    date: kstDateStr(),
+    time: new Date().toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' }),
+    by: _currentUser?.name || '시스템',
+    action,
+    detail,
+  });
+  if (db.activityLog.length > 500) db.activityLog.length = 500;
+}
+
 function hasPerm(perm) {
   if (!_currentUser) return false;
   if (_currentUser.role === 'admin') return true; // 관리자는 항상 전체
@@ -3072,12 +3312,42 @@ async function migratePwIfNeeded() {
   if (changed) { markDirty('auth'); saveDb(); }
 }
 
+// ── 로그인 실패 제한 (5회 실패 시 5분 잠금)
+const LOGIN_FAIL_KEY  = 'luke_login_fail';
+const LOGIN_LOCK_KEY  = 'luke_login_lock';
+const MAX_FAIL = 5;
+const LOCK_MS  = 5 * 60 * 1000; // 5분
+
+function getLoginFailInfo() {
+  try {
+    return {
+      count: parseInt(sessionStorage.getItem(LOGIN_FAIL_KEY) || '0'),
+      lockUntil: parseInt(sessionStorage.getItem(LOGIN_LOCK_KEY) || '0'),
+    };
+  } catch(e) { return { count:0, lockUntil:0 }; }
+}
+function resetLoginFail() {
+  try { sessionStorage.removeItem(LOGIN_FAIL_KEY); sessionStorage.removeItem(LOGIN_LOCK_KEY); } catch(e) {}
+}
+
 async function doLogin() {
+  const errorEl = document.getElementById('loginError');
+  const { count, lockUntil } = getLoginFailInfo();
+
+  // 잠금 상태 확인
+  if (lockUntil && Date.now() < lockUntil) {
+    const remain = Math.ceil((lockUntil - Date.now()) / 1000);
+    const m = Math.floor(remain / 60), s = remain % 60;
+    errorEl.textContent = `로그인 ${MAX_FAIL}회 실패로 ${m}분 ${s}초 후 다시 시도하세요.`;
+    return;
+  }
+
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPw').value;
   const hashed = await sha256(pw);
   const acc = (db.auth.accounts || []).find(a => a.id === id && a.pw === hashed);
   if (acc) {
+    resetLoginFail();
     _currentUser = { id: acc.id, name: acc.name || acc.id, title: acc.title || '', role: acc.role || 'staff', permissions: acc.permissions || [] };
     const loginScreen = document.getElementById('loginScreen');
     const appShell = document.getElementById('appShell');
@@ -3088,12 +3358,20 @@ async function doLogin() {
     document.getElementById('sbUserName').textContent = acc.name || acc.id;
     document.getElementById('sbAvatar').textContent = (acc.name || acc.id).charAt(0).toUpperCase();
     document.getElementById('settingsIdDisplay').textContent = acc.id;
-    applyRoleUI(); // 역할에 따른 UI 제한 적용
+    applyRoleUI();
     renderAll();
     saveLoginSession(acc.id);
     setTimeout(autoReconnectFirebase, 400);
   } else {
-    document.getElementById('loginError').textContent = '아이디 또는 비밀번호가 올바르지 않습니다.';
+    const newCount = count + 1;
+    try { sessionStorage.setItem(LOGIN_FAIL_KEY, newCount.toString()); } catch(e) {}
+    if (newCount >= MAX_FAIL) {
+      const lockUntilTime = Date.now() + LOCK_MS;
+      try { sessionStorage.setItem(LOGIN_LOCK_KEY, lockUntilTime.toString()); } catch(e) {}
+      errorEl.textContent = `로그인 ${MAX_FAIL}회 실패로 5분간 잠금됩니다.`;
+    } else {
+      errorEl.textContent = `아이디 또는 비밀번호가 올바르지 않습니다. (${newCount}/${MAX_FAIL})`;
+    }
     document.getElementById('loginPw').value = '';
     document.getElementById('loginPw').focus();
   }
@@ -3270,10 +3548,9 @@ function renderAll() {
   safeRender(renderAttendance, 'attendance');
   // 설정 카드 높이 맞추기 (렌더 후 실행)
   setTimeout(matchSettingsCardHeight, 50);
-  // 자동 로그인 토글 상태 반영
   renderAutoLoginToggle();
-  // 계정 목록 렌더
   renderAccountList();
+  applyPayDueDayInput();
 }
 
 // loadDb는 앱 시작 시 SW load 이벤트에서 호출됨
@@ -3422,10 +3699,12 @@ function renderDashboard() {
 // MEMBERS
 // ═══════════════════════════════════
 function renderMembers() {
-  const q = document.getElementById('memberSearch').value.toLowerCase();
+  const q = document.getElementById('memberSearch').value.toLowerCase().trim();
   const sf = document.getElementById('memberStatusFilter').value;
   const filtered = db.members.filter(m =>
-    (!q || m.name.includes(q) || (m.phone||'').includes(q)) &&
+    (!q || m.name.toLowerCase().includes(q) || (m.phone||'').includes(q) ||
+     (m.course||'').toLowerCase().includes(q) || (m.memo||'').toLowerCase().includes(q) ||
+     (m.grade||'').toLowerCase().includes(q)) &&
     (!sf || m.status === sf)
   ).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   document.getElementById('memberSubtitle').textContent = `총 ${filtered.length}명`;
@@ -3520,13 +3799,29 @@ function saveMember() {
   };
   if (editMemberId) {
     const i = db.members.findIndex(m=>m.id===editMemberId);
-    db.members[i] = { ...db.members[i], ...data };
+    const prev = db.members[i];
+    // ── 수강 과정 변경 시 이력 기록
+    if (prev.course !== data.course) {
+      if (!prev.courseHistory) prev.courseHistory = [];
+      prev.courseHistory.push({
+        from: prev.course, to: data.course,
+        date: kstDateStr(), by: _currentUser?.name || '알 수 없음'
+      });
+      data.courseHistory = prev.courseHistory;
+    } else {
+      data.courseHistory = prev.courseHistory || [];
+    }
+    db.members[i] = { ...prev, ...data };
+    logActivity(editMemberId ? '회원 수정' : '회원 등록', data.name);
     toast('회원 정보가 수정되었습니다.');
   } else {
     data.id = 'M'+Date.now();
+    data.courseHistory = [];
     db.members.push(data);
+    logActivity('회원 등록', data.name);
     toast('새 회원이 등록되었습니다.');
   }
+  markDirty('members');
   saveDb(); closeMemberModal();
   safeRender(renderMembers,'members'); safeRender(renderDashboard,'dashboard');
 }
@@ -3535,6 +3830,7 @@ function deleteMember(id) {
   if (!confirm('회원을 삭제하시겠습니까?')) return;
   db.members = db.members.filter(m=>m.id!==id);
   Object.keys(db.payments).forEach(k=>{ if(k.startsWith(id+'_')) delete db.payments[k]; });
+  logActivity('회원 삭제', db.members.find?.(m=>m.id===id)?.name || id);
   markDirty('members'); markDirty('payments'); // payments도 함께 동기화
   saveDb(); safeRender(renderMembers,'members'); safeRender(renderDashboard,'dashboard'); toast('삭제되었습니다.');
 }
@@ -3668,6 +3964,21 @@ function renderUnpaid() {
   document.getElementById('unpaidSubtitle').textContent = `미납 ${unpaidData.length}명 / 재원 ${active.length}명`;
   const el = document.getElementById('unpaidList');
 
+  const dueDay = getPayDueDay();
+  const todayStr = kstDateStr();
+  const todayDate = parseInt(todayStr.slice(8));
+  const dueDayLabel = dueDay ? ` · 마감 매월 ${dueDay}일` : '';
+  // D-day 계산
+  function calcDday(memberId) {
+    if (!dueDay) return '';
+    const [y, mo] = currentTuitionMonth.split('-').map(Number);
+    const dueStr = `${y}-${String(mo).padStart(2,'0')}-${String(dueDay).padStart(2,'0')}`;
+    const diff = Math.ceil((new Date(dueStr) - new Date(todayStr)) / 86400000);
+    if (diff > 0) return `<span style="font-size:10px;color:var(--amber);font-weight:700;">D-${diff}</span>`;
+    if (diff === 0) return `<span style="font-size:10px;color:var(--coral);font-weight:700;">D-day</span>`;
+    return `<span style="font-size:10px;color:var(--coral);font-weight:700;">D+${Math.abs(diff)}</span>`;
+  }
+
   if(!unpaidData.length) {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon"><span class="ti ti-circle-check" style="font-size:38px;color:var(--teal);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span></div><div class="empty-text">미납 회원이 없습니다</div><div class="empty-sub">이번 달 원비를 모두 납부했습니다</div></div>';
     return;
@@ -3704,6 +4015,7 @@ function renderUnpaid() {
           <div style="display:flex;align-items:center;gap:6px;">
             <span style="font-weight:700;font-size:13px;">${m.name}</span>
             <span class="badge ${badgeClr}" style="font-size:10px;">${monthLabel}</span>
+            ${calcDday(m.id)}
             ${months>=2?`<span style="font-size:10px;color:var(--amber);font-weight:600;"><span class="ti ti-alert-triangle" style="vertical-align:-1px;"><svg viewBox="0 0 24 24"><path d="m10.363 3.591-8.106 13.534A1.914 1.914 0 0 0 3.91 20h16.18a1.914 1.914 0 0 0 1.653-2.875L13.637 3.591a1.914 1.914 0 0 0-3.274 0z"/><path d="M12 9v4M12 17h.01"/></svg></span> 장기미납</span>`:''}
           </div>
           <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">${m.course} · ${m.phone||'-'}</div>
@@ -3724,8 +4036,11 @@ function renderUnpaid() {
 function quickPay(mid) {
   if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const m = db.members.find(x=>x.id===mid);
+  if (!m) { toast('회원 정보를 찾을 수 없습니다.', true); return; }
   const today = kstDateStr();
-  db.payments[k] = {paid:true, amount:m.fee||0, date:today, payMethod:'현금', memo:''};
+  const k = mid + '_' + currentTuitionMonth;
+  db.payments[k] = {paid:true, amount:m.fee||0, date:today, payMethod:'현금', memo:'', by:_currentUser?.name||'알 수 없음'};
+  markDirty('payments');
   saveDb(); safeRender(renderUnpaid,'unpaid'); safeRender(renderTuition,'tuition'); safeRender(renderDashboard,'dashboard');
   toast(m.name+' 납부 처리되었습니다.');
 }
@@ -3830,7 +4145,11 @@ function renderSettle() {
 
 function saveTuition() {
   if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
-  db.payments[editTuitionKey]={paid:true,amount:parseInt(document.getElementById('tAmount').value)||0,date:document.getElementById('tDate').value,payMethod:document.getElementById('tPayMethod').value,memo:document.getElementById('tMemo').value.trim(),by:_currentUser?.name||'알 수 없음'};
+  const amt = parseInt(document.getElementById('tAmount').value)||0;
+  const mName = db.members.find(x=>x.id===editTuitionKey.split('_')[0])?.name||'';
+  db.payments[editTuitionKey]={paid:true,amount:amt,date:document.getElementById('tDate').value,payMethod:document.getElementById('tPayMethod').value,memo:document.getElementById('tMemo').value.trim(),by:_currentUser?.name||'알 수 없음'};
+  logActivity('원비 수납', `${mName} ${editTuitionKey.split('_')[1]} ${amt.toLocaleString()}원`);
+  markDirty('payments');
   saveDb(); closeTuitionModal();
   safeRender(renderTuition,'tuition');
   safeRender(renderUnpaid,'unpaid');
@@ -3841,6 +4160,7 @@ function markUnpaid() {
   if (!hasPerm('payments') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   if(!confirm('미납 처리하시겠습니까?')) return;
   delete db.payments[editTuitionKey];
+  markDirty('payments');
   saveDb(); closeTuitionModal();
   safeRender(renderTuition,'tuition');
   safeRender(renderUnpaid,'unpaid');
@@ -3855,6 +4175,7 @@ function markAllPaid() {
     const k=m.id+'_'+currentTuitionMonth;
     if(!db.payments[k]?.paid) db.payments[k]={paid:true,amount:m.fee||0,date:today,payMethod:'현금',memo:''};
   });
+  markDirty('payments');
   saveDb(); safeRender(renderTuition,'tuition'); safeRender(renderUnpaid,'unpaid'); safeRender(renderDashboard,'dashboard'); toast('전체 납부 처리되었습니다.');
 }
 
@@ -3943,6 +4264,8 @@ function saveMaterial(){
   const data={name,category:cat,qty:parseInt(document.getElementById('matQty').value)||0,minQty:parseInt(document.getElementById('matMin').value)||0,unit:document.getElementById('matUnit').value||'개',price:parseInt(document.getElementById('matPrice').value)||0,memo:document.getElementById('matMemo').value.trim()};
   if(editMaterialId){const i=db.materials.findIndex(m=>m.id===editMaterialId);db.materials[i]={...db.materials[i],...data};toast('수정되었습니다.');}
   else{data.id='MAT'+Date.now();db.materials.push(data);toast('자재가 등록되었습니다.');}
+  markDirty('materials');
+  if(data.category && !['물감','붓','캔버스','종이','기타'].includes(data.category)) markDirty('meta');
   saveDb();closeMaterialModal();safeRender(renderMaterials,'materials');safeRender(renderDashboard,'dashboard');
 }
 // ══════════════════════════════════════════
@@ -4345,6 +4668,7 @@ function setAllAtt(status) {
     if (!db.attendance[dv]) db.attendance[dv] = {};
     active.forEach(m => { db.attendance[dv][m.id] = status; });
   }
+  markDirty('attendance');
   saveDb();
   safeRender(renderAttendance, 'attendance');
   const label = status === 'present' ? '전체 출석' : status === 'absent' ? '전체 결석' : '출석 초기화';
@@ -4491,7 +4815,20 @@ function openMemberDetailModal(id) {
           </div>
         </div>`).join('')}
     </div>
-    ${m.memo ? `<div style="background:var(--amber-bg);border:1px solid #F0C060;border-radius:var(--r-md);padding:10px 14px;font-size:12.5px;color:var(--ink-3);margin-bottom:4px;"><span style="font-weight:600;color:var(--amber);">메모 </span>${m.memo}</div>` : ''}
+    ${m.memo ? `<div style="background:var(--amber-bg);border:1px solid #F0C060;border-radius:var(--r-md);padding:10px 14px;font-size:12.5px;color:var(--ink-3);margin-bottom:12px;"><span style="font-weight:600;color:var(--amber);">메모 </span>${m.memo}</div>` : ''}
+    ${(m.courseHistory||[]).length > 0 ? `
+    <div style="background:var(--bg);border-radius:var(--r-md);padding:12px 14px;margin-bottom:4px;">
+      <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:8px;">수강 과정 변경 이력</div>
+      ${[...(m.courseHistory||[])].reverse().map(h => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-2);">
+          <div style="font-size:12.5px;">
+            <span class="badge badge-gray" style="font-size:10px;">${h.from}</span>
+            <span style="margin:0 4px;color:var(--muted);">→</span>
+            <span class="badge badge-purple" style="font-size:10px;">${h.to}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);">${h.date} · ${h.by}</div>
+        </div>`).join('')}
+    </div>` : ''}
   `;
   document.getElementById('memberDetailModal').classList.add('open');
 }
@@ -4555,9 +4892,26 @@ function saveSchoolName() {
   if (!val) { toast('학원 이름을 입력해주세요.', true); return; }
   if (!db.meta) db.meta = {};
   db.meta.schoolName = val;
+  markDirty('meta');
   saveDb();
   applySchoolName();
   toast('학원 이름이 저장되었습니다.');
+}
+
+function getPayDueDay() { return db.meta?.payDueDay || 0; }
+function savePayDueDay() {
+  if (!hasPerm('settings') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  const val = parseInt(document.getElementById('payDueDayInput').value) || 0;
+  if (val < 1 || val > 31) { toast('1~31 사이의 날짜를 입력해주세요.', true); return; }
+  if (!db.meta) db.meta = {};
+  db.meta.payDueDay = val;
+  markDirty('meta'); saveDb();
+  toast(`납부 마감일이 매월 ${val}일로 설정되었습니다.`);
+  safeRender(renderUnpaid, 'unpaid');
+}
+function applyPayDueDayInput() {
+  const el = document.getElementById('payDueDayInput');
+  if (el && getPayDueDay()) el.value = getPayDueDay();
 }
 
 // ═══════════════════════════════════
@@ -4664,12 +5018,66 @@ function copyOrderList() {
 let calMonth = kstMonthStr();
 
 function switchAttTab(tab) {
-  ['daily','calendar','rank'].forEach(t => {
+  ['daily','calendar','rank','bulk'].forEach(t => {
     document.getElementById('att-tab-'+t).style.display = t===tab?'block':'none';
     document.getElementById('atab-'+t).classList.toggle('active', t===tab);
   });
   if (tab === 'calendar') renderAttCalendar();
   if (tab === 'rank') renderAttRank();
+  if (tab === 'bulk') renderBulkMemberSelect();
+}
+
+function renderBulkMemberSelect() {
+  const el = document.getElementById('bulkMemberSelect');
+  if (!el) return;
+  const active = db.members.filter(m=>m.status==='active').sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+  el.innerHTML = active.map(m=>`
+    <label class="perm-checkbox-row" onclick="togglePerm('bulk_${m.id}')">
+      <input type="checkbox" id="bulk_${m.id}" checked>
+      <span class="perm-label">${m.name} <span class="perm-sub">${m.course}</span></span>
+    </label>`).join('');
+  // 대상 radio 변경 시 선택창 토글
+  document.querySelectorAll('input[name="bulkTarget"]').forEach(r => {
+    r.onchange = () => {
+      el.style.display = document.getElementById('bulkTargetSelect').checked ? 'block' : 'none';
+    };
+  });
+}
+
+function applyBulkAtt() {
+  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  const from = document.getElementById('bulkAttFrom').value;
+  const to   = document.getElementById('bulkAttTo').value;
+  if (!from || !to) { toast('시작일과 종료일을 모두 입력해주세요.', true); return; }
+  if (from > to) { toast('시작일이 종료일보다 늦습니다.', true); return; }
+  const typeEl = document.querySelector('input[name="bulkAttType"]:checked');
+  const type = typeEl ? typeEl.value : 'present';
+  const useAll = document.getElementById('bulkTargetAll').checked;
+  const active = db.members.filter(m=>m.status==='active');
+  const targets = useAll ? active : active.filter(m => document.getElementById('bulk_'+m.id)?.checked);
+  if (!targets.length) { toast('대상 회원이 없습니다.', true); return; }
+
+  // 날짜 범위 순회
+  let dayCount = 0;
+  const cur = new Date(from + 'T12:00:00+09:00');
+  const end = new Date(to   + 'T12:00:00+09:00');
+  while (cur <= end) {
+    const y = cur.getFullYear(), mo = String(cur.getMonth()+1).padStart(2,'0'), d = String(cur.getDate()).padStart(2,'0');
+    const dateStr = `${y}-${mo}-${d}`;
+    if (type === 'clear') {
+      targets.forEach(m => { if (db.attendance[dateStr]) delete db.attendance[dateStr][m.id]; });
+    } else {
+      if (!db.attendance[dateStr]) db.attendance[dateStr] = {};
+      targets.forEach(m => { db.attendance[dateStr][m.id] = type; });
+    }
+    cur.setDate(cur.getDate() + 1);
+    dayCount++;
+  }
+  markDirty('attendance');
+  saveDb();
+  const typeLabel = type==='present'?'출석':type==='absent'?'결석':'초기화';
+  logActivity('일괄 출결', `${from}~${to} ${targets.length}명 ${typeLabel}`);
+  toast(`${targets.length}명 × ${dayCount}일 ${typeLabel} 처리 완료`);
 }
 
 // ── 달력 뷰
@@ -4822,12 +5230,90 @@ function renderMemberTrendChart() {
 
 function saveAtt(){
   if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  logActivity('출결 저장', document.getElementById('attDate')?.value || kstDateStr());
+  markDirty('attendance');
   saveDb();toast('출석 정보가 저장되었습니다.');
 }
 
 // ═══════════════════════════════════
 // DATA I/O
 // ═══════════════════════════════════
+// ══════════════════════════════════════════
+// 엑셀 내보내기 (SheetJS CDN)
+// ══════════════════════════════════════════
+async function exportExcel() {
+  if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  toast('엑셀 파일 생성 중...');
+
+  // SheetJS 동적 로드
+  if (!window.XLSX) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  const wb = window.XLSX.utils.book_new();
+  const thisMonth = kstMonthStr();
+
+  // ── 시트1: 회원 목록
+  const memberRows = [['이름','연락처','학년/나이','수강과정','주수업','원비','등록일','생일','상태','메모']];
+  db.members.forEach(m => {
+    memberRows.push([m.name,m.phone||'',m.grade||'',m.course,m.weeklyClass||'',m.fee||0,m.startDate||'',m.birthday||'',m.status==='active'?'재원':'탈퇴',m.memo||'']);
+  });
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(memberRows), '회원목록');
+
+  // ── 시트2: 이번 달 원비 현황
+  const payRows = [['이름','수강과정','원비','납부여부','납부금액','납부일','결제수단','처리자','메모']];
+  db.members.filter(m=>m.status==='active').forEach(m => {
+    const p = db.payments[m.id+'_'+thisMonth];
+    payRows.push([m.name,m.course,m.fee||0,p?.paid?'납부':'미납',p?.amount||'',p?.date||'',p?.payMethod||'',p?.by||'',p?.memo||'']);
+  });
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(payRows), `원비_${thisMonth}`);
+
+  // ── 시트3: 이번 달 출결
+  const attDays = Object.keys(db.attendance).filter(d=>d.startsWith(thisMonth)).sort();
+  const attHeader = ['이름','수강과정',...attDays.map(d=>d.slice(5)),'출석','지각','결석'];
+  const attRows = [attHeader];
+  db.members.filter(m=>m.status==='active').sort((a,b)=>a.name.localeCompare(b.name,'ko')).forEach(m => {
+    let present=0,late=0,absent=0;
+    const row = [m.name, m.course];
+    attDays.forEach(d => {
+      const s = db.attendance[d]?.[m.id]||'';
+      row.push(s==='present'?'출':s==='late'?'지':s==='absent'?'결':'');
+      if(s==='present') present++; else if(s==='late') late++; else if(s==='absent') absent++;
+    });
+    row.push(present,late,absent);
+    attRows.push(row);
+  });
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(attRows), `출결_${thisMonth}`);
+
+  // ── 시트4: 자재 재고 현황
+  const matRows = [['자재명','카테고리','현재재고','단위','최소재고','상태']];
+  db.materials.forEach(m => {
+    matRows.push([m.name,m.category||'',m.qty,m.unit,m.minQty,m.qty<=m.minQty?'부족':'정상']);
+  });
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(matRows), '자재재고');
+
+  // ── 시트5: 월별 수납 통계 (최근 6개월)
+  const statsRows = [['월','재원','납부','미납','납부율','수납금액']];
+  for (let i=5;i>=0;i--) {
+    const mon = kstMonthOffset(-i);
+    const active = db.members.filter(m=>m.status==='active'||(m.startDate||'').slice(0,7)<=mon);
+    let paid=0,amt=0;
+    active.forEach(m=>{const p=db.payments[m.id+'_'+mon];if(p?.paid){paid++;amt+=p.amount||0;}});
+    statsRows.push([mon,active.length,paid,active.length-paid,active.length?Math.round(paid/active.length*100)+'%':'0%',amt]);
+  }
+  window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.aoa_to_sheet(statsRows), '월별통계');
+
+  const fname = `루크미술학원_${thisMonth}.xlsx`;
+  window.XLSX.writeFile(wb, fname);
+  logActivity('엑셀 내보내기', fname);
+  toast(`${fname} 다운로드 완료`);
+}
+
 function exportData(){
   if (!hasPerm('backup') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
   const d = kstDateStr();
@@ -5239,7 +5725,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build2.3';
+const CURRENT_SW_VERSION = 'v1.0-build0.0';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
@@ -5265,6 +5751,8 @@ async function checkVersionAndReload() {
       }
       sessionStorage.setItem(RELOAD_FLAG, Date.now().toString());
       window.location.reload(true);
+      // reload 이후 코드 실행 방지 — reload()는 비동기이므로 명시적 중단
+      await new Promise(() => {}); // 절대 resolve되지 않는 Promise로 이후 실행 차단
     }
   } catch(e) {
     console.warn('버전 체크 실패:', e.message);
