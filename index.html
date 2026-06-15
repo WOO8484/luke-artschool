@@ -2545,7 +2545,7 @@ function autoBackupWrite() {}
 let _dirtysections = new Set();
 function markDirty(section) { _dirtysections.add(section); }
 function markAllDirty() {
-  ['members','payments','materials','attendance','stockLog','meta','auth'].forEach(s => _dirtysections.add(s));
+  ['members','payments','materials','attendance','stockLog','meta','auth','activityLog'].forEach(s => _dirtysections.add(s));
 }
 
 function saveDb() {
@@ -2615,14 +2615,15 @@ const FB_URL  = FB_BASE + FB_PATH;
 
 // 항목별 경로 (충돌 방지용 분리 저장)
 const FB_SECTIONS = {
-  members:    FB_BASE + '/artschool/sections/members.json',
-  payments:   FB_BASE + '/artschool/sections/payments.json',
-  materials:  FB_BASE + '/artschool/sections/materials.json',
-  attendance: FB_BASE + '/artschool/sections/attendance.json',
-  stockLog:   FB_BASE + '/artschool/sections/stockLog.json',
-  meta:       FB_BASE + '/artschool/sections/meta.json',
-  auth:       FB_BASE + '/artschool/sections/auth.json',
-  ts:         FB_BASE + '/artschool/sections/ts.json',
+  members:     FB_BASE + '/artschool/sections/members.json',
+  payments:    FB_BASE + '/artschool/sections/payments.json',
+  materials:   FB_BASE + '/artschool/sections/materials.json',
+  attendance:  FB_BASE + '/artschool/sections/attendance.json',
+  stockLog:    FB_BASE + '/artschool/sections/stockLog.json',
+  meta:        FB_BASE + '/artschool/sections/meta.json',
+  auth:        FB_BASE + '/artschool/sections/auth.json',
+  activityLog: FB_BASE + '/artschool/sections/activityLog.json',
+  ts:          FB_BASE + '/artschool/sections/ts.json',
 };
 
 let _fbEventSource     = null;
@@ -3016,7 +3017,7 @@ function startFirebaseListener() {
 
         // 변경된 섹션들을 병렬로 fetch
         const changed = [];
-        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth'].map(async sec => {
+        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth','activityLog'].map(async sec => {
           try {
             const res = await fetchWithTimeout(FB_SECTIONS[sec], {}, 8000);
             if(!res.ok) return;
@@ -3076,7 +3077,7 @@ async function autoReconnectFirebase() {
 
       if(tsData && remoteTs > localTs) {
         // 클라우드가 더 최신 → 섹션별로 fetch해서 병합
-        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth'].map(async sec => {
+        await Promise.all(['members','payments','materials','attendance','stockLog','meta','auth','activityLog'].map(async sec => {
           try {
             const res = await fetchWithTimeout(FB_SECTIONS[sec], {}, 8000);
             if(!res.ok) return;
@@ -3279,6 +3280,7 @@ function logActivity(action, detail = '') {
     detail,
   });
   if (db.activityLog.length > 500) db.activityLog.length = 500;
+  markDirty('activityLog');
 }
 
 function hasPerm(perm) {
