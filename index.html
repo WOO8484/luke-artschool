@@ -1081,7 +1081,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.7</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.8</div>
 
   </div>
 </div>
@@ -1415,20 +1415,20 @@ select { -webkit-appearance: auto; }
     </div>
   </div>
 
-  <!-- 출석 체크 + 이달 수업 현황 -->
-  <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:start;">
-    <div class="card" style="min-height:0;">
-      <div class="card-header" style="padding-bottom:12px;">
+  <!-- 출석 체크 + 이달 수업 현황 (고정 높이 독립 스크롤) -->
+  <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch;">
+    <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 280px);min-height:400px;max-height:700px;">
+      <div class="card-header" style="flex-shrink:0;">
         <div class="card-title">출석 체크</div>
       </div>
-      <div id="attList"></div>
+      <div id="attList" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
-    <div class="card" style="min-height:0;">
-      <div class="card-header" style="padding-bottom:12px;">
+    <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 280px);min-height:400px;max-height:700px;">
+      <div class="card-header" style="flex-shrink:0;">
         <div class="card-title">이달 수업 현황</div>
         <div class="card-subtitle" id="attStatsMonthLabel"></div>
       </div>
-      <div id="attStats"></div>
+      <div id="attStats" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
   </div>
 
@@ -1688,7 +1688,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.7</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.8</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2070,7 +2070,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.7</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.8</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2094,7 +2094,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.7</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.8</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -6063,7 +6063,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build0.7';
+const CURRENT_SW_VERSION = 'v1.0-build0.8';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
