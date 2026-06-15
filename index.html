@@ -908,9 +908,6 @@ select { -webkit-appearance: auto; }
   .two-col   { grid-template-columns: 1fr !important; gap: 12px; }
   .three-col { grid-template-columns: 1fr !important; }
   .form-grid { grid-template-columns: 1fr !important; gap: 10px; }
-  .form-group.full > div[style*="grid-template-columns:1fr 1fr"] {
-    grid-template-columns: 1fr !important;
-  }
   .form-group.full { grid-column: 1 !important; }
 
   /* 버튼 */
@@ -1075,19 +1072,17 @@ select { -webkit-appearance: auto; }
     </div>
     <div class="login-field">
       <label>아이디</label>
-      <input type="text" id="loginId" placeholder="아이디를 입력하세요" autocomplete="username" onkeydown="if(event.key==='Enter')_call(doLogin)">
+      <input type="text" id="loginId" placeholder="아이디를 입력하세요" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="login-field">
       <label>비밀번호</label>
-      <input type="password" id="loginPw" placeholder="비밀번호를 입력하세요" autocomplete="current-password" onkeydown="if(event.key==='Enter')_call(doLogin)">
+      <input type="password" id="loginPw" placeholder="비밀번호를 입력하세요" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="login-error" id="loginError"></div>
-    <button type="button" class="login-btn" onclick="_call(doLogin)">로그인</button>
-    <div id="loginDefaultHint" style="display:none;margin-top:12px;padding:9px 14px;background:#f5f3ff;border:1px solid #e0d9ff;border-radius:10px;font-size:12px;color:#6E4FD0;text-align:center;line-height:1.6;">
-      🔑 초기 계정 &nbsp;|&nbsp; 아이디: <strong>admin</strong> &nbsp;/&nbsp; 비밀번호: <strong>1234</strong>
-    </div>
+    <button class="login-btn" onclick="doLogin()">로그인</button>
+    <div id="loginDefaultHint" style="display:none;text-align:center;margin-top:12px;padding:8px 12px;background:#f5f3ff;border-radius:8px;font-size:11.5px;color:#6E4FD0;">🔑 초기 계정: <strong>admin</strong> / <strong>1234</strong></div>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.7</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.6</div>
 
   </div>
 </div>
@@ -1147,7 +1142,7 @@ select { -webkit-appearance: auto; }
         <div id="firebaseStatus"></div>
         <span id="firebaseStatusText"></span>
       </div>
-      <button type="button" class="sb-logout" onclick="doLogout()"><span class="ti ti-logout"><svg viewBox="0 0 24 24"><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"/><path d="M9 12h12l-3-3m0 6 3-3"/></svg></span> 로그아웃</button>
+      <button class="sb-logout" onclick="doLogout()"><span class="ti ti-logout"><svg viewBox="0 0 24 24"><path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"/><path d="M9 12h12l-3-3m0 6 3-3"/></svg></span> 로그아웃</button>
       <input type="file" id="fileInput" accept=".json" onchange="importData(event)">
     </div>
   </div>
@@ -1158,12 +1153,12 @@ select { -webkit-appearance: auto; }
     <div id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <div id="topbar">
       <div class="tb-left">
-        <button type="button" id="menuToggle" onclick="toggleSidebar()">☰</button>
+        <button id="menuToggle" onclick="toggleSidebar()">☰</button>
         <div class="tb-title" id="pageTitle">대시보드</div>
       </div>
       <div class="tb-right">
         <div class="tb-date" id="todayInfo"></div>
-        <button type="button" class="btn btn-sm btn-ghost" onclick="openHelpModal()" style="padding:6px 10px;font-size:12px;border-radius:var(--r-md);gap:4px;" title="도움말">
+        <button class="btn btn-sm btn-ghost" onclick="openHelpModal()" style="padding:6px 10px;font-size:12px;border-radius:var(--r-md);gap:4px;" title="도움말">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 17v.01M12 13a2 2 0 0 0 1.5-3.5A2 2 0 0 0 10 11"/></svg>
           도움말
         </button>
@@ -1181,14 +1176,14 @@ select { -webkit-appearance: auto; }
           <div id="dashCardTuition" class="card" style="flex:1;display:flex;flex-direction:column;">
             <div class="card-header">
               <div><div class="card-title">이번 달 원비 현황</div><div class="card-subtitle" id="dashTuitionSub"></div></div>
-              <button type="button" class="btn btn-sm btn-ghost" onclick="showPage('tuition',document.querySelector('[data-page=tuition]'))">전체보기</button>
+              <button class="btn btn-sm btn-ghost" onclick="showPage('tuition',document.querySelector('[data-page=tuition]'))">전체보기</button>
             </div>
             <div id="dashTuition" style="flex:1;"></div>
           </div>
           <div id="dashCardMaterials" class="card" style="flex:1;display:flex;flex-direction:column;margin-top:0;">
             <div class="card-header">
               <div><div class="card-title">재고 부족 자재</div></div>
-              <button type="button" class="btn btn-sm btn-ghost" onclick="showPage('materials',document.querySelector('[data-page=materials]'))">전체보기</button>
+              <button class="btn btn-sm btn-ghost" onclick="showPage('materials',document.querySelector('[data-page=materials]'))">전체보기</button>
             </div>
             <div id="dashMaterials" style="flex:1;"></div>
           </div>
@@ -1196,7 +1191,7 @@ select { -webkit-appearance: auto; }
         <div id="dashCardMembers" class="card">
           <div class="card-header">
             <div class="card-title">최근 등록 회원</div>
-            <button type="button" class="btn btn-sm btn-ghost" onclick="showPage('members',document.querySelector('[data-page=members]'))">전체보기</button>
+            <button class="btn btn-sm btn-ghost" onclick="showPage('members',document.querySelector('[data-page=members]'))">전체보기</button>
           </div>
           <div id="dashMembers"></div>
         </div>
@@ -1230,7 +1225,7 @@ select { -webkit-appearance: auto; }
                 <option value="active">재원</option>
                 <option value="withdrawn">탈퇴</option>
               </select>
-              <button type="button" id="btnRegMember" class="btn btn-primary btn-sm" onclick="openMemberModal()">+ 회원 등록</button>
+              <button id="btnRegMember" class="btn btn-primary btn-sm" onclick="openMemberModal()">+ 회원 등록</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -1249,15 +1244,15 @@ select { -webkit-appearance: auto; }
         <!-- 월 네비 + 탭 헤더 -->
         <div class="flex-between mb-12 flex-wrap gap-8">
           <div class="month-nav">
-            <button type="button" class="month-nav-btn" onclick="changeMonth(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
+            <button class="month-nav-btn" onclick="changeMonth(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
             <span class="month-nav-label" id="tuitionMonth"></span>
-            <button type="button" class="month-nav-btn" onclick="changeMonth(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+            <button class="month-nav-btn" onclick="changeMonth(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
           </div>
           <div class="flex-center gap-8">
             <div class="tuition-tabs">
-              <button type="button" class="tuition-tab active" id="ttab-payment" onclick="switchTuitionTab('payment')"><span class="ti ti-layout-grid"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> 납부 현황</button>
-              <button type="button" class="tuition-tab" id="ttab-unpaid" onclick="switchTuitionTab('unpaid')"><span class="ti ti-alert-circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></span> 미납 내역</button>
-              <button type="button" class="tuition-tab" id="ttab-settle" onclick="switchTuitionTab('settle')"><span class="ti ti-report-money"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M14 12a2 2 0 1 0-4 0v1a2 2 0 0 0 4 0v-1"/><path d="M10 16h4"/></svg></span> 월 결산</button>
+              <button class="tuition-tab active" id="ttab-payment" onclick="switchTuitionTab('payment')"><span class="ti ti-layout-grid"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span> 납부 현황</button>
+              <button class="tuition-tab" id="ttab-unpaid" onclick="switchTuitionTab('unpaid')"><span class="ti ti-alert-circle"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg></span> 미납 내역</button>
+              <button class="tuition-tab" id="ttab-settle" onclick="switchTuitionTab('settle')"><span class="ti ti-report-money"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M14 12a2 2 0 1 0-4 0v1a2 2 0 0 0 4 0v-1"/><path d="M10 16h4"/></svg></span> 월 결산</button>
             </div>
           </div>
         </div>
@@ -1267,7 +1262,7 @@ select { -webkit-appearance: auto; }
           <div class="card" style="margin-bottom:16px;">
             <div class="card-header">
               <div id="tuitionSummaryBar" class="flex-center gap-8 flex-wrap"></div>
-              <button type="button" id="btnAllPaid" class="btn btn-sm btn-ghost" onclick="markAllPaid()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 전체 납부처리</button>
+              <button id="btnAllPaid" class="btn btn-sm btn-ghost" onclick="markAllPaid()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 전체 납부처리</button>
             </div>
             <div id="tuitionGrid"></div>
           </div>
@@ -1324,7 +1319,7 @@ select { -webkit-appearance: auto; }
       <div id="page-materials" class="page">
         <div class="flex-between mb-12 flex-wrap gap-8">
           <div class="flex-center gap-8 flex-wrap">
-            <button type="button" id="btnRegMat" class="btn btn-primary btn-sm" onclick="openMaterialModal()">+ 자재 등록</button>
+            <button id="btnRegMat" class="btn btn-primary btn-sm" onclick="openMaterialModal()">+ 자재 등록</button>
             <select class="form-input" id="matCategoryFilter" onchange="renderMaterials()" style="width:130px;">
               <option value="">전체 카테고리</option>
               <option value="물감">물감</option><option value="붓">붓</option>
@@ -1336,8 +1331,8 @@ select { -webkit-appearance: auto; }
             </div>
           </div>
           <div class="tuition-tabs">
-            <button type="button" class="tuition-tab active" id="mtab-stock" onclick="switchMatTab('stock')"><span class="ti ti-package"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/><path d="M8 5.25l8 4.5"/></svg></span> 재고 현황</button>
-            <button type="button" class="tuition-tab" id="mtab-log" onclick="switchMatTab('log')"><span class="ti ti-list-details"><svg viewBox="0 0 24 24"><path d="M13 5h8M13 9h6M13 13h8M13 17h6"/><rect x="3" y="4" width="6" height="6" rx="1"/><rect x="3" y="14" width="6" height="6" rx="1"/></svg></span> 입출고 이력</button>
+            <button class="tuition-tab active" id="mtab-stock" onclick="switchMatTab('stock')"><span class="ti ti-package"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/><path d="M8 5.25l8 4.5"/></svg></span> 재고 현황</button>
+            <button class="tuition-tab" id="mtab-log" onclick="switchMatTab('log')"><span class="ti ti-list-details"><svg viewBox="0 0 24 24"><path d="M13 5h8M13 9h6M13 13h8M13 17h6"/><rect x="3" y="4" width="6" height="6" rx="1"/><rect x="3" y="14" width="6" height="6" rx="1"/></svg></span> 입출고 이력</button>
           </div>
         </div>
 
@@ -1348,7 +1343,7 @@ select { -webkit-appearance: auto; }
             <div id="matCatSummary" style="display:flex;flex-wrap:wrap;gap:10px;padding-top:4px;"></div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">자재 재고 현황</div><button type="button" class="btn btn-sm btn-ghost" onclick="copyOrderList()" id="copyOrderBtn" style="display:none;color:var(--amber);border-color:var(--amber);">📋 발주 목록 복사</button></div>
+            <div class="card-header"><div class="card-title">자재 재고 현황</div><button class="btn btn-sm btn-ghost" onclick="copyOrderList()" id="copyOrderBtn" style="display:none;color:var(--amber);border-color:var(--amber);">📋 발주 목록 복사</button></div>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>자재명</th><th>카테고리</th><th>재고</th><th>최소재고</th><th>단가</th><th>상태</th><th style="text-align:center;">관리</th></tr></thead>
@@ -1393,43 +1388,43 @@ select { -webkit-appearance: auto; }
         <div class="stats-grid" id="attSummaryStats" style="margin-bottom:16px;"></div>
         <!-- 뷰 탭 -->
         <div style="display:flex;gap:8px;margin-bottom:14px;">
-          <button type="button" class="tuition-tab active" id="atab-daily" onclick="switchAttTab('daily')">일별 출석 체크</button>
-          <button type="button" class="tuition-tab" id="atab-calendar" onclick="switchAttTab('calendar')">📅 월별 달력</button>
-          <button type="button" class="tuition-tab" id="atab-rank" onclick="switchAttTab('rank')">🏅 출석률 순위</button>
-          <button type="button" class="tuition-tab" id="atab-bulk" onclick="switchAttTab('bulk')">📋 날짜 범위 일괄</button>
-          <button type="button" class="tuition-tab" id="atab-makeup" onclick="switchAttTab('makeup')">🔄 보강 현황</button>
+          <button class="tuition-tab active" id="atab-daily" onclick="switchAttTab('daily')">일별 출석 체크</button>
+          <button class="tuition-tab" id="atab-calendar" onclick="switchAttTab('calendar')">📅 월별 달력</button>
+          <button class="tuition-tab" id="atab-rank" onclick="switchAttTab('rank')">🏅 출석률 순위</button>
+          <button class="tuition-tab" id="atab-bulk" onclick="switchAttTab('bulk')">📋 날짜 범위 일괄</button>
         </div>
         <div id="att-tab-daily">
-
-  <!-- 컨트롤 바 -->
-  <div class="card" style="margin-bottom:12px;padding:12px 16px;">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:4px;">
-        <button type="button" class="month-nav-btn" onclick="changeAttDate(-1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m15 6-6 6 6 6"/></svg></button>
-        <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:130px;text-align:center;font-size:13px;height:34px;padding:4px 8px;">
-        <button type="button" class="month-nav-btn" onclick="changeAttDate(1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m9 6 6 6-6 6"/></svg></button>
-      </div>
-      <div style="width:1px;height:24px;background:var(--border);"></div>
-      <button type="button" id="btnAttPresent" class="btn btn-sm btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
-      <button type="button" id="btnAttAbsent"  class="btn btn-sm btn-ghost" onclick="setAllAtt('absent')"  style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
-      <button type="button" id="btnAttReset"   class="btn btn-sm btn-ghost" onclick="setAllAtt(null)">초기화</button>
-      <div style="flex:1;"></div>
-      <button type="button" id="btnAttSave" class="btn btn-sm btn-success" onclick="saveAtt()">저장</button>
-    </div>
-  </div>
-
-  <!-- 통합 카드 -->
-  <div class="card" style="padding:0;overflow:hidden;">
-    <!-- 테이블 헤더 -->
-    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);">
-      <div style="font-size:12px;font-weight:600;color:var(--muted);">회원 · 수업 현황</div>
-      <div style="font-size:12px;font-weight:600;color:var(--muted);text-align:right;" id="attStatsMonthLabel"></div>
-    </div>
-    <!-- 목록 -->
-    <div id="attList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 320px);min-height:200px;"></div>
-  </div>
-
-</div><!-- /att-tab-daily -->
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch;">
+          <!-- 출석 체크 -->
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-header" style="flex-direction:column;align-items:flex-start;gap:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;flex-wrap:wrap;">
+                <div class="card-title">출석 체크</div>
+                <div class="month-nav" style="gap:4px;">
+                  <button class="month-nav-btn" onclick="changeAttDate(-1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m15 6-6 6 6 6"/></svg></button>
+                  <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:120px;text-align:center;font-size:12px;padding:5px 4px;min-height:0;height:32px;">
+                  <button class="month-nav-btn" onclick="changeAttDate(1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m9 6 6 6-6 6"/></svg></button>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button id="btnAttPresent" class="btn btn-xs btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
+                <button id="btnAttAbsent" class="btn btn-xs btn-ghost" onclick="setAllAtt('absent')" style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
+                <button id="btnAttReset" class="btn btn-xs btn-ghost" onclick="setAllAtt(null)">초기화</button>
+                <button id="btnAttSave" class="btn btn-xs btn-success" onclick="saveAtt()">저장</button>
+              </div>
+            </div>
+            <div id="attList" style="flex:1;overflow-y:auto;"></div>
+          </div>
+          <!-- 이달 수업 현황 -->
+          <div class="card" style="display:flex;flex-direction:column;">
+            <div class="card-header">
+              <div class="card-title">이달 수업 현황</div>
+              <div class="card-subtitle" id="attStatsMonthLabel"></div>
+            </div>
+            <div id="attStats" style="flex:1;overflow-y:auto;"></div>
+          </div>
+        </div><!-- /grid -->
+        </div><!-- /att-tab-daily -->
         <!-- 달력 뷰 -->
         <div id="att-tab-calendar" style="display:none;">
           <div class="card">
@@ -1439,9 +1434,9 @@ select { -webkit-appearance: auto; }
                 <div class="card-subtitle" id="calMonthLabel"></div>
               </div>
               <div class="month-nav">
-                <button type="button" class="month-nav-btn" onclick="changeCalMonth(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
+                <button class="month-nav-btn" onclick="changeCalMonth(-1)"><span class="ti ti-chevron-left"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></span></button>
                 <span class="month-nav-label" id="calMonthNav"></span>
-                <button type="button" class="month-nav-btn" onclick="changeCalMonth(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+                <button class="month-nav-btn" onclick="changeCalMonth(1)"><span class="ti ti-chevron-right"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
               </div>
             </div>
             <div id="attCalendar"></div>
@@ -1455,19 +1450,7 @@ select { -webkit-appearance: auto; }
           </div>
         </div>
 
-        <!-- 보강 현황 탭 -->
-        <div id="att-tab-makeup" style="display:none;">
-          <div class="card">
-            <div class="card-header">
-              <div><div class="card-title">보강 현황</div><div class="card-subtitle" id="makeupMonthLabel"></div></div>
-              <div style="display:flex;gap:6px;">
-                <button type="button" class="btn btn-sm btn-ghost" onclick="changeMakeupMonth(-1)">◀</button>
-                <button type="button" class="btn btn-sm btn-ghost" onclick="changeMakeupMonth(1)">▶</button>
-              </div>
-            </div>
-            <div id="makeupList"></div>
-          </div>
-        </div>
+        <!-- 날짜 범위 일괄 처리 탭 -->
         <div id="att-tab-bulk" style="display:none;">
           <div class="card">
             <div class="card-header">
@@ -1514,7 +1497,7 @@ select { -webkit-appearance: auto; }
               </div>
               <div id="bulkMemberSelect" style="display:none;margin-top:10px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-md);padding:8px;"></div>
             </div>
-            <button type="button" class="btn btn-primary" style="width:100%;" onclick="applyBulkAtt()">일괄 적용</button>
+            <button class="btn btn-primary" style="width:100%;" onclick="applyBulkAtt()">일괄 적용</button>
           </div>
         </div>
       </div>
@@ -1547,15 +1530,15 @@ select { -webkit-appearance: auto; }
               <div style="width:1px;height:28px;background:var(--border);flex-shrink:0;"></div>
               <!-- 버튼들 -->
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                <button type="button" class="btn btn-primary btn-sm" onclick="autoReconnectFirebase()">
+                <button class="btn btn-primary btn-sm" onclick="autoReconnectFirebase()">
                   <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><path d="M7 18a4.6 4.4 0 0 1 0-9 5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7H7"/></svg>
                   연결하기
                 </button>
-                <button type="button" class="btn btn-ghost btn-sm" onclick="disconnectFirebase()" id="fbDisconnectBtn" style="display:none;">
+                <button class="btn btn-ghost btn-sm" onclick="disconnectFirebase()" id="fbDisconnectBtn" style="display:none;">
                   <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><path d="m2 2 20 20"/><path d="M9.654 9.654A4.6 4.4 0 0 0 7 18h11a3.5 3.5 0 0 0 .503-6.963"/></svg>
                   연결 끊기
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="testFirebaseConnection()" style="color:var(--amber);border-color:var(--amber);">
+                <button class="btn btn-outline btn-sm" onclick="testFirebaseConnection()" style="color:var(--amber);border-color:var(--amber);">
                   <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                   연결 진단
                 </button>
@@ -1577,14 +1560,14 @@ select { -webkit-appearance: auto; }
             </div>
             <div style="display:flex;gap:8px;margin-top:4px;margin-bottom:16px;">
               <input type="text" class="form-input" id="schoolNameInput" placeholder="학원 이름 입력" style="flex:1;">
-              <button type="button" id="btnSaveSchool" class="btn btn-primary" onclick="saveSchoolName()">저장</button>
+              <button id="btnSaveSchool" class="btn btn-primary" onclick="saveSchoolName()">저장</button>
             </div>
             <div class="settings-row">
               <div class="settings-row-info"><strong>원비 납부 마감일</strong><span>매월 며칠까지 납부해야 하는지 설정</span></div>
               <div style="display:flex;align-items:center;gap:8px;">
                 <input type="number" class="form-input" id="payDueDayInput" min="1" max="31" placeholder="10" style="width:70px;text-align:center;">
                 <span style="font-size:13px;color:var(--muted);">일</span>
-                <button type="button" class="btn btn-sm btn-primary" onclick="savePayDueDay()">저장</button>
+                <button class="btn btn-sm btn-primary" onclick="savePayDueDay()">저장</button>
               </div>
             </div>
             <div class="card-header" style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border);"><div class="card-title">계정 관리</div></div>
@@ -1600,7 +1583,7 @@ select { -webkit-appearance: auto; }
 
             <!-- 계정 추가 (원장만) -->
             <div id="addAccountSection">
-              <button type="button" class="btn btn-outline btn-sm" onclick="openAddAccountModal()" style="width:100%;justify-content:center;">
+              <button class="btn btn-outline btn-sm" onclick="openAddAccountModal()" style="width:100%;justify-content:center;">
                 + 계정 추가
               </button>
             </div>
@@ -1629,7 +1612,7 @@ select { -webkit-appearance: auto; }
                 <label class="form-label">새 비밀번호 확인</label>
                 <input type="password" class="form-input" id="pwConfirm" placeholder="새 비밀번호 확인">
               </div>
-              <button type="button" class="btn btn-primary" style="margin-top:4px;" onclick="_call(changePw)">비밀번호 변경</button>
+              <button class="btn btn-primary" style="margin-top:4px;" onclick="changePw()">비밀번호 변경</button>
             </div>
           </div>
           </div><!-- /settingsCard1 -->
@@ -1647,35 +1630,35 @@ select { -webkit-appearance: auto; }
                 <strong>버전 이력으로 복구</strong>
                 <span>최근 10개 저장 시점으로 되돌릴 수 있습니다</span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="openHistoryModal()" style="color:var(--amber);border-color:var(--amber);">🕐 복구</button>
+              <button class="btn btn-sm btn-outline" onclick="openHistoryModal()" style="color:var(--amber);border-color:var(--amber);">🕐 복구</button>
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>엑셀 내보내기</strong>
                 <span>회원·원비·출결·자재·통계 5개 시트</span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="_call(exportExcel)" style="color:var(--teal);border-color:var(--teal);">📊 내보내기</button>
+              <button class="btn btn-sm btn-outline" onclick="exportExcel()" style="color:var(--teal);border-color:var(--teal);">📊 내보내기</button>
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>수동 백업</strong>
                 <span>지금 즉시 JSON 파일로 저장합니다</span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="exportData()"><span class="ti ti-device-floppy"><svg viewBox="0 0 24 24"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/><path d="M10 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M8 4v4h6V4"/></svg></span> 저장</button>
+              <button class="btn btn-sm btn-outline" onclick="exportData()"><span class="ti ti-device-floppy"><svg viewBox="0 0 24 24"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/><path d="M10 14a2 2 0 1 0 4 0 2 2 0 0 0-4 0"/><path d="M8 4v4h6V4"/></svg></span> 저장</button>
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>데이터 복원</strong>
                 <span>백업 파일을 불러옵니다</span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('fileInput').click()"><span class="ti ti-folder-open"><svg viewBox="0 0 24 24"><path d="M5 19l2.5-7H20l-2.5 7H5z"/><path d="M3 5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H19a2 2 0 0 1 2 2v2H5.5"/></svg></span> 불러오기</button>
+              <button class="btn btn-sm btn-outline" onclick="document.getElementById('fileInput').click()"><span class="ti ti-folder-open"><svg viewBox="0 0 24 24"><path d="M5 19l2.5-7H20l-2.5 7H5z"/><path d="M3 5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H19a2 2 0 0 1 2 2v2H5.5"/></svg></span> 불러오기</button>
             </div>
             <div class="settings-row">
               <div class="settings-row-info">
                 <strong>전체 데이터 초기화</strong>
                 <span style="color:var(--coral);">모든 데이터가 삭제됩니다</span>
               </div>
-              <button type="button" class="btn btn-sm btn-danger" onclick="_call(resetAll)">초기화</button>
+              <button class="btn btn-sm btn-danger" onclick="resetAll()">초기화</button>
             </div>
 
             <!-- 구분선 -->
@@ -1687,7 +1670,7 @@ select { -webkit-appearance: auto; }
                 <strong>관리자 활동 로그</strong>
                 <span>최근 500건의 주요 작업 이력</span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="openActivityLogModal()">📋 로그 보기</button>
+              <button class="btn btn-sm btn-outline" onclick="openActivityLogModal()">📋 로그 보기</button>
             </div>
 
             <!-- 구분선 -->
@@ -1697,10 +1680,10 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.7</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.6</span>
                 </span>
               </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
+              <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
             </div>
           </div>
           </div><!-- /settingsCard2 -->
@@ -1719,7 +1702,7 @@ select { -webkit-appearance: auto; }
         <div class="modal-title" id="accountModalTitle">계정 추가</div>
         <div class="card-subtitle" id="accModalSubtitle">새 계정을 만듭니다</div>
       </div>
-      <button type="button" class="modal-close" onclick="closeAccountModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="modal-close" onclick="closeAccountModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
 
     <!-- 스크롤 영역 -->
@@ -1795,8 +1778,8 @@ select { -webkit-appearance: auto; }
     </div><!-- /스크롤 영역 -->
 
     <div class="modal-footer" style="flex-shrink:0;margin-top:16px;">
-      <button type="button" class="btn btn-ghost" onclick="closeAccountModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="_call(saveAccount)">저장</button>
+      <button class="btn btn-ghost" onclick="closeAccountModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveAccount()">저장</button>
     </div>
   </div>
 </div>
@@ -1811,7 +1794,7 @@ select { -webkit-appearance: auto; }
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <input type="text" class="form-input" id="activityLogSearch" placeholder="검색..." style="width:140px;" oninput="renderActivityLog()">
-        <button type="button" class="modal-close" onclick="closeActivityLogModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        <button class="modal-close" onclick="closeActivityLogModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
     </div>
     <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
@@ -1838,19 +1821,19 @@ select { -webkit-appearance: auto; }
         <div class="modal-title">도움말</div>
         <div class="card-subtitle">기능별 사용 방법을 확인하세요</div>
       </div>
-      <button type="button" class="modal-close" onclick="closeHelpModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="modal-close" onclick="closeHelpModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
 
     <!-- 탭 -->
     <div style="display:flex;gap:4px;padding:0 0 12px;flex-shrink:0;flex-wrap:wrap;">
-      <button type="button" class="tuition-tab active" id="htab-start"    onclick="switchHelpTab('start')">🚀 시작하기</button>
-      <button type="button" class="tuition-tab"        id="htab-members"  onclick="switchHelpTab('members')">👥 회원</button>
-      <button type="button" class="tuition-tab"        id="htab-tuition"  onclick="switchHelpTab('tuition')">💰 원비</button>
-      <button type="button" class="tuition-tab"        id="htab-att"      onclick="switchHelpTab('att')">📋 출결</button>
-      <button type="button" class="tuition-tab"        id="htab-materials"onclick="switchHelpTab('materials')">🎨 자재</button>
-      <button type="button" class="tuition-tab"        id="htab-account"  onclick="switchHelpTab('account')">🔐 계정</button>
-      <button type="button" class="tuition-tab"        id="htab-settings" onclick="switchHelpTab('settings')">⚙️ 설정</button>
-      <button type="button" class="tuition-tab"        id="htab-faq"      onclick="switchHelpTab('faq')">❓ FAQ</button>
+      <button class="tuition-tab active" id="htab-start"    onclick="switchHelpTab('start')">🚀 시작하기</button>
+      <button class="tuition-tab"        id="htab-members"  onclick="switchHelpTab('members')">👥 회원</button>
+      <button class="tuition-tab"        id="htab-tuition"  onclick="switchHelpTab('tuition')">💰 원비</button>
+      <button class="tuition-tab"        id="htab-att"      onclick="switchHelpTab('att')">📋 출결</button>
+      <button class="tuition-tab"        id="htab-materials"onclick="switchHelpTab('materials')">🎨 자재</button>
+      <button class="tuition-tab"        id="htab-account"  onclick="switchHelpTab('account')">🔐 계정</button>
+      <button class="tuition-tab"        id="htab-settings" onclick="switchHelpTab('settings')">⚙️ 설정</button>
+      <button class="tuition-tab"        id="htab-faq"      onclick="switchHelpTab('faq')">❓ FAQ</button>
     </div>
 
     <!-- 콘텐츠 -->
@@ -2065,31 +2048,6 @@ select { -webkit-appearance: auto; }
   </div>
 </div>
 
-<!-- ══════════ 보강 모달 ══════════ -->
-<div class="modal-overlay" id="makeupModal">
-  <div class="modal" style="width:360px;">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">보강 처리</div>
-        <div class="card-subtitle" id="makeupModalSub">보강 날짜를 입력하세요</div>
-      </div>
-      <button type="button" class="modal-close" onclick="closeMakeupModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    </div>
-    <div class="form-group" style="margin-bottom:16px;">
-      <label class="form-label">보강 날짜</label>
-      <input type="date" class="form-input" id="makeupDate">
-    </div>
-    <div class="form-group" style="margin-bottom:20px;">
-      <label class="form-label">메모 (선택)</label>
-      <input type="text" class="form-input" id="makeupMemo" placeholder="예: 토요일 오후 보강">
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeMakeupModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="_call(confirmMakeup)">보강완료 처리</button>
-    </div>
-  </div>
-</div>
-
 <!-- 업데이트 이력 모달 -->
 <div class="modal-overlay" id="updateHistoryModal">
   <div class="modal" style="width:600px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -2098,23 +2056,23 @@ select { -webkit-appearance: auto; }
     <div class="modal-header" style="flex-shrink:0;">
       <div class="modal-icon" style="background:var(--purple-bg);"><span style="font-size:20px;">📋</span></div>
       <div class="modal-title">프로그램 정보</div>
-      <button type="button" class="modal-close" onclick="closeUpdateHistoryModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="modal-close" onclick="closeUpdateHistoryModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
 
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.7</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.6</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
     <!-- 탭 -->
     <div style="display:flex;gap:4px;padding:14px 0 0;flex-shrink:0;">
-      <button type="button" id="uhTab1" onclick="switchUhTab(1)"
+      <button id="uhTab1" onclick="switchUhTab(1)"
         style="padding:8px 18px;border-radius:99px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--purple);color:#fff;transition:all .2s;">
         🕐 업데이트 이력
       </button>
-      <button type="button" id="uhTab2" onclick="switchUhTab(2)"
+      <button id="uhTab2" onclick="switchUhTab(2)"
         style="padding:8px 18px;border-radius:99px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:var(--bg-2);color:var(--muted);transition:all .2s;">
         📖 기능 목록
       </button>
@@ -2128,7 +2086,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.7</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.6</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -2334,7 +2292,7 @@ select { -webkit-appearance: auto; }
     </div><!-- /scroll area -->
 
     <div class="modal-footer" style="flex-shrink:0;">
-      <button type="button" class="btn btn-primary" onclick="closeUpdateHistoryModal()">닫기</button>
+      <button class="btn btn-primary" onclick="closeUpdateHistoryModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -2348,7 +2306,7 @@ select { -webkit-appearance: auto; }
         <div class="modal-title" id="pwConfirmTitle">확인</div>
         <div class="card-subtitle" id="pwConfirmDesc"></div>
       </div>
-      <button type="button" class="modal-close" onclick="closePwConfirmModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="modal-close" onclick="closePwConfirmModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
 
     <!-- 경고 메시지 -->
@@ -2390,8 +2348,8 @@ select { -webkit-appearance: auto; }
     <div id="pwConfirmError" style="font-size:12px;color:var(--coral);margin-top:6px;display:none;">비밀번호가 올바르지 않습니다.</div>
 
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closePwConfirmModal()">취소</button>
-      <button type="button" class="btn btn-danger" id="pwConfirmBtn" onclick="_call(confirmPwAction)">확인</button>
+      <button class="btn btn-ghost" onclick="closePwConfirmModal()">취소</button>
+      <button class="btn btn-danger" id="pwConfirmBtn" onclick="confirmPwAction()">확인</button>
     </div>
   </div>
 </div>
@@ -2402,7 +2360,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--amber-bg);"><span style="font-size:20px;">🕐</span></div>
       <div class="modal-title">버전 이력으로 복구</div>
-      <button type="button" class="modal-close" onclick="closeHistoryModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <button class="modal-close" onclick="closeHistoryModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     </div>
     <div style="font-size:12.5px;color:var(--muted);margin-bottom:16px;padding:10px 12px;background:var(--amber-bg);border-radius:var(--r-sm);border:1px solid #F0C060;">
       ⚠️ 선택한 시점의 데이터로 <strong>완전히 교체</strong>됩니다. 현재 데이터는 사라집니다.
@@ -2411,7 +2369,7 @@ select { -webkit-appearance: auto; }
       <div style="text-align:center;padding:30px;color:var(--muted);">이력을 불러오는 중...</div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeHistoryModal()">닫기</button>
+      <button class="btn btn-ghost" onclick="closeHistoryModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -2429,7 +2387,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--purple-bg);"><span class="ti ti-user-circle" style="color:var(--purple);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855"/></svg></span></div>
       <div class="modal-title" id="memberModalTitle">회원 등록</div>
-      <button type="button" class="modal-close" onclick="closeMemberModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeMemberModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div class="form-grid">
       <div class="form-group">
@@ -2474,18 +2432,13 @@ select { -webkit-appearance: auto; }
         <label class="form-label">월 원비 (원)</label>
         <input type="number" class="form-input" id="mFee" placeholder="150000">
       </div>
-      <!-- 등록일 + 생일: full 행에서 2열로 나눠 항상 충분한 너비 확보 -->
-      <div class="form-group full">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <div>
-            <label class="form-label">등록일</label>
-            <input type="date" class="form-input" id="mStartDate" style="width:100%;box-sizing:border-box;">
-          </div>
-          <div>
-            <label class="form-label">생일 🎂</label>
-            <input type="date" class="form-input" id="mBirthday" style="width:100%;box-sizing:border-box;">
-          </div>
-        </div>
+      <div class="form-group">
+        <label class="form-label">등록일</label>
+        <input type="date" class="form-input" id="mStartDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">생일 🎂</label>
+        <input type="date" class="form-input" id="mBirthday">
       </div>
       <div class="form-group">
         <label class="form-label">보호자 연락처</label>
@@ -2508,8 +2461,8 @@ select { -webkit-appearance: auto; }
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeMemberModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="saveMember()">저장하기</button>
+      <button class="btn btn-ghost" onclick="closeMemberModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveMember()">저장하기</button>
     </div>
   </div>
 </div>
@@ -2520,7 +2473,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--teal-bg);"><span class="ti ti-credit-card" style="color:var(--teal);"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h.01M11 15h2"/></svg></span></div>
       <div class="modal-title" id="tuitionModalTitle">원비 납부 처리</div>
-      <button type="button" class="modal-close" onclick="closeTuitionModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeTuitionModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div class="form-grid">
       <div class="form-group">
@@ -2553,9 +2506,9 @@ select { -webkit-appearance: auto; }
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-danger btn-sm" id="tUnpaidBtn" onclick="markUnpaid()" style="margin-right:auto;">미납 처리</button>
-      <button type="button" class="btn btn-ghost" onclick="closeTuitionModal()">취소</button>
-      <button type="button" class="btn btn-success" onclick="saveTuition()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부 완료</button>
+      <button class="btn btn-danger btn-sm" id="tUnpaidBtn" onclick="markUnpaid()" style="margin-right:auto;">미납 처리</button>
+      <button class="btn btn-ghost" onclick="closeTuitionModal()">취소</button>
+      <button class="btn btn-success" onclick="saveTuition()"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부 완료</button>
     </div>
   </div>
 </div>
@@ -2566,7 +2519,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--amber-bg);"><span class="ti ti-brush" style="color:var(--amber);"><svg viewBox="0 0 24 24"><path d="M3 21v-4l9-9"/><path d="M12.5 7.5L17 3a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4L17 11.5"/><path d="M3 21a2 2 0 0 0 2-2c0-1.1-1-2-2-3-1 1-2 1.9-2 3a2 2 0 0 0 2 2"/></svg></span></div>
       <div class="modal-title" id="materialModalTitle">자재 등록</div>
-      <button type="button" class="modal-close" onclick="closeMaterialModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeMaterialModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div class="form-grid">
       <div class="form-group">
@@ -2607,8 +2560,8 @@ select { -webkit-appearance: auto; }
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeMaterialModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="saveMaterial()">저장하기</button>
+      <button class="btn btn-ghost" onclick="closeMaterialModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveMaterial()">저장하기</button>
     </div>
   </div>
 </div>
@@ -2619,7 +2572,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--bg-2);"><span class="ti ti-package" style="color:var(--muted);"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/><path d="M8 5.25l8 4.5"/></svg></span></div>
       <div class="modal-title" id="matUseTitle">입고 / 사용</div>
-      <button type="button" class="modal-close" onclick="closeMatUseModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeMatUseModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div class="form-grid" style="grid-template-columns:1fr;">
       <div class="form-group">
@@ -2639,8 +2592,8 @@ select { -webkit-appearance: auto; }
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeMatUseModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="confirmMatUse()">확인</button>
+      <button class="btn btn-ghost" onclick="closeMatUseModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmMatUse()">확인</button>
     </div>
   </div>
 </div>
@@ -2651,12 +2604,12 @@ select { -webkit-appearance: auto; }
     <div class="modal-header" style="position:sticky;top:0;background:var(--surface);z-index:1;">
       <div class="modal-icon" style="background:var(--purple-bg);"><span class="ti ti-user-circle" style="color:var(--purple);"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M6.168 18.849A4 4 0 0 1 10 16h4a4 4 0 0 1 3.834 2.855"/></svg></span></div>
       <div class="modal-title" id="memberDetailName">회원 상세</div>
-      <button type="button" class="modal-close" onclick="closeMemberDetailModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeMemberDetailModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div id="memberDetailBody" style="padding-top:4px;"></div>
     <div class="modal-footer" style="position:sticky;bottom:0;background:var(--surface);">
-      <button type="button" class="btn btn-ghost" onclick="closeMemberDetailModal()">닫기</button>
-      <button type="button" class="btn btn-primary" id="memberDetailEditBtn">수정</button>
+      <button class="btn btn-ghost" onclick="closeMemberDetailModal()">닫기</button>
+      <button class="btn btn-primary" id="memberDetailEditBtn">수정</button>
     </div>
   </div>
 </div>
@@ -2667,7 +2620,7 @@ select { -webkit-appearance: auto; }
     <div class="modal-header">
       <div class="modal-icon" style="background:var(--purple-bg);"><span class="ti ti-list-details" style="color:var(--purple);"><svg viewBox="0 0 24 24"><path d="M13 5h8M13 9h6M13 13h8M13 17h6"/><rect x="3" y="4" width="6" height="6" rx="1"/><rect x="3" y="14" width="6" height="6" rx="1"/></svg></span></div>
       <div class="modal-title">이력 수정</div>
-      <button type="button" class="modal-close" onclick="closeLogEditModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+      <button class="modal-close" onclick="closeLogEditModal()"><span class="ti ti-x"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
     </div>
     <div class="form-grid" style="grid-template-columns:1fr;">
       <div class="form-group">
@@ -2699,8 +2652,8 @@ select { -webkit-appearance: auto; }
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-ghost" onclick="closeLogEditModal()">취소</button>
-      <button type="button" class="btn btn-primary" onclick="saveLogEdit()">저장</button>
+      <button class="btn btn-ghost" onclick="closeLogEditModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveLogEdit()">저장</button>
     </div>
   </div>
 </div>
@@ -2767,11 +2720,7 @@ let editMemberId = null, editMaterialId = null, editTuitionKey = null, matUseId 
 function loadDb() {
   try {
     const s = _storage.getItem('luke_artschool_v2');
-    if (s) {
-      const d = JSON.parse(s);
-      // members가 없어도 auth 등 저장된 데이터는 최대한 보존
-      if (d && typeof d === 'object') db = d;
-    }
+    if (s) { const d = JSON.parse(s); if(d.members) db = d; }
   } catch(e){}
   if (!db.members)    db.members    = [];
   if (!db.payments)   db.payments   = {};
@@ -3099,7 +3048,7 @@ async function openHistoryModal() {
             저장자: ${snap.savedBy||'-'} · 회원 ${snap.memberCount||0}명
           </div>
         </div>
-        <button type="button" class="btn btn-sm" onclick="restoreSnapshot(${i})"
+        <button class="btn btn-sm" onclick="restoreSnapshot(${i})"
           style="background:var(--amber-bg);color:var(--amber);border:1px solid #F0C060;font-size:12px;">
           이 시점으로 복구
         </button>
@@ -3175,46 +3124,6 @@ function switchHelpTab(tab) {
     if (content) content.style.display = t === tab ? 'block' : 'none';
     if (btn)     btn.classList.toggle('active', t === tab);
   });
-}
-
-// ══════════════════════════════════════════
-// 보강 처리
-// ══════════════════════════════════════════
-let _makeupAbsDate = null;
-let _makeupMid = null;
-
-function openMakeupModal(absDate, mid) {
-  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
-  _makeupAbsDate = absDate;
-  _makeupMid = mid;
-  const m = db.members.find(x => x.id === mid);
-  document.getElementById('makeupModalSub').textContent = `${m?.name || ''} · ${absDate} 결석`;
-  document.getElementById('makeupDate').value = kstDateStr();
-  document.getElementById('makeupMemo').value = '';
-  document.getElementById('makeupModal').classList.add('open');
-}
-function closeMakeupModal() {
-  document.getElementById('makeupModal').classList.remove('open');
-  _makeupAbsDate = null; _makeupMid = null;
-}
-function confirmMakeup() {
-  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
-  const makeupDate = document.getElementById('makeupDate').value;
-  const memo = document.getElementById('makeupMemo').value.trim();
-  if (!makeupDate) { toast('보강 날짜를 입력해주세요.', true); return; }
-
-  // 결석 → 출석으로 변경 + 보강 날짜/메모 기록
-  if (!db.attendance[_makeupAbsDate]) db.attendance[_makeupAbsDate] = {};
-  db.attendance[_makeupAbsDate][_makeupMid] = 'present';
-  db.attendance[_makeupAbsDate][_makeupMid + '_makeup'] = makeupDate;
-  if (memo) db.attendance[_makeupAbsDate][_makeupMid + '_makeupMemo'] = memo;
-
-  logActivity('보강 처리', `${db.members.find(x=>x.id===_makeupMid)?.name||_makeupMid} · 결석일 ${_makeupAbsDate} → 보강 ${makeupDate}`);
-  markDirty('attendance');
-  saveDb();
-  closeMakeupModal();
-  safeRender(renderAttendance, 'attendance');
-  toast('보강 완료 처리되었습니다. 출석으로 반영됩니다.');
 }
 
 function openUpdateHistoryModal() {
@@ -3423,19 +3332,7 @@ function startFirebaseListener() {
             if(!json) return;
             const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
             if(secData !== null && secData !== undefined) {
-              // auth 섹션: 현재 로그인 계정 보존
-              if (sec === 'auth' && _currentUser && secData.accounts) {
-                const myId = _currentUser.id;
-                const localAcc = (db.auth?.accounts || []).find(a => a.id === myId);
-                db[sec] = secData;
-                // Firebase auth에 내 계정이 없으면 로컬 계정 유지
-                const existsInRemote = db.auth.accounts.some(a => a.id === myId);
-                if (!existsInRemote && localAcc) {
-                  db.auth.accounts.push(localAcc);
-                }
-              } else {
-                db[sec] = secData;
-              }
+              db[sec] = secData;
               changed.push(sec);
             }
           } catch(e) { console.warn('섹션 fetch 실패:', sec, e.message); }
@@ -3494,23 +3391,7 @@ async function autoReconnectFirebase() {
             const json = await res.json();
             if(!json) return;
             const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
-            if(secData !== null && secData !== undefined) {
-              // auth: 로그인 전이면 Firebase 데이터 우선, 현재 로그인 중이면 내 계정 보존
-              if (sec === 'auth' && secData.accounts) {
-                const localAccounts = db.auth?.accounts || [];
-                db[sec] = secData;
-                if (_currentUser) {
-                  const myId = _currentUser.id;
-                  const existsInRemote = db.auth.accounts.some(a => a.id === myId);
-                  if (!existsInRemote) {
-                    const localAcc = localAccounts.find(a => a.id === myId);
-                    if (localAcc) db.auth.accounts.push(localAcc);
-                  }
-                }
-              } else {
-                db[sec] = secData;
-              }
-            }
+            if(secData !== null && secData !== undefined) db[sec] = secData;
           } catch(e) { console.warn('섹션 로드 실패:', sec); }
         }));
         if(!db.attendance)      db.attendance = {};
@@ -3669,63 +3550,8 @@ function toggleWithdrawDate() {
 // ═══════════════════════════════════
 // ── SHA-256 해싱 유틸리티 (Web Crypto API)
 async function sha256(str) {
-  // crypto.subtle은 https:// 또는 localhost에서만 동작
-  // file:// 등 비보안 컨텍스트에서는 순수 JS 구현으로 대체
-  if (window.crypto?.subtle) {
-    try {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-    } catch(e) {}
-  }
-  // 폴백: 순수 JS SHA-256 구현
-  return _sha256Fallback(str);
-}
-
-function _sha256Fallback(str) {
-  // RFC 6234 기반 순수 JS SHA-256
-  function rightRotate(v, n) { return (v >>> n) | (v << (32 - n)); }
-  const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
-  const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
-             0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
-             0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
-             0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
-             0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
-             0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
-             0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
-             0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
-  const bytes = new TextEncoder().encode(str);
-  const len = bytes.length;
-  const bitLen = len * 8;
-  const padLen = ((len + 9 + 63) & ~63) - len;
-  const padded = new Uint8Array(len + padLen);
-  padded.set(bytes);
-  padded[len] = 0x80;
-  const view = new DataView(padded.buffer);
-  view.setUint32(padded.length - 4, bitLen, false);
-  const h = [...H];
-  for (let i = 0; i < padded.length; i += 64) {
-    const w = new Array(64);
-    for (let j = 0; j < 16; j++) w[j] = view.getUint32(i + j * 4, false);
-    for (let j = 16; j < 64; j++) {
-      const s0 = rightRotate(w[j-15],7) ^ rightRotate(w[j-15],18) ^ (w[j-15] >>> 3);
-      const s1 = rightRotate(w[j-2],17) ^ rightRotate(w[j-2],19) ^ (w[j-2] >>> 10);
-      w[j] = (w[j-16] + s0 + w[j-7] + s1) >>> 0;
-    }
-    let [a,b,c,d,e,f,g,hh] = h;
-    for (let j = 0; j < 64; j++) {
-      const S1 = rightRotate(e,6) ^ rightRotate(e,11) ^ rightRotate(e,25);
-      const ch = (e & f) ^ (~e & g);
-      const temp1 = (hh + S1 + ch + K[j] + w[j]) >>> 0;
-      const S0 = rightRotate(a,2) ^ rightRotate(a,13) ^ rightRotate(a,22);
-      const maj = (a & b) ^ (a & c) ^ (b & c);
-      const temp2 = (S0 + maj) >>> 0;
-      hh = g; g = f; f = e; e = (d + temp1) >>> 0;
-      d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
-    }
-    h[0]=(h[0]+a)>>>0; h[1]=(h[1]+b)>>>0; h[2]=(h[2]+c)>>>0; h[3]=(h[3]+d)>>>0;
-    h[4]=(h[4]+e)>>>0; h[5]=(h[5]+f)>>>0; h[6]=(h[6]+g)>>>0; h[7]=(h[7]+hh)>>>0;
-  }
-  return h.map(v => v.toString(16).padStart(8,'0')).join('');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
 // ── 저장된 비밀번호가 평문인지 확인 (해시는 64자 hex)
@@ -3813,23 +3639,6 @@ function resetLoginFail() {
   try { sessionStorage.removeItem(LOGIN_FAIL_KEY); sessionStorage.removeItem(LOGIN_LOCK_KEY); } catch(e) {}
 }
 
-// ── async 함수 Safari 안전 래퍼
-// 사파리에서 onclick="asyncFn()" 호출 시 에러가 조용히 묻히는 문제 방지
-function _call(fn, ...args) {
-  try {
-    const result = fn(...args);
-    if (result && typeof result.catch === 'function') {
-      result.catch(e => {
-        console.error('[_call 오류]', fn.name, e);
-        toast('오류가 발생했습니다: ' + (e.message || e), true);
-      });
-    }
-  } catch(e) {
-    console.error('[_call 동기 오류]', fn.name, e);
-    toast('오류가 발생했습니다: ' + (e.message || e), true);
-  }
-}
-
 async function doLogin() {
   const errorEl = document.getElementById('loginError');
   const { count, lockUntil } = getLoginFailInfo();
@@ -3844,37 +3653,24 @@ async function doLogin() {
 
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPw').value;
-
   if (!id || !pw) {
-    errorEl.textContent = '아이디와 비밀번호를 입력해주세요.';
+    errorEl.textContent = '아이디와 비밀번호를 입력하세요.';
     return;
   }
+  const hashed = await sha256(pw);
 
-  let hashed;
-  try {
-    hashed = await sha256(pw);
-  } catch(e) {
-    errorEl.textContent = 'SHA-256 오류: ' + e.message;
-    return;
-  }
+  // 평문(구버전) 또는 해시(신버전) 모두 허용하여 비교
+  const acc = (db.auth.accounts || []).find(a => {
+    if (a.id !== id) return false;
+    if (isHashed(a.pw)) return a.pw === hashed;   // 신버전: 해시 비교
+    return a.pw === pw;                             // 구버전: 평문 비교 후 즉시 마이그레이션
+  });
 
-  // DB에 계정이 아예 없는 경우 방어
-  if (!db.auth?.accounts?.length) {
-    errorEl.textContent = '계정 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.';
-    return;
-  }
-
-  // 해시 비교 먼저, 그 다음 평문 비교 (마이그레이션 안 된 경우)
-  let acc = (db.auth.accounts || []).find(a => a.id === id && isHashed(a.pw) && a.pw === hashed);
-  if (!acc) {
-    const accPlain = (db.auth.accounts || []).find(a => a.id === id && !isHashed(a.pw) && a.pw === pw);
-    if (accPlain) {
-      // 평문 → 해시로 즉시 업그레이드 후 로그인
-      accPlain.pw = hashed;
-      markDirty('auth');
-      saveDb();
-      acc = accPlain;
-    }
+  // 로그인 성공 시 평문 비밀번호가 있으면 해시로 업그레이드
+  if (acc && !isHashed(acc.pw)) {
+    acc.pw = hashed;
+    markDirty('auth');
+    saveDb();
   }
 
   if (acc) {
@@ -3903,11 +3699,9 @@ async function doLogin() {
     } else {
       errorEl.textContent = `아이디 또는 비밀번호가 올바르지 않습니다. (${newCount}/${MAX_FAIL})`;
     }
+    const hint = document.getElementById('loginDefaultHint'); if(hint && newCount >= 1) hint.style.display = '';
     document.getElementById('loginPw').value = '';
     document.getElementById('loginPw').focus();
-    // 1회 이상 실패 시 초기 계정 힌트 표시
-    const hint = document.getElementById('loginDefaultHint');
-    if (hint) hint.style.display = '';
   }
 }
 
@@ -3967,7 +3761,8 @@ function doLogout() {
   clearTimeout(_fbSyncTimer); clearTimeout(_fbRetryTimer);
   clearLoginSession();
   document.getElementById('loginId').value = '';
-  document.getElementById('loginPw').value = '';
+  const hint = document.getElementById('loginDefaultHint'); if(hint && newCount >= 1) hint.style.display = '';
+    document.getElementById('loginPw').value = '';
   document.getElementById('loginError').textContent = '';
   const loginScreen = document.getElementById('loginScreen');
   const appShell = document.getElementById('appShell');
@@ -4037,7 +3832,6 @@ function showPage(page, el) {
   if (renderMap[page]) safeRender(renderMap[page], page);
   // 설정 페이지 진입 시 카드 높이 맞추기
   if(page === 'settings') setTimeout(matchSettingsCardHeight, 50);
-  if(page === 'attendance') setTimeout(matchAttCardHeight, 50);
   // 모바일 / 아이패드: 페이지 이동 후 사이드바 닫기
   if(window.innerWidth <= 1024) closeSidebar();
 }
@@ -4276,9 +4070,9 @@ function renderMembers() {
       </td>
       <td>${statusBadge}</td>
       <td style="text-align:center;white-space:nowrap;">
-        <button type="button" class="btn btn-sm btn-ghost" onclick="openMemberDetailModal('${m.id}')">상세</button>
-        ${hasPerm('members') ? `<button type="button" class="btn btn-sm btn-outline" onclick="openMemberModal('${m.id}')" style="margin-left:3px;">수정</button>
-        <button type="button" class="btn btn-sm btn-danger" onclick="deleteMember('${m.id}')" style="margin-left:3px;">삭제</button>` : ''}
+        <button class="btn btn-sm btn-ghost" onclick="openMemberDetailModal('${m.id}')">상세</button>
+        ${hasPerm('members') ? `<button class="btn btn-sm btn-outline" onclick="openMemberModal('${m.id}')" style="margin-left:3px;">수정</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMember('${m.id}')" style="margin-left:3px;">삭제</button>` : ''}
       </td>
     </tr>`;
   }).join('');
@@ -4561,8 +4355,8 @@ function renderUnpaid() {
           <div style="font-weight:700;font-size:13px;color:${isLong?'var(--amber)':'var(--coral)'};">${unpaidAmt.toLocaleString()}원</div>
           <div style="font-size:10.5px;color:var(--muted);">월 ${(m.fee||0).toLocaleString()}원 × ${months}개월</div>
         </div>
-        <button type="button" class="btn btn-sm btn-ghost" onclick="copyUnpaidMsg('${m.id}')" title="알림 문구 복사" style="padding:5px 8px;"><span class="ti ti-user" style="font-size:13px;"><svg viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2M16 3h2a2 2 0 0 1 2 2v3M9 9l3 3-3 3M13 12H3"/></svg></span></button>
-        ${(hasPerm('payments') || _currentUser?.role==='admin') ? `<button type="button" class="btn btn-sm btn-success" onclick="openTuitionModal('${m.id}')"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부처리</button>` : ''}
+        <button class="btn btn-sm btn-ghost" onclick="copyUnpaidMsg('${m.id}')" title="알림 문구 복사" style="padding:5px 8px;"><span class="ti ti-user" style="font-size:13px;"><svg viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2M16 3h2a2 2 0 0 1 2 2v3M9 9l3 3-3 3M13 12H3"/></svg></span></button>
+        ${(hasPerm('payments') || _currentUser?.role==='admin') ? `<button class="btn btn-sm btn-success" onclick="openTuitionModal('${m.id}')"><span class="ti ti-circle-check"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg></span> 납부처리</button>` : ''}
       </div>
     </div>`}).join('')}`;
 }
@@ -4753,10 +4547,10 @@ function renderMaterials() {
       <td><span class="badge ${isLow?'badge-coral':'badge-teal'}">${isLow?'⚠ 부족':'정상'}</span></td>
       <td style="text-align:center;white-space:nowrap;">
         ${(hasPerm('materials') || _currentUser?.role==='admin') ? `
-        <button type="button" class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','add')" style="color:var(--teal);border-color:var(--teal);">입고</button>
-        <button type="button" class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','use')" style="color:var(--coral);border-color:var(--coral);margin-left:3px;">사용</button>
-        <button type="button" class="btn btn-xs btn-outline" onclick="openMaterialModal('${m.id}')" style="margin-left:3px;">수정</button>
-        <button type="button" class="btn btn-xs btn-danger" onclick="deleteMaterial('${m.id}')" style="margin-left:3px;">삭제</button>
+        <button class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','add')" style="color:var(--teal);border-color:var(--teal);">입고</button>
+        <button class="btn btn-xs btn-ghost" onclick="openMatUseModal('${m.id}','use')" style="color:var(--coral);border-color:var(--coral);margin-left:3px;">사용</button>
+        <button class="btn btn-xs btn-outline" onclick="openMaterialModal('${m.id}')" style="margin-left:3px;">수정</button>
+        <button class="btn btn-xs btn-danger" onclick="deleteMaterial('${m.id}')" style="margin-left:3px;">삭제</button>
         ` : '<span style="font-size:11px;color:var(--muted-2);">조회만</span>'}
       </td>
     </tr>`;
@@ -4933,8 +4727,8 @@ function renderMatLog() {
     <td style="font-size:12px;color:var(--muted);">${l.memo||'-'}</td>
     <td style="text-align:center;white-space:nowrap;">
       ${(hasPerm('materials') || _currentUser?.role==='admin') ? `
-      <button type="button" class="btn btn-xs btn-outline" onclick="openLogEditModal('${l.id}')">수정</button>
-      <button type="button" class="btn btn-xs btn-danger" onclick="deleteLog('${l.id}')" style="margin-left:3px;">삭제</button>
+      <button class="btn btn-xs btn-outline" onclick="openLogEditModal('${l.id}')">수정</button>
+      <button class="btn btn-xs btn-danger" onclick="deleteLog('${l.id}')" style="margin-left:3px;">삭제</button>
       ` : '-'}
     </td>
   </tr>`).join('');
@@ -5028,6 +4822,7 @@ function renderAttendance(){
 
   if(!active.length){
     attEl.innerHTML='<div class="empty-state"><div class="empty-icon"><span class="ti ti-users" style="font-size:38px;color:var(--muted-2);"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg></span></div><div class="empty-text">재원 회원이 없습니다</div></div>';
+    document.getElementById('attStats').innerHTML='';
     document.getElementById('attSummaryStats').innerHTML='';
     return;
   }
@@ -5038,30 +4833,18 @@ function renderAttendance(){
       const s=att[m.id]||'none';
       const cl = (type) => `btn btn-sm att-btn ${s===type?(type==='present'?'btn-success':type==='late'?'btn-primary':'btn-danger'):'btn-ghost'}`;
       const lbl = (()=>{try{return classLabel(m)}catch(e){return '-'}})();
-      return `<div class="att-row" data-mid="${m.id}" style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border-2);">
-        <!-- 왼쪽: 이름 + 수업 현황 -->
-        <div style="min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
-            <div class="att-name">${m.name}</div>
-            <span class="att-course-tag">${m.course}</span>
-            <span class="class-chip">${lbl}</span>
-            ${s==='present'?'<span class="badge badge-teal" style="font-size:10px;">출석</span>':s==='late'?'<span class="badge badge-amber" style="font-size:10px;">지각</span>':s==='absent'?'<span class="badge badge-coral" style="font-size:10px;">결석</span>':''}
-            ${(()=>{const mk=db.attendance[dv]?.[m.id+'_makeup'];return mk?`<span class="badge badge-purple" style="font-size:10px;">보강완료 ${mk}</span>`:''})()}
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <div style="flex:1;max-width:140px;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
-              <div style="height:100%;width:${Math.min(100,Math.round(((stats[m.id]?.present||0)+(stats[m.id]?.late||0))/Math.max(1,getMonthlyTarget(m))*100))}%;background:${(()=>{const p=Math.min(100,Math.round(((stats[m.id]?.present||0)+(stats[m.id]?.late||0))/Math.max(1,getMonthlyTarget(m))*100));return p>=80?'var(--teal)':p>=50?'var(--amber)':'var(--coral)'})()};border-radius:99px;"></div>
-            </div>
-            <span style="font-size:11px;color:var(--muted);white-space:nowrap;">${(stats[m.id]?.present||0)+(stats[m.id]?.late||0)} / ${getMonthlyTarget(m)}회</span>
-          </div>
+      return `<div class="att-row" data-mid="${m.id}">
+        <div class="flex-center gap-6" style="flex-wrap:wrap;">
+          <div class="att-name">${m.name}</div>
+          <span class="att-course-tag">${m.course}</span>
+          <span class="class-chip">${lbl}</span>
+          ${s==='present'?'<span class="badge badge-teal" style="font-size:10px;">출석</span>':s==='late'?'<span class="badge badge-amber" style="font-size:10px;">지각</span>':s==='absent'?'<span class="badge badge-coral" style="font-size:10px;">결석</span>':''}
         </div>
-        <!-- 오른쪽: 출결 버튼 -->
-        <div class="att-btns" style="flex-shrink:0;">
+        <div class="att-btns">
           ${(hasPerm('attendance') || _currentUser?.role==='admin') ? `
-          <button type="button" data-status="present" onclick="setAtt('${dv}','${m.id}','present')" class="${cl('present')}">출석</button>
-          <button type="button" data-status="late"    onclick="setAtt('${dv}','${m.id}','late')"    class="${cl('late')}">지각</button>
-          <button type="button" data-status="absent"  onclick="setAtt('${dv}','${m.id}','absent')"  class="${cl('absent')}">결석</button>
-          ${s==='absent' && !db.attendance[dv]?.[m.id+'_makeup'] ? `<button type="button" class="btn btn-sm btn-ghost" onclick="openMakeupModal('${dv}','${m.id}')" style="color:var(--purple);border-color:var(--purple);margin-left:2px;">보강</button>` : ''}
+          <button data-status="present" onclick="setAtt('${dv}','${m.id}','present')" class="${cl('present')}">출석</button>
+          <button data-status="late"    onclick="setAtt('${dv}','${m.id}','late')"    class="${cl('late')}">지각</button>
+          <button data-status="absent"  onclick="setAtt('${dv}','${m.id}','absent')"  class="${cl('absent')}">결석</button>
           ` : `<span style="font-size:11px;color:var(--muted-2);">${s||'미입력'}</span>`}
         </div>
       </div>`;
@@ -5078,9 +4861,7 @@ function renderAttendance(){
   const stats={};
   active.forEach(m=>{stats[m.id]={present:0,late:0,absent:0};});
   days.forEach(d=>{
-    Object.entries(db.attendance[d]||{}).forEach(([mid,s])=>{\
-      // _makeup, _makeupMemo 등 메타 키 제외
-      if(mid.includes('_')) return;
+    Object.entries(db.attendance[d]||{}).forEach(([mid,s])=>{
       if(stats[mid]) stats[mid][s]=(stats[mid][s]||0)+1;
     });
   });
@@ -5120,10 +4901,38 @@ function renderAttendance(){
       <div class="stat-sub">목표 50% 미만</div>
     </div>`;
 
-    // 수업현황은 통합 행에 포함 — attStats 별도 렌더 불필요
+  // 수업일수 진행률 카드
+  document.getElementById('attStats').innerHTML=
+    active.map(m=>{
+      const st=stats[m.id]||{present:0,late:0,absent:0};
+      const done=st.present+st.late;
+      const target=getMonthlyTarget(m);
+      const pct=target>0?Math.min(100,Math.round(done/target*100)):0;
+      const barClr=pct>=80?'var(--teal)':pct>=50?'var(--amber)':'var(--coral)';
+      const statusTxt=done>=target?'<span style="font-size:10px;color:var(--teal);font-weight:600;">✓ 목표달성</span>':
+        done===0?'<span style="font-size:10px;color:var(--muted);">미출석</span>':'';
+      return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+        <div class="flex-between" style="margin-bottom:5px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:13px;font-weight:600;">${m.name}</span>
+            <span class="class-chip"><span class="ti ti-calendar-repeat" style="font-size:10px;"><svg viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 8-8 8 8 0 0 1 8 8v2"/><path d="M4 11l3-3-3-3M20 11l-3 3 3 3"/><path d="M4 19v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>${(()=>{try{return classLabel(m)}catch(e){return '-'}})()}</span>
+            ${statusTxt}
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:13px;font-weight:700;color:${barClr};">${done}</span>
+            <span style="font-size:11px;color:var(--muted);">/${target}회</span>
+          </div>
+        </div>
+        <div class="att-progress-wrap">
+          <div class="att-progress-bar" style="width:${pct}%;background:${barClr};"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span style="font-size:10.5px;color:var(--muted);">출 ${st.present} · 지 ${st.late} · 결 ${st.absent}</span>
+          <span style="font-size:10.5px;color:var(--muted);">${pct}%</span>
+        </div>
+      </div>`;
+    }).join('');
   } catch(statErr) { console.error('attStats 오류:', statErr); }
-  // 카드 높이 재계산 (iOS 포함 모든 기기 대응)
-  setTimeout(matchAttCardHeight, 30);
 }
 function setAtt(date,mid,status){
   if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
@@ -5352,34 +5161,6 @@ function openMemberDetailModal(id) {
           <div style="font-size:11px;color:var(--muted);">${h.date} · ${h.by}</div>
         </div>`).join('')}
     </div>` : ''}
-    ${(()=>{
-      // 이 회원의 보강 이력 수집
-      const makeupList = [];
-      Object.keys(db.attendance).sort().reverse().forEach(d => {
-        const dayAtt = db.attendance[d] || {};
-        if (dayAtt[m.id + '_makeup']) {
-          makeupList.push({
-            absDate: d,
-            makeupDate: dayAtt[m.id + '_makeup'],
-            memo: dayAtt[m.id + '_makeupMemo'] || '',
-          });
-        }
-      });
-      if (!makeupList.length) return '';
-      return `
-      <div style="background:var(--bg);border-radius:var(--r-md);padding:12px 14px;margin-bottom:4px;">
-        <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:8px;">보강 이력</div>
-        ${makeupList.map(mk => `
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-2);">
-            <div style="font-size:12.5px;display:flex;align-items:center;gap:6px;">
-              <span class="badge badge-coral" style="font-size:10px;">결석 ${mk.absDate}</span>
-              <span style="color:var(--muted);">→</span>
-              <span class="badge badge-purple" style="font-size:10px;">보강 ${mk.makeupDate}</span>
-              ${mk.memo ? `<span style="font-size:11px;color:var(--muted);">${mk.memo}</span>` : ''}
-            </div>
-          </div>`).join('')}
-      </div>`;
-    })()}
   `;
   document.getElementById('memberDetailModal').classList.add('open');
 }
@@ -5569,91 +5350,13 @@ function copyOrderList() {
 let calMonth = kstMonthStr();
 
 function switchAttTab(tab) {
-  ['daily','calendar','rank','bulk','makeup'].forEach(t => {
-    const c = document.getElementById('att-tab-'+t);
-    const b = document.getElementById('atab-'+t);
-    if(c) c.style.display = t===tab?'block':'none';
-    if(b) b.classList.toggle('active', t===tab);
+  ['daily','calendar','rank','bulk'].forEach(t => {
+    document.getElementById('att-tab-'+t).style.display = t===tab?'block':'none';
+    document.getElementById('atab-'+t).classList.toggle('active', t===tab);
   });
   if (tab === 'calendar') renderAttCalendar();
-  if (tab === 'rank')     renderAttRank();
-  if (tab === 'bulk')     renderBulkMemberSelect();
-  if (tab === 'makeup')   renderMakeupList();
-}
-
-// ══════════════════════════════════════════
-// 보강 현황
-// ══════════════════════════════════════════
-let _makeupMonth = null;
-
-function changeMakeupMonth(delta) {
-  if (!_makeupMonth) _makeupMonth = kstMonthStr();
-  const [y, mo] = _makeupMonth.split('-').map(Number);
-  const d = new Date(y, mo - 1 + delta, 1);
-  _makeupMonth = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-  renderMakeupList();
-}
-
-function renderMakeupList() {
-  if (!_makeupMonth) _makeupMonth = kstMonthStr();
-  const el  = document.getElementById('makeupList');
-  const lbl = document.getElementById('makeupMonthLabel');
-  if (!el) return;
-  if (lbl) lbl.textContent = _makeupMonth.replace('-','년 ') + '월';
-
-  // 해당 월 결석 + 보강 이력 수집
-  const days = Object.keys(db.attendance).filter(d => d.startsWith(_makeupMonth)).sort();
-  const rows = [];
-  days.forEach(d => {
-    const dayAtt = db.attendance[d] || {};
-    db.members.filter(m => m.status === 'active').forEach(m => {
-      const s = dayAtt[m.id];
-      const makeupDate = dayAtt[m.id + '_makeup'] || '';
-      const memo       = dayAtt[m.id + '_makeupMemo'] || '';
-      if (s === 'absent' || makeupDate) {
-        rows.push({ name: m.name, mid: m.id, absDate: d, makeupDate, memo, done: !!makeupDate });
-      }
-    });
-  });
-
-  if (!rows.length) {
-    el.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-text">이달 결석 또는 보강 내역이 없습니다</div></div>';
-    return;
-  }
-
-  rows.sort((a,b) => a.done - b.done || a.absDate.localeCompare(b.absDate));
-  const doneCount = rows.filter(r => r.done).length;
-  const pendCount = rows.filter(r => !r.done).length;
-
-  el.innerHTML = `
-    <div style="display:flex;gap:10px;margin-bottom:14px;">
-      <div style="background:var(--coral-bg);border-radius:var(--r-md);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--coral);">보강 대기 ${pendCount}건</div>
-      <div style="background:var(--teal-bg);border-radius:var(--r-md);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--teal);">보강 완료 ${doneCount}건</div>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead><tr style="background:var(--bg);">
-        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">회원</th>
-        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">결석일</th>
-        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">보강일</th>
-        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">메모</th>
-        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:center;border-bottom:1px solid var(--border);">처리</th>
-      </tr></thead>
-      <tbody>
-        ${rows.map(r => `
-        <tr style="border-bottom:1px solid var(--border-2);">
-          <td style="padding:9px 10px;font-size:13px;font-weight:600;">${r.name}</td>
-          <td style="padding:9px 10px;font-size:12.5px;color:var(--coral);">${r.absDate}</td>
-          <td style="padding:9px 10px;font-size:12.5px;color:${r.done?'var(--teal)':'var(--muted)'};">${r.makeupDate||'—'}</td>
-          <td style="padding:9px 10px;font-size:12px;color:var(--muted);">${r.memo||'—'}</td>
-          <td style="padding:9px 10px;text-align:center;">
-            ${r.done
-              ? '<span class="badge badge-teal" style="font-size:11px;">완료</span>'
-              : `<button type="button" class="btn btn-xs btn-outline" onclick="openMakeupModal('${r.absDate}','${r.mid}')" style="color:var(--purple);border-color:var(--purple);">보강 처리</button>`
-            }
-          </td>
-        </tr>`).join('')}
-      </tbody>
-    </table>`;
+  if (tab === 'rank') renderAttRank();
+  if (tab === 'bulk') renderBulkMemberSelect();
 }
 
 function renderBulkMemberSelect() {
@@ -6239,8 +5942,8 @@ function renderAccountList() {
       </div>
       ${isAdmin && !isMe ? `
         <div style="display:flex;gap:5px;flex-shrink:0;">
-          <button type="button" class="btn btn-xs btn-ghost" onclick="openEditAccountModal('${acc.id}')">수정</button>
-          ${!isAccAdmin ? `<button type="button" class="btn btn-xs btn-danger" onclick="deleteAccount('${acc.id}')">삭제</button>` : ''}
+          <button class="btn btn-xs btn-ghost" onclick="openEditAccountModal('${acc.id}')">수정</button>
+          ${!isAccAdmin ? `<button class="btn btn-xs btn-danger" onclick="deleteAccount('${acc.id}')">삭제</button>` : ''}
         </div>` : ''}
     </div>`;
   }).join('');
@@ -6372,7 +6075,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.7';
+const CURRENT_SW_VERSION = 'v1.0-build0.6';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
@@ -6409,22 +6112,8 @@ async function checkVersionAndReload() {
 // 창 크기 변경 시 설정 카드 높이 재조정
 window.addEventListener('resize', () => {
   clearTimeout(window._resizeTimer);
-  window._resizeTimer = setTimeout(() => {
-    matchSettingsCardHeight();
-    matchAttCardHeight();
-  }, 100);
+  window._resizeTimer = setTimeout(matchSettingsCardHeight, 100);
 });
-
-// ── 출결 통합 카드 높이 동적 계산 (iOS safari 100vh 버그 대응)
-function matchAttCardHeight() {
-  const listEl = document.getElementById('attList');
-  if (!listEl) return;
-  const viewH   = window.innerHeight;
-  const rect    = listEl.getBoundingClientRect();
-  const bottomPad = 24;
-  const maxH = Math.max(200, viewH - rect.top - bottomPad);
-  listEl.style.maxHeight = Math.min(maxH, 680) + 'px';
-}
 
 // ── Service Worker 등록 (캐시 자동 업데이트)
 if('serviceWorker' in navigator) {
