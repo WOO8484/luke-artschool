@@ -908,6 +908,9 @@ select { -webkit-appearance: auto; }
   .two-col   { grid-template-columns: 1fr !important; gap: 12px; }
   .three-col { grid-template-columns: 1fr !important; }
   .form-grid { grid-template-columns: 1fr !important; gap: 10px; }
+  .form-group.full > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
   .form-group.full { grid-column: 1 !important; }
 
   /* 버튼 */
@@ -1081,7 +1084,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.8</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.0</div>
 
   </div>
 </div>
@@ -1416,19 +1419,19 @@ select { -webkit-appearance: auto; }
   </div>
 
   <!-- 출석 체크 + 이달 수업 현황 (고정 높이 독립 스크롤) -->
-  <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch;">
-    <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 280px);min-height:400px;max-height:700px;">
+  <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch;" id="attDailyGrid">
+    <div class="card" style="display:flex;flex-direction:column;" id="attCheckCard">
       <div class="card-header" style="flex-shrink:0;">
         <div class="card-title">출석 체크</div>
       </div>
-      <div id="attList" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+      <div id="attList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
-    <div class="card" style="display:flex;flex-direction:column;height:calc(100vh - 280px);min-height:400px;max-height:700px;">
+    <div class="card" style="display:flex;flex-direction:column;" id="attStatsCard">
       <div class="card-header" style="flex-shrink:0;">
         <div class="card-title">이달 수업 현황</div>
         <div class="card-subtitle" id="attStatsMonthLabel"></div>
       </div>
-      <div id="attStats" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+      <div id="attStats" style="overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
     </div>
   </div>
 
@@ -1688,7 +1691,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.8</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.0</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2070,7 +2073,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.8</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.0</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2094,7 +2097,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.8</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.0</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -2440,13 +2443,18 @@ select { -webkit-appearance: auto; }
         <label class="form-label">월 원비 (원)</label>
         <input type="number" class="form-input" id="mFee" placeholder="150000">
       </div>
-      <div class="form-group">
-        <label class="form-label">등록일</label>
-        <input type="date" class="form-input" id="mStartDate" style="width:100%;box-sizing:border-box;">
-      </div>
-      <div class="form-group">
-        <label class="form-label">생일 🎂</label>
-        <input type="date" class="form-input" id="mBirthday" style="width:100%;box-sizing:border-box;min-width:0;">
+      <!-- 등록일 + 생일: full 행에서 2열로 나눠 항상 충분한 너비 확보 -->
+      <div class="form-group full">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div>
+            <label class="form-label">등록일</label>
+            <input type="date" class="form-input" id="mStartDate" style="width:100%;box-sizing:border-box;">
+          </div>
+          <div>
+            <label class="form-label">생일 🎂</label>
+            <input type="date" class="form-input" id="mBirthday" style="width:100%;box-sizing:border-box;">
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">보호자 연락처</label>
@@ -3820,6 +3828,7 @@ function showPage(page, el) {
   if (renderMap[page]) safeRender(renderMap[page], page);
   // 설정 페이지 진입 시 카드 높이 맞추기
   if(page === 'settings') setTimeout(matchSettingsCardHeight, 50);
+  if(page === 'attendance') setTimeout(matchAttCardHeight, 50);
   // 모바일 / 아이패드: 페이지 이동 후 사이드바 닫기
   if(window.innerWidth <= 1024) closeSidebar();
 }
@@ -4921,6 +4930,8 @@ function renderAttendance(){
       </div>`;
     }).join('');
   } catch(statErr) { console.error('attStats 오류:', statErr); }
+  // 카드 높이 재계산 (iOS 포함 모든 기기 대응)
+  setTimeout(matchAttCardHeight, 30);
 }
 function setAtt(date,mid,status){
   if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
@@ -6063,7 +6074,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build0.8';
+const CURRENT_SW_VERSION = 'v1.0-build1.0';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
@@ -6100,8 +6111,38 @@ async function checkVersionAndReload() {
 // 창 크기 변경 시 설정 카드 높이 재조정
 window.addEventListener('resize', () => {
   clearTimeout(window._resizeTimer);
-  window._resizeTimer = setTimeout(matchSettingsCardHeight, 100);
+  window._resizeTimer = setTimeout(() => {
+    matchSettingsCardHeight();
+    matchAttCardHeight();
+  }, 100);
 });
+
+// ── 출결 카드 높이 동적 계산 (iOS safari 100vh 버그 대응)
+function matchAttCardHeight() {
+  const grid = document.getElementById('attDailyGrid');
+  if (!grid) return;
+  const listEl  = document.getElementById('attList');
+  const statsEl = document.getElementById('attStats');
+  if (!listEl || !statsEl) return;
+
+  // 실제 보이는 영역 기준으로 계산
+  const viewH   = window.innerHeight;  // 실제 뷰포트 (주소창 제외)
+  const gridTop = grid.getBoundingClientRect().top;
+  const bottomPad = 24;
+  const cardH   = Math.max(300, viewH - gridTop - bottomPad);
+  const maxH    = Math.min(cardH, 680);
+
+  // 카드 자체 높이
+  const checkCard = document.getElementById('attCheckCard');
+  const statsCard = document.getElementById('attStatsCard');
+  if (checkCard) checkCard.style.height = maxH + 'px';
+  if (statsCard) statsCard.style.height = maxH + 'px';
+
+  // 카드 헤더 높이 빼고 스크롤 영역 설정
+  const headerH = checkCard?.querySelector('.card-header')?.offsetHeight || 56;
+  listEl.style.height  = (maxH - headerH - 28) + 'px';
+  statsEl.style.height = (maxH - headerH - 28) + 'px';
+}
 
 // ── Service Worker 등록 (캐시 자동 업데이트)
 if('serviceWorker' in navigator) {
