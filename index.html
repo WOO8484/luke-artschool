@@ -1394,6 +1394,7 @@ select { -webkit-appearance: auto; }
           <button class="tuition-tab" id="atab-calendar" onclick="switchAttTab('calendar')">📅 월별 달력</button>
           <button class="tuition-tab" id="atab-rank" onclick="switchAttTab('rank')">🏅 출석률 순위</button>
           <button class="tuition-tab" id="atab-bulk" onclick="switchAttTab('bulk')">📋 날짜 범위 일괄</button>
+          <button class="tuition-tab" id="atab-makeup" onclick="switchAttTab('makeup')">🔄 보강 현황</button>
         </div>
         <div id="att-tab-daily">
 
@@ -1451,7 +1452,19 @@ select { -webkit-appearance: auto; }
           </div>
         </div>
 
-        <!-- 날짜 범위 일괄 처리 탭 -->
+        <!-- 보강 현황 탭 -->
+        <div id="att-tab-makeup" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">보강 현황</div><div class="card-subtitle" id="makeupMonthLabel"></div></div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-sm btn-ghost" onclick="changeMakeupMonth(-1)">◀</button>
+                <button class="btn btn-sm btn-ghost" onclick="changeMakeupMonth(1)">▶</button>
+              </div>
+            </div>
+            <div id="makeupList"></div>
+          </div>
+        </div>
         <div id="att-tab-bulk" style="display:none;">
           <div class="card">
             <div class="card-header">
@@ -5199,6 +5212,34 @@ function openMemberDetailModal(id) {
           <div style="font-size:11px;color:var(--muted);">${h.date} · ${h.by}</div>
         </div>`).join('')}
     </div>` : ''}
+    ${(()=>{
+      // 이 회원의 보강 이력 수집
+      const makeupList = [];
+      Object.keys(db.attendance).sort().reverse().forEach(d => {
+        const dayAtt = db.attendance[d] || {};
+        if (dayAtt[m.id + '_makeup']) {
+          makeupList.push({
+            absDate: d,
+            makeupDate: dayAtt[m.id + '_makeup'],
+            memo: dayAtt[m.id + '_makeupMemo'] || '',
+          });
+        }
+      });
+      if (!makeupList.length) return '';
+      return `
+      <div style="background:var(--bg);border-radius:var(--r-md);padding:12px 14px;margin-bottom:4px;">
+        <div style="font-size:10.5px;color:var(--muted);font-weight:600;margin-bottom:8px;">보강 이력</div>
+        ${makeupList.map(mk => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-2);">
+            <div style="font-size:12.5px;display:flex;align-items:center;gap:6px;">
+              <span class="badge badge-coral" style="font-size:10px;">결석 ${mk.absDate}</span>
+              <span style="color:var(--muted);">→</span>
+              <span class="badge badge-purple" style="font-size:10px;">보강 ${mk.makeupDate}</span>
+              ${mk.memo ? `<span style="font-size:11px;color:var(--muted);">${mk.memo}</span>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+    })()}
   `;
   document.getElementById('memberDetailModal').classList.add('open');
 }
@@ -5388,13 +5429,91 @@ function copyOrderList() {
 let calMonth = kstMonthStr();
 
 function switchAttTab(tab) {
-  ['daily','calendar','rank','bulk'].forEach(t => {
-    document.getElementById('att-tab-'+t).style.display = t===tab?'block':'none';
-    document.getElementById('atab-'+t).classList.toggle('active', t===tab);
+  ['daily','calendar','rank','bulk','makeup'].forEach(t => {
+    const c = document.getElementById('att-tab-'+t);
+    const b = document.getElementById('atab-'+t);
+    if(c) c.style.display = t===tab?'block':'none';
+    if(b) b.classList.toggle('active', t===tab);
   });
   if (tab === 'calendar') renderAttCalendar();
-  if (tab === 'rank') renderAttRank();
-  if (tab === 'bulk') renderBulkMemberSelect();
+  if (tab === 'rank')     renderAttRank();
+  if (tab === 'bulk')     renderBulkMemberSelect();
+  if (tab === 'makeup')   renderMakeupList();
+}
+
+// ══════════════════════════════════════════
+// 보강 현황
+// ══════════════════════════════════════════
+let _makeupMonth = null;
+
+function changeMakeupMonth(delta) {
+  if (!_makeupMonth) _makeupMonth = kstMonthStr();
+  const [y, mo] = _makeupMonth.split('-').map(Number);
+  const d = new Date(y, mo - 1 + delta, 1);
+  _makeupMonth = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  renderMakeupList();
+}
+
+function renderMakeupList() {
+  if (!_makeupMonth) _makeupMonth = kstMonthStr();
+  const el  = document.getElementById('makeupList');
+  const lbl = document.getElementById('makeupMonthLabel');
+  if (!el) return;
+  if (lbl) lbl.textContent = _makeupMonth.replace('-','년 ') + '월';
+
+  // 해당 월 결석 + 보강 이력 수집
+  const days = Object.keys(db.attendance).filter(d => d.startsWith(_makeupMonth)).sort();
+  const rows = [];
+  days.forEach(d => {
+    const dayAtt = db.attendance[d] || {};
+    db.members.filter(m => m.status === 'active').forEach(m => {
+      const s = dayAtt[m.id];
+      const makeupDate = dayAtt[m.id + '_makeup'] || '';
+      const memo       = dayAtt[m.id + '_makeupMemo'] || '';
+      if (s === 'absent' || makeupDate) {
+        rows.push({ name: m.name, mid: m.id, absDate: d, makeupDate, memo, done: !!makeupDate });
+      }
+    });
+  });
+
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:32px;"><div class="empty-text">이달 결석 또는 보강 내역이 없습니다</div></div>';
+    return;
+  }
+
+  rows.sort((a,b) => a.done - b.done || a.absDate.localeCompare(b.absDate));
+  const doneCount = rows.filter(r => r.done).length;
+  const pendCount = rows.filter(r => !r.done).length;
+
+  el.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:14px;">
+      <div style="background:var(--coral-bg);border-radius:var(--r-md);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--coral);">보강 대기 ${pendCount}건</div>
+      <div style="background:var(--teal-bg);border-radius:var(--r-md);padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--teal);">보강 완료 ${doneCount}건</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:var(--bg);">
+        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">회원</th>
+        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">결석일</th>
+        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">보강일</th>
+        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:left;border-bottom:1px solid var(--border);">메모</th>
+        <th style="padding:8px 10px;font-size:11px;color:var(--muted);font-weight:600;text-align:center;border-bottom:1px solid var(--border);">처리</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr style="border-bottom:1px solid var(--border-2);">
+          <td style="padding:9px 10px;font-size:13px;font-weight:600;">${r.name}</td>
+          <td style="padding:9px 10px;font-size:12.5px;color:var(--coral);">${r.absDate}</td>
+          <td style="padding:9px 10px;font-size:12.5px;color:${r.done?'var(--teal)':'var(--muted)'};">${r.makeupDate||'—'}</td>
+          <td style="padding:9px 10px;font-size:12px;color:var(--muted);">${r.memo||'—'}</td>
+          <td style="padding:9px 10px;text-align:center;">
+            ${r.done
+              ? '<span class="badge badge-teal" style="font-size:11px;">완료</span>'
+              : `<button class="btn btn-xs btn-outline" onclick="openMakeupModal('${r.absDate}','${r.mid}')" style="color:var(--purple);border-color:var(--purple);">보강 처리</button>`
+            }
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
 }
 
 function renderBulkMemberSelect() {
