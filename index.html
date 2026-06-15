@@ -1083,8 +1083,11 @@ select { -webkit-appearance: auto; }
     </div>
     <div class="login-error" id="loginError"></div>
     <button type="button" class="login-btn" onclick="_call(doLogin)">로그인</button>
+    <div id="loginDefaultHint" style="display:none;margin-top:12px;padding:9px 14px;background:#f5f3ff;border:1px solid #e0d9ff;border-radius:10px;font-size:12px;color:#6E4FD0;text-align:center;line-height:1.6;">
+      🔑 초기 계정 &nbsp;|&nbsp; 아이디: <strong>admin</strong> &nbsp;/&nbsp; 비밀번호: <strong>1234</strong>
+    </div>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.7</div>
+    <div style="text-align:center;margin-top:14px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.7</div>
 
   </div>
 </div>
@@ -2764,7 +2767,11 @@ let editMemberId = null, editMaterialId = null, editTuitionKey = null, matUseId 
 function loadDb() {
   try {
     const s = _storage.getItem('luke_artschool_v2');
-    if (s) { const d = JSON.parse(s); if(d.members) db = d; }
+    if (s) {
+      const d = JSON.parse(s);
+      // members가 없어도 auth 등 저장된 데이터는 최대한 보존
+      if (d && typeof d === 'object') db = d;
+    }
   } catch(e){}
   if (!db.members)    db.members    = [];
   if (!db.payments)   db.payments   = {};
@@ -3857,7 +3864,19 @@ async function doLogin() {
     return;
   }
 
-  const acc = (db.auth.accounts || []).find(a => a.id === id && a.pw === hashed);
+  // 해시 비교 먼저, 그 다음 평문 비교 (마이그레이션 안 된 경우)
+  let acc = (db.auth.accounts || []).find(a => a.id === id && isHashed(a.pw) && a.pw === hashed);
+  if (!acc) {
+    const accPlain = (db.auth.accounts || []).find(a => a.id === id && !isHashed(a.pw) && a.pw === pw);
+    if (accPlain) {
+      // 평문 → 해시로 즉시 업그레이드 후 로그인
+      accPlain.pw = hashed;
+      markDirty('auth');
+      saveDb();
+      acc = accPlain;
+    }
+  }
+
   if (acc) {
     resetLoginFail();
     _currentUser = { id: acc.id, name: acc.name || acc.id, title: acc.title || '', role: acc.role || 'staff', permissions: acc.permissions || [] };
@@ -3875,16 +3894,6 @@ async function doLogin() {
     saveLoginSession(acc.id);
     setTimeout(autoReconnectFirebase, 400);
   } else {
-    // 평문 비교도 시도 (마이그레이션 안 된 경우 대비)
-    const accPlain = (db.auth.accounts || []).find(a => a.id === id && !isHashed(a.pw) && a.pw === pw);
-    if (accPlain) {
-      // 마이그레이션 후 재시도
-      accPlain.pw = hashed;
-      markDirty('auth');
-      saveDb();
-      doLogin();
-      return;
-    }
     const newCount = count + 1;
     try { sessionStorage.setItem(LOGIN_FAIL_KEY, newCount.toString()); } catch(e) {}
     if (newCount >= MAX_FAIL) {
@@ -3896,6 +3905,9 @@ async function doLogin() {
     }
     document.getElementById('loginPw').value = '';
     document.getElementById('loginPw').focus();
+    // 1회 이상 실패 시 초기 계정 힌트 표시
+    const hint = document.getElementById('loginDefaultHint');
+    if (hint) hint.style.display = '';
   }
 }
 
