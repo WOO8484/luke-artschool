@@ -662,6 +662,23 @@ tbody tr:hover td { background: var(--bg); }
 .perm-label { font-size: 12.5px; font-weight: 500; color: var(--ink-3); line-height: 1.4; pointer-events: none; }
 .perm-sub { display: block; font-size: 10.5px; color: var(--muted); font-weight: 400; }
 
+/* HELP MODAL */
+.help-section { margin-bottom:16px; }
+.help-title { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.help-row { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid var(--border-2); font-size:12.5px; color:var(--ink-3); }
+.help-badge { background:var(--purple-bg); color:var(--purple); padding:2px 8px; border-radius:99px; font-size:10.5px; font-weight:600; flex-shrink:0; white-space:nowrap; }
+.help-badge.help-badge-warn { background:var(--amber-bg); color:var(--amber); }
+.help-badge.help-badge-danger { background:var(--coral-bg); color:var(--coral); }
+.help-tip { font-size:11.5px; color:var(--teal); background:var(--teal-bg); border-radius:var(--r-sm); padding:6px 10px; margin-top:8px; }
+.help-tip.help-warn { color:var(--amber); background:var(--amber-bg); }
+.help-steps { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+.help-step { display:flex; align-items:flex-start; gap:8px; }
+.help-step > span { width:20px; height:20px; border-radius:50%; background:var(--purple); color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.help-step > div { font-size:12.5px; color:var(--ink-3); padding-top:2px; line-height:1.5; }
+.help-faq-item { margin-bottom:10px; border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
+.help-faq-q { background:var(--bg); padding:8px 12px; font-size:12.5px; font-weight:600; color:var(--purple); }
+.help-faq-a { padding:8px 12px; font-size:12px; color:var(--ink-3); line-height:1.6; }
+
 /* PASSWORD CHANGE */
 .pw-row { display: flex; align-items: center; gap: 10px; }
 
@@ -1144,6 +1161,10 @@ select { -webkit-appearance: auto; }
       </div>
       <div class="tb-right">
         <div class="tb-date" id="todayInfo"></div>
+        <button class="btn btn-sm btn-ghost" onclick="openHelpModal()" style="padding:6px 10px;font-size:12px;border-radius:var(--r-md);gap:4px;" title="도움말">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 17v.01M12 13a2 2 0 0 0 1.5-3.5A2 2 0 0 0 10 11"/></svg>
+          도움말
+        </button>
       </div>
     </div>
 
@@ -1794,6 +1815,241 @@ select { -webkit-appearance: auto; }
         <tbody id="activityLogBody"></tbody>
       </table>
     </div>
+  </div>
+</div>
+
+<!-- ══════════ 도움말 모달 ══════════ -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal" style="width:600px;max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="modal-header" style="flex-shrink:0;">
+      <div>
+        <div class="modal-title">도움말</div>
+        <div class="card-subtitle">기능별 사용 방법을 확인하세요</div>
+      </div>
+      <button class="modal-close" onclick="closeHelpModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+
+    <!-- 탭 -->
+    <div style="display:flex;gap:4px;padding:0 0 12px;flex-shrink:0;flex-wrap:wrap;">
+      <button class="tuition-tab active" id="htab-start"    onclick="switchHelpTab('start')">🚀 시작하기</button>
+      <button class="tuition-tab"        id="htab-members"  onclick="switchHelpTab('members')">👥 회원</button>
+      <button class="tuition-tab"        id="htab-tuition"  onclick="switchHelpTab('tuition')">💰 원비</button>
+      <button class="tuition-tab"        id="htab-att"      onclick="switchHelpTab('att')">📋 출결</button>
+      <button class="tuition-tab"        id="htab-materials"onclick="switchHelpTab('materials')">🎨 자재</button>
+      <button class="tuition-tab"        id="htab-account"  onclick="switchHelpTab('account')">🔐 계정</button>
+      <button class="tuition-tab"        id="htab-settings" onclick="switchHelpTab('settings')">⚙️ 설정</button>
+      <button class="tuition-tab"        id="htab-faq"      onclick="switchHelpTab('faq')">❓ FAQ</button>
+    </div>
+
+    <!-- 콘텐츠 -->
+    <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+
+      <!-- 시작하기 -->
+      <div id="help-start">
+        <div class="help-section">
+          <div class="help-title">📱 앱 설치 (홈 화면 추가)</div>
+          <div class="help-row"><span class="help-badge">아이폰/아이패드</span><span>Safari → 공유 버튼(□↑) → 홈 화면에 추가</span></div>
+          <div class="help-row"><span class="help-badge">안드로이드</span><span>Chrome → 메뉴(⋮) → 홈 화면에 추가</span></div>
+          <div class="help-tip">홈 화면에 추가하면 전체화면 앱처럼 실행됩니다.</div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">🔑 로그인</div>
+          <div class="help-row"><span class="help-badge">잠금</span><span>비밀번호 5회 오류 시 5분 자동 잠금</span></div>
+          <div class="help-row"><span class="help-badge">세션</span><span>새로고침해도 유지 · 탭 닫으면 로그아웃</span></div>
+          <div class="help-row"><span class="help-badge">자동로그인</span><span>설정에서 켜면 탭 닫아도 유지</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">🔴 오프라인 / 동기화</div>
+          <div class="help-row"><span class="help-badge">오프라인</span><span>마지막 데이터 조회 가능 · 변경 시 로컬 저장</span></div>
+          <div class="help-row"><span class="help-badge">동기화</span><span>온라인 복귀 시 Firebase 자동 동기화</span></div>
+          <div class="help-tip help-warn">출결 [저장] 버튼을 눌러야 다른 기기에 반영됩니다.</div>
+        </div>
+      </div>
+
+      <!-- 회원 -->
+      <div id="help-members" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">👤 회원 등록</div>
+          <div class="help-steps">
+            <div class="help-step"><span>1</span><div><b>+ 회원 등록</b> 버튼 클릭</div></div>
+            <div class="help-step"><span>2</span><div>이름(필수) · 연락처 · 수강과정 · 원비 입력</div></div>
+            <div class="help-step"><span>3</span><div><b>[저장]</b> → 즉시 다른 기기 반영</div></div>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">🔍 검색</div>
+          <div class="help-row"><span class="help-badge">범위</span><span>이름 · 연락처 · 수강과정 · 메모 · 학년 통합 검색</span></div>
+          <div class="help-tip">"수채화" 검색 시 수채화 수강 회원 전체 표시</div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📋 수강 이력</div>
+          <div class="help-row"><span class="help-badge">자동 기록</span><span>수강 과정 변경 시 일시 · 처리자 자동 기록</span></div>
+          <div class="help-row"><span class="help-badge">확인</span><span>회원 [상세] 버튼 → 수강 과정 변경 이력 섹션</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">⚠️ 탈퇴 vs 삭제</div>
+          <div class="help-row"><span class="help-badge help-badge-warn">탈퇴</span><span>데이터 보존 · 재원 목록 제외 · 재등록 가능 ← 권장</span></div>
+          <div class="help-row"><span class="help-badge help-badge-danger">삭제</span><span>완전 삭제 · 원비 기록도 삭제 · 복구 불가</span></div>
+        </div>
+      </div>
+
+      <!-- 원비 -->
+      <div id="help-tuition" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">💳 납부 처리</div>
+          <div class="help-steps">
+            <div class="help-step"><span>1</span><div>◀ ▶ 로 달 이동</div></div>
+            <div class="help-step"><span>2</span><div>회원 카드 클릭 (미납: 붉은색 / 납부: 초록)</div></div>
+            <div class="help-step"><span>3</span><div>금액 · 납부일 · 결제수단 입력</div></div>
+            <div class="help-step"><span>4</span><div><b>[납부 처리]</b> → 처리자 자동 기록</div></div>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📅 납부 마감일 · D-day</div>
+          <div class="help-row"><span class="help-badge">설정</span><span>설정 → 학원 정보 → 원비 납부 마감일 입력</span></div>
+          <div class="help-row"><span class="help-badge">D-day</span><span>미납 목록에 D-3 · D-day · D+2 배지 자동 표시</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📊 전체 납부 처리</div>
+          <div class="help-row"><span class="help-badge">방법</span><span>상단 [전체 납부처리] → 확인 → 예외 회원만 개별 수정</span></div>
+          <div class="help-tip">전체 처리 후 예외 회원만 수정하면 빠릅니다.</div>
+        </div>
+      </div>
+
+      <!-- 출결 -->
+      <div id="help-att" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">✅ 일별 출석 체크</div>
+          <div class="help-steps">
+            <div class="help-step"><span>1</span><div>날짜 선택 (기본: 오늘)</div></div>
+            <div class="help-step"><span>2</span><div>[출석] · [지각] · [결석] 버튼 클릭 (재클릭 시 취소)</div></div>
+            <div class="help-step"><span>3</span><div><b>[저장]</b> 클릭 → Firebase 동기화</div></div>
+          </div>
+          <div class="help-tip help-warn">[저장]을 눌러야 다른 기기에 반영됩니다!</div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📋 날짜 범위 일괄 처리</div>
+          <div class="help-row"><span class="help-badge">탭</span><span>출결 관리 → [📋 날짜 범위 일괄] 탭</span></div>
+          <div class="help-row"><span class="help-badge">용도</span><span>방학 · 공휴일 · 행사 기간을 한 번에 처리</span></div>
+          <div class="help-row"><span class="help-badge">유형</span><span>출석 처리 / 결석 처리 / 기록 초기화 선택</span></div>
+          <div class="help-row"><span class="help-badge">대상</span><span>전체 재원 또는 특정 회원 선택</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📅 달력 · 순위</div>
+          <div class="help-row"><span class="help-badge">달력</span><span>[월별 달력] 탭 — 해당 월 출결 현황</span></div>
+          <div class="help-row"><span class="help-badge">순위</span><span>[출석률 순위] 탭 — 회원별 출석률 랭킹</span></div>
+        </div>
+      </div>
+
+      <!-- 자재 -->
+      <div id="help-materials" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">📦 자재 등록 · 입고 · 사용</div>
+          <div class="help-steps">
+            <div class="help-step"><span>1</span><div>[+ 자재 등록] → 자재명 · 단위 · 최소 재고 입력</div></div>
+            <div class="help-step"><span>2</span><div>[입고] → 수량 입력 → 확인 (재고 증가)</div></div>
+            <div class="help-step"><span>3</span><div>[사용] → 수량 입력 → 확인 (재고 감소)</div></div>
+          </div>
+          <div class="help-tip">최소 재고 이하 시 대시보드·자재 목록에 부족 알림 표시</div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📝 이력 · 발주</div>
+          <div class="help-row"><span class="help-badge">이력</span><span>[입출고 이력] 탭 — 일시 · 구분 · 수량 · 처리자</span></div>
+          <div class="help-row"><span class="help-badge">재계산</span><span>이력 수정/삭제 시 재고 자동 재계산</span></div>
+          <div class="help-row"><span class="help-badge">발주</span><span>[발주 목록 복사] — 부족 자재 목록 복사</span></div>
+        </div>
+      </div>
+
+      <!-- 계정 -->
+      <div id="help-account" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">👑 계정 추가 (관리자만)</div>
+          <div class="help-steps">
+            <div class="help-step"><span>1</span><div>설정 → 계정 관리 → [+ 계정 추가]</div></div>
+            <div class="help-step"><span>2</span><div>이름 · 아이디 · 비밀번호 · 직책 입력</div></div>
+            <div class="help-step"><span>3</span><div>권한 체크 (직책 선택 시 기본 자동 체크)</div></div>
+            <div class="help-step"><span>4</span><div>[저장] → 즉시 사용 가능</div></div>
+          </div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">🔐 기본 권한 (직책별)</div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:var(--purple);color:#fff;">
+                <th style="padding:6px 8px;text-align:left;">권한</th>
+                <th style="padding:6px 8px;text-align:center;">원장</th>
+                <th style="padding:6px 8px;text-align:center;">실장</th>
+                <th style="padding:6px 8px;text-align:center;">강사</th>
+              </tr></thead>
+              <tbody>
+                <tr style="background:var(--bg);"><td style="padding:5px 8px;">회원 관리</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td></tr>
+                <tr><td style="padding:5px 8px;">원비 수납</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td></tr>
+                <tr style="background:var(--bg);"><td style="padding:5px 8px;">자재 입출고</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td></tr>
+                <tr><td style="padding:5px 8px;">출결 관리</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td></tr>
+                <tr style="background:var(--bg);"><td style="padding:5px 8px;">백업·설정</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="help-tip" style="margin-top:8px;">관리자가 계정별로 자유롭게 조정 가능합니다.</div>
+        </div>
+      </div>
+
+      <!-- 설정 -->
+      <div id="help-settings" style="display:none;">
+        <div class="help-section">
+          <div class="help-title">💾 데이터 백업 · 복원</div>
+          <div class="help-row"><span class="help-badge">백업</span><span>설정 → [저장] → JSON 파일 다운로드</span></div>
+          <div class="help-row"><span class="help-badge">복원</span><span>[불러오기] → 파일 선택 → 비밀번호 확인</span></div>
+          <div class="help-row"><span class="help-badge">버전 복구</span><span>[🕐 복구] → 최근 10개 시점 중 선택</span></div>
+          <div class="help-tip help-warn">복원 전 [백업 후 복원] 옵션 체크를 권장합니다.</div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📊 엑셀 내보내기</div>
+          <div class="help-row"><span class="help-badge">방법</span><span>설정 → [📊 내보내기] → xlsx 다운로드</span></div>
+          <div class="help-row"><span class="help-badge">시트 구성</span><span>회원목록 · 원비 · 출결 · 자재재고 · 월별통계</span></div>
+        </div>
+        <div class="help-section">
+          <div class="help-title">📋 활동 로그</div>
+          <div class="help-row"><span class="help-badge">방법</span><span>설정 → [📋 로그 보기] → 최근 500건</span></div>
+          <div class="help-row"><span class="help-badge">기록</span><span>회원 등록/삭제, 원비 수납, 출결 저장, 입출고 등</span></div>
+        </div>
+      </div>
+
+      <!-- FAQ -->
+      <div id="help-faq" style="display:none;">
+        <div class="help-section">
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 새로고침하면 로그인이 풀리나요?</div>
+            <div class="help-faq-a">아니요. 탭이 열려있는 한 유지됩니다. 탭을 닫으면 재로그인이 필요합니다.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 비밀번호를 5회 틀렸습니다.</div>
+            <div class="help-faq-a">5분간 잠금됩니다. 남은 시간이 화면에 표시됩니다. 5분 후 재시도하세요.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 출결이 다른 기기에 안 나타나요.</div>
+            <div class="help-faq-a">출결 [저장] 버튼을 눌렀는지 확인하세요. 저장 버튼을 눌러야 Firebase에 동기화됩니다.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 데이터를 실수로 삭제했습니다.</div>
+            <div class="help-faq-a">설정 → [🕐 복구]에서 최근 10개 시점 중 하나로 복구할 수 있습니다.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 강사가 원비를 볼 수 없습니다.</div>
+            <div class="help-faq-a">설정 → 계정 수정 → [원비 조회] 권한을 추가하면 됩니다.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 엑셀 내보내기 시 파일이 안 됩니다.</div>
+            <div class="help-faq-a">첫 실행 시 라이브러리를 인터넷에서 불러옵니다. 인터넷 연결 확인 후 재시도하세요.</div>
+          </div>
+          <div class="help-faq-item">
+            <div class="help-faq-q">Q. 오프라인에서 사용 가능한가요?</div>
+            <div class="help-faq-a">마지막 로드된 데이터 조회는 가능합니다. 변경사항은 온라인 복귀 시 자동 동기화됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /콘텐츠 -->
   </div>
 </div>
 
@@ -2820,6 +3076,26 @@ function renderActivityLog() {
       <td style="padding:8px 12px;"><span class="badge ${ACTION_BADGE[l.action]||'badge-gray'}" style="font-size:10.5px;">${l.action}</span></td>
       <td style="padding:8px 12px;font-size:12px;color:var(--muted);">${l.detail||'-'}</td>
     </tr>`).join('');
+}
+
+// ══════════════════════════════════════════
+// 도움말 모달
+// ══════════════════════════════════════════
+function openHelpModal() {
+  switchHelpTab('start');
+  document.getElementById('helpModal').classList.add('open');
+}
+function closeHelpModal() {
+  document.getElementById('helpModal').classList.remove('open');
+}
+function switchHelpTab(tab) {
+  const tabs = ['start','members','tuition','att','materials','account','settings','faq'];
+  tabs.forEach(t => {
+    const content = document.getElementById('help-'+t);
+    const btn     = document.getElementById('htab-'+t);
+    if (content) content.style.display = t === tab ? 'block' : 'none';
+    if (btn)     btn.classList.toggle('active', t === tab);
+  });
 }
 
 function openUpdateHistoryModal() {
