@@ -1084,7 +1084,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.0</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.2</div>
 
   </div>
 </div>
@@ -1397,42 +1397,32 @@ select { -webkit-appearance: auto; }
         </div>
         <div id="att-tab-daily">
 
-  <!-- 날짜 + 버튼 컨트롤 바 -->
-  <div class="card" style="margin-bottom:12px;padding:14px 18px;">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <!-- 날짜 네비 -->
+  <!-- 컨트롤 바 -->
+  <div class="card" style="margin-bottom:12px;padding:12px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       <div style="display:flex;align-items:center;gap:4px;">
         <button class="month-nav-btn" onclick="changeAttDate(-1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m15 6-6 6 6 6"/></svg></button>
-        <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:130px;text-align:center;font-size:13px;height:36px;padding:6px 8px;">
+        <input type="date" class="form-input" id="attDate" onchange="renderAttendance()" style="width:130px;text-align:center;font-size:13px;height:34px;padding:4px 8px;">
         <button class="month-nav-btn" onclick="changeAttDate(1)"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="m9 6 6 6-6 6"/></svg></button>
       </div>
-      <!-- 구분선 -->
-      <div style="width:1px;height:28px;background:var(--border);"></div>
-      <!-- 일괄 버튼 -->
+      <div style="width:1px;height:24px;background:var(--border);"></div>
       <button id="btnAttPresent" class="btn btn-sm btn-ghost" onclick="setAllAtt('present')" style="color:var(--teal);border-color:var(--teal);">✓ 전체 출석</button>
       <button id="btnAttAbsent"  class="btn btn-sm btn-ghost" onclick="setAllAtt('absent')"  style="color:var(--coral);border-color:var(--coral);">✗ 전체 결석</button>
       <button id="btnAttReset"   class="btn btn-sm btn-ghost" onclick="setAllAtt(null)">초기화</button>
-      <!-- 저장 버튼 오른쪽 끝 -->
       <div style="flex:1;"></div>
       <button id="btnAttSave" class="btn btn-sm btn-success" onclick="saveAtt()">저장</button>
     </div>
   </div>
 
-  <!-- 출석 체크 + 이달 수업 현황 (고정 높이 독립 스크롤) -->
-  <div style="display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch;" id="attDailyGrid">
-    <div class="card" style="display:flex;flex-direction:column;" id="attCheckCard">
-      <div class="card-header" style="flex-shrink:0;">
-        <div class="card-title">출석 체크</div>
-      </div>
-      <div id="attList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
+  <!-- 통합 카드 -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <!-- 테이블 헤더 -->
+    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);">회원 · 수업 현황</div>
+      <div style="font-size:12px;font-weight:600;color:var(--muted);text-align:right;" id="attStatsMonthLabel"></div>
     </div>
-    <div class="card" style="display:flex;flex-direction:column;" id="attStatsCard">
-      <div class="card-header" style="flex-shrink:0;">
-        <div class="card-title">이달 수업 현황</div>
-        <div class="card-subtitle" id="attStatsMonthLabel"></div>
-      </div>
-      <div id="attStats" style="overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
-    </div>
+    <!-- 목록 -->
+    <div id="attList" style="overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:calc(100vh - 320px);min-height:200px;"></div>
   </div>
 
 </div><!-- /att-tab-daily -->
@@ -1691,7 +1681,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.0</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.2</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2059,6 +2049,31 @@ select { -webkit-appearance: auto; }
   </div>
 </div>
 
+<!-- ══════════ 보강 모달 ══════════ -->
+<div class="modal-overlay" id="makeupModal">
+  <div class="modal" style="width:360px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">보강 처리</div>
+        <div class="card-subtitle" id="makeupModalSub">보강 날짜를 입력하세요</div>
+      </div>
+      <button class="modal-close" onclick="closeMakeupModal()"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="form-group" style="margin-bottom:16px;">
+      <label class="form-label">보강 날짜</label>
+      <input type="date" class="form-input" id="makeupDate">
+    </div>
+    <div class="form-group" style="margin-bottom:20px;">
+      <label class="form-label">메모 (선택)</label>
+      <input type="text" class="form-input" id="makeupMemo" placeholder="예: 토요일 오후 보강">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeMakeupModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmMakeup()">보강완료 처리</button>
+    </div>
+  </div>
+</div>
+
 <!-- 업데이트 이력 모달 -->
 <div class="modal-overlay" id="updateHistoryModal">
   <div class="modal" style="width:600px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;">
@@ -2073,7 +2088,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.0</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.2</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2097,7 +2112,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.0</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.2</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -3140,6 +3155,45 @@ function switchHelpTab(tab) {
     if (content) content.style.display = t === tab ? 'block' : 'none';
     if (btn)     btn.classList.toggle('active', t === tab);
   });
+}
+
+// ══════════════════════════════════════════
+// 보강 처리
+// ══════════════════════════════════════════
+let _makeupAbsDate = null;
+let _makeupMid = null;
+
+function openMakeupModal(absDate, mid) {
+  if (!hasPerm('attendance') && _currentUser?.role !== 'admin') { toast('권한이 없습니다.', true); return; }
+  _makeupAbsDate = absDate;
+  _makeupMid = mid;
+  const m = db.members.find(x => x.id === mid);
+  document.getElementById('makeupModalSub').textContent = `${m?.name || ''} · ${absDate} 결석`;
+  document.getElementById('makeupDate').value = kstDateStr();
+  document.getElementById('makeupMemo').value = '';
+  document.getElementById('makeupModal').classList.add('open');
+}
+function closeMakeupModal() {
+  document.getElementById('makeupModal').classList.remove('open');
+  _makeupAbsDate = null; _makeupMid = null;
+}
+function confirmMakeup() {
+  const makeupDate = document.getElementById('makeupDate').value;
+  const memo = document.getElementById('makeupMemo').value.trim();
+  if (!makeupDate) { toast('보강 날짜를 입력해주세요.', true); return; }
+
+  // 결석 → 출석으로 변경 + 보강 날짜/메모 기록
+  if (!db.attendance[_makeupAbsDate]) db.attendance[_makeupAbsDate] = {};
+  db.attendance[_makeupAbsDate][_makeupMid] = 'present';
+  db.attendance[_makeupAbsDate][_makeupMid + '_makeup'] = makeupDate;
+  if (memo) db.attendance[_makeupAbsDate][_makeupMid + '_makeupMemo'] = memo;
+
+  logActivity('보강 처리', `${db.members.find(x=>x.id===_makeupMid)?.name||_makeupMid} · 결석일 ${_makeupAbsDate} → 보강 ${makeupDate}`);
+  markDirty('attendance');
+  saveDb();
+  closeMakeupModal();
+  safeRender(renderAttendance, 'attendance');
+  toast('보강 완료 처리되었습니다. 출석으로 반영됩니다.');
 }
 
 function openUpdateHistoryModal() {
@@ -4830,18 +4884,30 @@ function renderAttendance(){
       const s=att[m.id]||'none';
       const cl = (type) => `btn btn-sm att-btn ${s===type?(type==='present'?'btn-success':type==='late'?'btn-primary':'btn-danger'):'btn-ghost'}`;
       const lbl = (()=>{try{return classLabel(m)}catch(e){return '-'}})();
-      return `<div class="att-row" data-mid="${m.id}">
-        <div class="flex-center gap-6" style="flex-wrap:wrap;">
-          <div class="att-name">${m.name}</div>
-          <span class="att-course-tag">${m.course}</span>
-          <span class="class-chip">${lbl}</span>
-          ${s==='present'?'<span class="badge badge-teal" style="font-size:10px;">출석</span>':s==='late'?'<span class="badge badge-amber" style="font-size:10px;">지각</span>':s==='absent'?'<span class="badge badge-coral" style="font-size:10px;">결석</span>':''}
+      return `<div class="att-row" data-mid="${m.id}" style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border-2);">
+        <!-- 왼쪽: 이름 + 수업 현황 -->
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+            <div class="att-name">${m.name}</div>
+            <span class="att-course-tag">${m.course}</span>
+            <span class="class-chip">${lbl}</span>
+            ${s==='present'?'<span class="badge badge-teal" style="font-size:10px;">출석</span>':s==='late'?'<span class="badge badge-amber" style="font-size:10px;">지각</span>':s==='absent'?'<span class="badge badge-coral" style="font-size:10px;">결석</span>':''}
+            ${(()=>{const mk=db.attendance[dv]?.[m.id+'_makeup'];return mk?`<span class="badge badge-purple" style="font-size:10px;">보강완료 ${mk}</span>`:''})()}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="flex:1;max-width:140px;height:4px;background:var(--border);border-radius:99px;overflow:hidden;">
+              <div style="height:100%;width:${Math.min(100,Math.round(((stats[m.id]?.present||0)+(stats[m.id]?.late||0))/Math.max(1,getMonthlyTarget(m))*100))}%;background:${(()=>{const p=Math.min(100,Math.round(((stats[m.id]?.present||0)+(stats[m.id]?.late||0))/Math.max(1,getMonthlyTarget(m))*100));return p>=80?'var(--teal)':p>=50?'var(--amber)':'var(--coral)'})()};border-radius:99px;"></div>
+            </div>
+            <span style="font-size:11px;color:var(--muted);white-space:nowrap;">${(stats[m.id]?.present||0)+(stats[m.id]?.late||0)} / ${getMonthlyTarget(m)}회</span>
+          </div>
         </div>
-        <div class="att-btns">
+        <!-- 오른쪽: 출결 버튼 -->
+        <div class="att-btns" style="flex-shrink:0;">
           ${(hasPerm('attendance') || _currentUser?.role==='admin') ? `
           <button data-status="present" onclick="setAtt('${dv}','${m.id}','present')" class="${cl('present')}">출석</button>
           <button data-status="late"    onclick="setAtt('${dv}','${m.id}','late')"    class="${cl('late')}">지각</button>
           <button data-status="absent"  onclick="setAtt('${dv}','${m.id}','absent')"  class="${cl('absent')}">결석</button>
+          ${s==='absent' && !db.attendance[dv]?.[m.id+'_makeup'] ? `<button class="btn btn-sm btn-ghost" onclick="openMakeupModal('${dv}','${m.id}')" style="color:var(--purple);border-color:var(--purple);margin-left:2px;">보강</button>` : ''}
           ` : `<span style="font-size:11px;color:var(--muted-2);">${s||'미입력'}</span>`}
         </div>
       </div>`;
@@ -4858,7 +4924,9 @@ function renderAttendance(){
   const stats={};
   active.forEach(m=>{stats[m.id]={present:0,late:0,absent:0};});
   days.forEach(d=>{
-    Object.entries(db.attendance[d]||{}).forEach(([mid,s])=>{
+    Object.entries(db.attendance[d]||{}).forEach(([mid,s])=>{\
+      // _makeup, _makeupMemo 등 메타 키 제외
+      if(mid.includes('_')) return;
       if(stats[mid]) stats[mid][s]=(stats[mid][s]||0)+1;
     });
   });
@@ -4898,37 +4966,8 @@ function renderAttendance(){
       <div class="stat-sub">목표 50% 미만</div>
     </div>`;
 
-  // 수업일수 진행률 카드
-  document.getElementById('attStats').innerHTML=
-    active.map(m=>{
-      const st=stats[m.id]||{present:0,late:0,absent:0};
-      const done=st.present+st.late;
-      const target=getMonthlyTarget(m);
-      const pct=target>0?Math.min(100,Math.round(done/target*100)):0;
-      const barClr=pct>=80?'var(--teal)':pct>=50?'var(--amber)':'var(--coral)';
-      const statusTxt=done>=target?'<span style="font-size:10px;color:var(--teal);font-weight:600;">✓ 목표달성</span>':
-        done===0?'<span style="font-size:10px;color:var(--muted);">미출석</span>':'';
-      return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
-        <div class="flex-between" style="margin-bottom:5px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:13px;font-weight:600;">${m.name}</span>
-            <span class="class-chip"><span class="ti ti-calendar-repeat" style="font-size:10px;"><svg viewBox="0 0 24 24"><path d="M4 13v-2a8 8 0 0 1 8-8 8 8 0 0 1 8 8v2"/><path d="M4 11l3-3-3-3M20 11l-3 3 3 3"/><path d="M4 19v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>${(()=>{try{return classLabel(m)}catch(e){return '-'}})()}</span>
-            ${statusTxt}
-          </div>
-          <div style="text-align:right;">
-            <span style="font-size:13px;font-weight:700;color:${barClr};">${done}</span>
-            <span style="font-size:11px;color:var(--muted);">/${target}회</span>
-          </div>
-        </div>
-        <div class="att-progress-wrap">
-          <div class="att-progress-bar" style="width:${pct}%;background:${barClr};"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px;">
-          <span style="font-size:10.5px;color:var(--muted);">출 ${st.present} · 지 ${st.late} · 결 ${st.absent}</span>
-          <span style="font-size:10.5px;color:var(--muted);">${pct}%</span>
-        </div>
-      </div>`;
-    }).join('');
+    // 수업현황은 통합 행에 포함 — attStats 별도 렌더 불필요
+  document.getElementById('attStats') && (document.getElementById('attStats').innerHTML = '');
   } catch(statErr) { console.error('attStats 오류:', statErr); }
   // 카드 높이 재계산 (iOS 포함 모든 기기 대응)
   setTimeout(matchAttCardHeight, 30);
@@ -6074,7 +6113,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.0';
+const CURRENT_SW_VERSION = 'v1.0-build1.2';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
@@ -6117,31 +6156,15 @@ window.addEventListener('resize', () => {
   }, 100);
 });
 
-// ── 출결 카드 높이 동적 계산 (iOS safari 100vh 버그 대응)
+// ── 출결 통합 카드 높이 동적 계산 (iOS safari 100vh 버그 대응)
 function matchAttCardHeight() {
-  const grid = document.getElementById('attDailyGrid');
-  if (!grid) return;
-  const listEl  = document.getElementById('attList');
-  const statsEl = document.getElementById('attStats');
-  if (!listEl || !statsEl) return;
-
-  // 실제 보이는 영역 기준으로 계산
-  const viewH   = window.innerHeight;  // 실제 뷰포트 (주소창 제외)
-  const gridTop = grid.getBoundingClientRect().top;
+  const listEl = document.getElementById('attList');
+  if (!listEl) return;
+  const viewH   = window.innerHeight;
+  const rect    = listEl.getBoundingClientRect();
   const bottomPad = 24;
-  const cardH   = Math.max(300, viewH - gridTop - bottomPad);
-  const maxH    = Math.min(cardH, 680);
-
-  // 카드 자체 높이
-  const checkCard = document.getElementById('attCheckCard');
-  const statsCard = document.getElementById('attStatsCard');
-  if (checkCard) checkCard.style.height = maxH + 'px';
-  if (statsCard) statsCard.style.height = maxH + 'px';
-
-  // 카드 헤더 높이 빼고 스크롤 영역 설정
-  const headerH = checkCard?.querySelector('.card-header')?.offsetHeight || 56;
-  listEl.style.height  = (maxH - headerH - 28) + 'px';
-  statsEl.style.height = (maxH - headerH - 28) + 'px';
+  const maxH = Math.max(200, viewH - rect.top - bottomPad);
+  listEl.style.maxHeight = Math.min(maxH, 680) + 'px';
 }
 
 // ── Service Worker 등록 (캐시 자동 업데이트)
