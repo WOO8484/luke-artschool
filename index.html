@@ -1081,7 +1081,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.5</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.6</div>
 
   </div>
 </div>
@@ -1506,44 +1506,45 @@ select { -webkit-appearance: auto; }
         <!-- Firebase 연결 카드 (전체 너비) -->
         <div class="card" style="margin-bottom:16px;">
           <div class="card-header">
-            <div>
-              <div class="card-title"><span class="ti ti-brand-firebase" style="color:#F5820D;vertical-align:-2px;margin-right:6px;"><svg viewBox="0 0 24 24"><path d="M4 20 8 4l4 8 3-5 1 13z"/><path d="M8 4 4 20l8-4 8 4L15 7l-3 5z"/></svg></span>Firebase 클라우드 연결</div>
-              <div class="card-subtitle">여러 기기에서 실시간으로 데이터를 공유합니다</div>
-            </div>
-            <div class="firebase-status offline" id="firebaseStatusSettings" style="margin:0;">
-              <div class="fb-dot"></div>
-              <span id="firebaseStatusSettingsText">미연결</span>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:40px;height:40px;border-radius:var(--r-md);background:#FFF4E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:#F5820D;"><path d="M4 20 8 4l4 8 3-5 1 13z"/><path d="M8 4 4 20l8-4 8 4L15 7l-3 5z"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Firebase 클라우드 연결</div>
+                <div class="card-subtitle">여러 기기에서 실시간으로 데이터를 공유합니다</div>
+              </div>
             </div>
           </div>
 
           <div id="fbConfigSection">
-            <!-- 연결 상태 표시 -->
-            <div style="margin-bottom:16px;">
-              <label class="form-label">연결 상태</label>
-              <div id="fbConfigStatus" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-md);background:var(--bg);border:1px solid var(--border);">
-                <span id="fbConfigDot" style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;"></span>
-                <span id="fbConfigText" style="font-size:13px;font-weight:500;color:var(--muted);">미연결</span>
+            <!-- 연결 상태 + 버튼 한 행 -->
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <!-- 상태 표시 -->
+              <div id="fbConfigStatus" style="display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:99px;background:var(--bg);border:1px solid var(--border);flex-shrink:0;">
+                <span id="fbConfigDot" style="width:8px;height:8px;border-radius:50%;background:var(--muted-2);flex-shrink:0;"></span>
+                <span id="fbConfigText" style="font-size:12.5px;font-weight:600;color:var(--muted);">미연결</span>
+              </div>
+              <!-- 구분선 -->
+              <div style="width:1px;height:28px;background:var(--border);flex-shrink:0;"></div>
+              <!-- 버튼들 -->
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <button class="btn btn-primary btn-sm" onclick="autoReconnectFirebase()">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><path d="M7 18a4.6 4.4 0 0 1 0-9 5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7H7"/></svg>
+                  연결하기
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="disconnectFirebase()" id="fbDisconnectBtn" style="display:none;">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><path d="m2 2 20 20"/><path d="M9.654 9.654A4.6 4.4 0 0 0 7 18h11a3.5 3.5 0 0 0 .503-6.963"/></svg>
+                  연결 끊기
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="testFirebaseConnection()" style="color:var(--amber);border-color:var(--amber);">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;margin-right:4px;vertical-align:-1px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  연결 진단
+                </button>
               </div>
             </div>
 
-            <!-- 버튼: 클라우드 연결 / 연결하기 / 연결 끊기 / 연결 진단 -->
-            <div class="flex-center gap-8 flex-wrap" style="margin-bottom:12px;">
-              <button class="btn btn-primary" onclick="autoReconnectFirebase()">
-                <span class="ti ti-cloud"><svg viewBox="0 0 24 24"><path d="M7 18a4.6 4.4 0 0 1 0-9 5 4.5 0 0 1 11 2h1a3.5 3.5 0 0 1 0 7H7"/></svg></span>
-                연결하기
-              </button>
-              <button class="btn btn-ghost" onclick="disconnectFirebase()" id="fbDisconnectBtn" style="display:none;">
-                <span class="ti ti-cloud-off"><svg viewBox="0 0 24 24"><path d="m2 2 20 20"/><path d="M9.654 9.654A4.6 4.4 0 0 0 7 18h11a3.5 3.5 0 0 0 .503-6.963"/></svg></span>
-                연결 끊기
-              </button>
-              <button class="btn btn-outline" onclick="testFirebaseConnection()" style="color:var(--amber);border-color:var(--amber);">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:-2px;margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                연결 진단
-              </button>
-            </div>
-
-
-            <div id="fbDiagResult" style="display:none;margin-top:10px;padding:12px 14px;border-radius:var(--r-md);font-size:12px;line-height:1.8;font-family:monospace;background:var(--bg);border:1px solid var(--border);word-break:break-all;"></div>
+            <div id="fbDiagResult" style="display:none;margin-top:12px;padding:12px 14px;border-radius:var(--r-md);font-size:12px;line-height:1.8;font-family:monospace;background:var(--bg);border:1px solid var(--border);word-break:break-all;"></div>
           </div>
         </div>
 
@@ -1678,7 +1679,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.5</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.6</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2060,7 +2061,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.5</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.6</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2084,7 +2085,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.5</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.6</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -3421,10 +3422,9 @@ async function autoReconnectFirebase() {
     const inp = document.getElementById('fbConfigText');
     const dot = document.getElementById('fbConfigDot');
     const box = document.getElementById('fbConfigStatus');
-    if(inp) inp.textContent = '클라우드 연결됨';
-    if(inp) inp.style.color = 'var(--teal)';
+    if(inp) { inp.textContent = '클라우드 연결됨'; inp.style.color = 'var(--teal)'; }
     if(dot) dot.style.background = 'var(--teal)';
-    if(box) { box.style.background = 'var(--teal-bg)'; box.style.borderColor = 'var(--teal)'; }
+    if(box) { box.style.background = 'var(--teal-bg)'; box.style.borderColor = '#A0D8C0'; }
   } catch(e) {
     const isPermission = e.message.includes('403') || e.message.includes('PERMISSION');
     const isFileProtocol = location.protocol === 'file:';
@@ -6054,7 +6054,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build0.5';
+const CURRENT_SW_VERSION = 'v1.0-build0.6';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
