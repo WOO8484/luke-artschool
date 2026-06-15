@@ -1451,15 +1451,15 @@ select { -webkit-appearance: auto; }
             <div style="margin-bottom:16px;">
               <label class="form-label">처리 유형</label>
               <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
-                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypePresent')">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;">
                   <input type="radio" name="bulkAttType" id="bulkTypePresent" value="present" checked style="accent-color:var(--teal);">
                   <span class="perm-label" style="color:var(--teal);">출석 처리</span>
                 </label>
-                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypeAbsent')">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;">
                   <input type="radio" name="bulkAttType" id="bulkTypeAbsent" value="absent" style="accent-color:var(--coral);">
                   <span class="perm-label" style="color:var(--coral);">결석 처리</span>
                 </label>
-                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;" onclick="togglePerm('bulkTypeClear')">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;min-width:120px;">
                   <input type="radio" name="bulkAttType" id="bulkTypeClear" value="clear" style="accent-color:var(--muted);">
                   <span class="perm-label">기록 초기화</span>
                 </label>
@@ -1468,11 +1468,11 @@ select { -webkit-appearance: auto; }
             <div style="margin-bottom:16px;">
               <label class="form-label">대상 회원</label>
               <div style="display:flex;gap:8px;margin-top:6px;">
-                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;" onclick="document.getElementById('bulkTargetAll').checked=true">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;">
                   <input type="radio" name="bulkTarget" id="bulkTargetAll" value="all" checked>
                   <span class="perm-label">전체 재원 회원</span>
                 </label>
-                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;" onclick="document.getElementById('bulkTargetSelect').checked=true">
+                <label class="perm-checkbox-row" style="border:1px solid var(--border);border-radius:var(--r-md);flex:1;">
                   <input type="radio" name="bulkTarget" id="bulkTargetSelect" value="select">
                   <span class="perm-label">회원 직접 선택</span>
                 </label>
@@ -1833,37 +1833,28 @@ select { -webkit-appearance: auto; }
       <!-- ── 탭1: 업데이트 이력 ── -->
       <div id="uhPanel1">
 
-        <!-- v2.0 신규 기능 -->
-        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+        <!-- v1.0 · build 0.0 최초 출시 -->
+        <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
             <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.0</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
-            <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신</span>
+            <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
           <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>로그인 실패 5회 시 5분 자동 잠금</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 검색 범위 확장 — 이름·연락처 외 수강과정·메모·학년까지</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>수강 이력 관리 — 과정 변경 시 일시·처리자와 함께 자동 기록, 회원 상세에서 확인</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>원비 납부 마감일 설정 — 미납 목록에 D-day 자동 표시</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>출결 날짜 범위 일괄 처리 — 방학·휴강·공휴일 기간 출석/결석/초기화</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>관리자 활동 로그 — 회원 등록·원비 수납·출결 등 최근 500건 기록</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>엑셀 내보내기 — 회원·원비·출결·자재·월별통계 5개 시트 xlsx 파일</li>
-          </ul>
-        </div>
-
-        <!-- v1.0 최초 출시 -->
-        <div style="padding:14px 0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="background:var(--ink-3);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0</span>
-            <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
-          </div>
-          <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;padding-left:4px;">
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 통합 관리</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화 (Firebase)</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>다중 계정 — 관리자·원장·실장·강사 직책별 계정 생성</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>8개 항목 개별 권한 제어 · 권한별 맞춤 대시보드</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>비밀번호 SHA-256 해싱 · 세션 로그인 · PWA 홈 화면 추가</li>
-            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--muted-2);flex-shrink:0;font-weight:600;">✓</span>납부·입출고 이력 처리자 기록 · 대시보드 통계·차트·알림</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 / 원비 / 출결 / 자재 통합 관리</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>PC / 아이패드 / 아이폰 / 안드로이드 실시간 동기화 (Firebase)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>다중 계정 — 관리자 · 원장 · 실장 · 강사 직책별 계정 생성</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>8개 항목 개별 권한 제어 · 버튼·기능 단위까지 적용</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>권한별 맞춤 대시보드 — 접근 가능한 통계·카드·차트만 표시</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>비밀번호 SHA-256 해싱 · 세션 로그인 · 로그인 실패 5회 잠금</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>홈 화면 앱 추가 지원 — PWA (아이콘 · 오프라인 캐시)</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>회원 검색 — 이름·연락처·수강과정·메모·학년</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>수강 이력 관리 — 과정 변경 시 일시·처리자 자동 기록</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>원비 납부 마감일 설정 · 미납 목록 D-day 자동 표시</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>출결 날짜 범위 일괄 처리 — 방학·휴강·공휴일 기간 처리</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>관리자 활동 로그 — 최근 500건 작업 이력 기록 및 조회</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>엑셀 내보내기 — 회원·원비·출결·자재·통계 5개 시트 xlsx</li>
+            <li style="font-size:13px;color:var(--ink-3);display:flex;gap:8px;"><span style="color:var(--teal);flex-shrink:0;font-weight:600;">✓</span>납부·입출고 이력 처리자 기록 · 대시보드 통계·차트·알림</li>
           </ul>
         </div>
 
@@ -2431,9 +2422,10 @@ function kstMonthStr() {
 }
 // n개월 전/후의 YYYY-MM 문자열 반환 (KST 기준)
 function kstMonthOffset(offsetMonths) {
-  const base = new Date(kstMonthStr() + '-01T00:00:00+09:00');
-  base.setMonth(base.getMonth() + offsetMonths);
-  return base.toISOString().slice(0, 7);
+  // kstMonthStr() 기준으로 month 이동 후 YYYY-MM 반환
+  const [y, m] = kstMonthStr().split('-').map(Number);
+  const d = new Date(y, m - 1 + offsetMonths, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 }
 
 let currentTuitionMonth = kstMonthStr();
@@ -4479,7 +4471,7 @@ function deleteLog(id) {
 // ═══════════════════════════════════
 function renderAttendance(){
   // 항상 일별 탭으로 복귀 (페이지 재진입 시 탭 불일치 방지)
-  ['daily','calendar','rank'].forEach(t=>{
+  ['daily','calendar','rank','bulk'].forEach(t=>{
     const tabEl=document.getElementById('att-tab-'+t);
     const btnEl=document.getElementById('atab-'+t);
     if(tabEl) tabEl.style.display=t==='daily'?'block':'none';
@@ -4634,6 +4626,8 @@ function setAtt(date,mid,status){
   }
 
   // 3. 저장 및 전체 렌더
+  markDirty('attendance');
+  logActivity('출결 체크', `${db.members.find(m=>m.id===mid)?.name||mid} ${document.getElementById('attDate')?.value||date} ${db.attendance[date]?.[mid]||'초기화'}`);
   saveDb();
   safeRender(renderAttendance,'attendance');
 }
@@ -4672,6 +4666,7 @@ function setAllAtt(status) {
   saveDb();
   safeRender(renderAttendance, 'attendance');
   const label = status === 'present' ? '전체 출석' : status === 'absent' ? '전체 결석' : '출석 초기화';
+  logActivity('출결 일괄', `${dv} ${label}`);
   toast(label + ' 처리되었습니다.');
 }
 
@@ -5032,10 +5027,10 @@ function renderBulkMemberSelect() {
   if (!el) return;
   const active = db.members.filter(m=>m.status==='active').sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   el.innerHTML = active.map(m=>`
-    <label class="perm-checkbox-row" onclick="togglePerm('bulk_${m.id}')">
+    <div class="perm-checkbox-row" onclick="togglePerm('bulk_${m.id}')">
       <input type="checkbox" id="bulk_${m.id}" checked>
       <span class="perm-label">${m.name} <span class="perm-sub">${m.course}</span></span>
-    </label>`).join('');
+    </div>`).join('');
   // 대상 radio 변경 시 선택창 토글
   document.querySelectorAll('input[name="bulkTarget"]').forEach(r => {
     r.onchange = () => {
@@ -5476,12 +5471,15 @@ function importData(e) {
           if(!db.stockLog)        db.stockLog = [];
           if(!db.meta)            db.meta = {};
           if(!db.meta.customCats) db.meta.customCats = [];
+          // ── 활동 로그 병합 (복원 후에도 기존 로그 유지)
+          if(!db.activityLog) db.activityLog = [];
           try { recalculateAllStock(); } catch(e){}
           markAllDirty();
           // ★ 불러오기 직후 타임스탬프 강제 최신화 — SSE가 클라우드 데이터로 롤백하는 것 방지
           const nowTs = Date.now();
           _storage.setItem('luke_local_ts', nowTs.toString());
           _fbIgnoreUntil = nowTs + 5000; // 5초간 SSE 수신 차단
+          logActivity('데이터 복원', f.name || '백업 파일');
           saveDb(); renderAll();
           toast(backupFirst ? '백업 후 데이터를 불러왔습니다.' : '데이터를 불러왔습니다.');
         }
