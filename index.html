@@ -1081,7 +1081,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.3</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 0.4</div>
 
   </div>
 </div>
@@ -1132,16 +1132,12 @@ select { -webkit-appearance: auto; }
           <span>관리자 계정</span>
         </div>
       </div>
-      <!-- 클라우드 백업 상태 (실시간) -->
-      <div class="cloud-sync-status" id="cloudSyncStatus" style="margin-bottom:8px;">
-        <div class="cs-indicator offline" id="csIndicator"></div>
-        <div class="cs-text">
-          <div class="cs-label" id="csLabel">백업 미연결</div>
-          <div class="cs-sub" id="csSub">Firebase 설정 필요</div>
-        </div>
-      </div>
       <!-- 기존 id 유지 (setFbStatus 호환) -->
       <div style="display:none;">
+        <div id="cloudSyncStatus"></div>
+        <div id="csIndicator"></div>
+        <div id="csLabel"></div>
+        <div id="csSub"></div>
         <div id="firebaseStatus"></div>
         <span id="firebaseStatusText"></span>
       </div>
@@ -1522,10 +1518,12 @@ select { -webkit-appearance: auto; }
 
           <div id="fbConfigSection">
             <!-- 연결 상태 표시 -->
-            <div class="form-group full" style="margin-bottom:14px;">
+            <div style="margin-bottom:16px;">
               <label class="form-label">연결 상태</label>
-              <input type="text" class="form-input" id="fbConfigInput"
-                value="luke-artschool-76afb" readonly style="background:var(--bg);color:var(--muted);">
+              <div id="fbConfigStatus" style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--r-md);background:var(--bg);border:1px solid var(--border);">
+                <span id="fbConfigDot" style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;"></span>
+                <span id="fbConfigText" style="font-size:13px;font-weight:500;color:var(--muted);">미연결</span>
+              </div>
             </div>
 
             <!-- 버튼: 클라우드 연결 / 연결하기 / 연결 끊기 / 연결 진단 -->
@@ -1680,7 +1678,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.3</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 0.4</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2062,7 +2060,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.3</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 0.4</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2086,7 +2084,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.3</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 0.4</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -2432,13 +2430,15 @@ select { -webkit-appearance: auto; }
         <label class="form-label">월 원비 (원)</label>
         <input type="number" class="form-input" id="mFee" placeholder="150000">
       </div>
-      <div class="form-group">
-        <label class="form-label">등록일</label>
-        <input type="date" class="form-input" id="mStartDate">
-      </div>
-      <div class="form-group">
-        <label class="form-label">생일 🎂</label>
-        <input type="date" class="form-input" id="mBirthday" style="width:100%;">
+      <div class="form-group full" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <label class="form-label">등록일</label>
+          <input type="date" class="form-input" id="mStartDate">
+        </div>
+        <div>
+          <label class="form-label">생일 🎂</label>
+          <input type="date" class="form-input" id="mBirthday">
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">보호자 연락처</label>
@@ -3420,8 +3420,13 @@ async function autoReconnectFirebase() {
     setFbStatus('online', '클라우드 연결됨');
     const btn = document.getElementById('fbDisconnectBtn');
     if(btn) btn.style.display = 'inline-flex';
-    const inp = document.getElementById('fbConfigInput');
-    if(inp) inp.value = '☁️ 클라우드 연결됨 — luke-artschool-76afb';
+    const inp = document.getElementById('fbConfigText');
+    const dot = document.getElementById('fbConfigDot');
+    const box = document.getElementById('fbConfigStatus');
+    if(inp) inp.textContent = '클라우드 연결됨';
+    if(inp) inp.style.color = 'var(--teal)';
+    if(dot) dot.style.background = 'var(--teal)';
+    if(box) { box.style.background = 'var(--teal-bg)'; box.style.borderColor = 'var(--teal)'; }
   } catch(e) {
     const isPermission = e.message.includes('403') || e.message.includes('PERMISSION');
     const isFileProtocol = location.protocol === 'file:';
@@ -3518,6 +3523,12 @@ function disconnectFirebase() {
   setFbStatus('offline', '클라우드 미연결');
   const btn = document.getElementById('fbDisconnectBtn');
   if(btn) btn.style.display = 'none';
+  const inp = document.getElementById('fbConfigText');
+  const dot = document.getElementById('fbConfigDot');
+  const box = document.getElementById('fbConfigStatus');
+  if(inp) { inp.textContent = '미연결'; inp.style.color = 'var(--muted)'; }
+  if(dot) dot.style.background = 'var(--muted)';
+  if(box) { box.style.background = 'var(--bg)'; box.style.borderColor = 'var(--border)'; }
   toast('Firebase 연결이 해제되었습니다.');
 }
 
@@ -6045,7 +6056,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build0.3';
+const CURRENT_SW_VERSION = 'v1.0-build0.4';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
