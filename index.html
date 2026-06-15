@@ -1064,7 +1064,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.1</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.2</div>
 
   </div>
 </div>
@@ -1586,7 +1586,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.1</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.2</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1704,7 +1704,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.1</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.2</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -1729,7 +1729,7 @@ select { -webkit-appearance: auto; }
         <!-- v1.0 최초 출시 -->
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.1</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.2</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최초 출시</span>
           </div>
@@ -2286,6 +2286,12 @@ function kstDateStr() {
 function kstMonthStr() {
   // YYYY-MM
   return kstDateStr().slice(0, 7);
+}
+// n개월 전/후의 YYYY-MM 문자열 반환 (KST 기준)
+function kstMonthOffset(offsetMonths) {
+  const base = new Date(kstMonthStr() + '-01T00:00:00+09:00');
+  base.setMonth(base.getMonth() + offsetMonths);
+  return base.toISOString().slice(0, 7);
 }
 
 let currentTuitionMonth = kstMonthStr();
@@ -3436,8 +3442,7 @@ function renderMembers() {
     let unpaidMonths = 0;
     if(m.status==='active'){
       for(let i=0;i<3;i++){
-        const d=new Date(); d.setMonth(d.getMonth()-i);
-        const mon=d.toISOString().slice(0,7);
+        const mon=kstMonthOffset(-i);
         if(mStartMon && mon < mStartMon) continue;
         const k2=m.id+'_'+mon;
         if(!db.payments[k2]?.paid) unpaidMonths++;
@@ -4315,7 +4320,11 @@ function changeAttDate(delta) {
   const input = document.getElementById('attDate');
   const cur = input.value ? new Date(input.value + 'T12:00:00+09:00') : kstDate();
   cur.setDate(cur.getDate() + delta);
-  input.value = cur.toISOString().slice(0, 10);
+  // KST 날짜 문자열로 변환 (toISOString은 UTC 기준이라 자정 전후 오류 가능)
+  const y = cur.getFullYear();
+  const mo = String(cur.getMonth()+1).padStart(2,'0');
+  const dy = String(cur.getDate()).padStart(2,'0');
+  input.value = `${y}-${mo}-${dy}`;
   renderAttendance();
 }
 
@@ -4351,8 +4360,7 @@ function copyUnpaidMsg(mid) {
   const unpaidMonths = [];
   const mStart = (m.startDate || '').slice(0, 7);
   for (let i = 0; i < 3; i++) {
-    const d = new Date(); d.setMonth(d.getMonth() - i);
-    const mon = d.toISOString().slice(0, 7);
+    const mon = kstMonthOffset(-i);
     if (mStart && mon < mStart) continue;
     if (!db.payments[m.id + '_' + mon]?.paid) {
       unpaidMonths.push(mon.replace('-', '년 ') + '월');
@@ -4417,8 +4425,7 @@ function openMemberDetailModal(id) {
   const payRows = [];
   const detailStartMon = (m.startDate || '').slice(0, 7);
   for (let i = 2; i >= 0; i--) {
-    const d = new Date(); d.setMonth(d.getMonth() - i);
-    const mon = d.toISOString().slice(0, 7);
+    const mon = kstMonthOffset(-i);
     if (detailStartMon && mon < detailStartMon) continue;
     const p = db.payments[m.id + '_' + mon];
     payRows.push({ mon, paid: p?.paid, amount: p?.amount, date: p?.date, method: p?.payMethod });
@@ -4501,8 +4508,7 @@ function renderRevenueChart() {
   // 최근 6개월
   const months = [];
   for (let i = 5; i >= 0; i--) {
-    const d = new Date(); d.setMonth(d.getMonth() - i);
-    months.push(d.toISOString().slice(0, 7));
+    months.push(kstMonthOffset(-i));
   }
   const data = months.map(mon => {
     const amt = Object.entries(db.payments)
@@ -4783,7 +4789,7 @@ function renderMemberTrendChart() {
   const el = document.getElementById('dashMemberTrend');
   if (!el) return;
   const months = [];
-  for (let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push(d.toISOString().slice(0,7));}
+  for (let i=5;i>=0;i--){months.push(kstMonthOffset(-i));}
   const data = months.map(mon=>{
     const y=parseInt(mon.slice(0,4)),m=parseInt(mon.slice(5,7));
     const newM = db.members.filter(x=>x.startDate&&x.startDate.slice(0,7)===mon).length;
@@ -5232,7 +5238,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build2.1';
+const CURRENT_SW_VERSION = 'v1.0-build2.2';
 
 async function checkVersionAndReload() {
   try {
