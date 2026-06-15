@@ -1064,7 +1064,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.2</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 2.3</div>
 
   </div>
 </div>
@@ -1462,9 +1462,10 @@ select { -webkit-appearance: auto; }
             </div>
             <div style="background:var(--coral-bg);border:1px solid #F5C4BA;border-radius:var(--r-md);padding:12px 14px;margin-bottom:16px;font-size:12px;line-height:1.7;color:var(--ink-3);">
               <div style="font-weight:700;margin-bottom:3px;color:var(--coral);">🔒 보안 주의 — 위 규칙은 누구나 읽기/쓰기 가능</div>
-              학원 내부 전용 앱이므로 현재 규칙으로도 실사용 가능하나, 보다 안전한 운영을 원하면 아래 규칙으로 교체하세요. Firebase IP 제한 또는 비공개 URL 운영을 권장합니다.<br>
-              <code style="background:rgba(0,0,0,0.06);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;font-size:11px;">{ "rules": { ".read": "auth != null", ".write": "auth != null" } }</code>
-              <span style="font-size:10.5px;color:var(--muted);">※ 위 규칙 사용 시 Firebase Authentication 연동 추가 필요</span>
+              학원 내부 전용 앱이므로 현재 규칙으로도 실사용 가능합니다.<br>
+              더 안전한 규칙(<code style="font-size:10.5px;">.read: "auth != null"</code>)으로 전환하려면 <strong>Firebase Authentication 연동이 추가로 필요</strong>합니다.<br>
+              현재 앱은 Firebase REST API + fetch 방식으로 통신하므로, 해당 규칙 적용 시 모든 요청 URL에 <code style="font-size:10.5px;">?auth=ID_TOKEN</code> 파라미터를 추가해야 403 오류가 발생하지 않습니다.<br>
+              <span style="font-size:10.5px;color:var(--muted);">※ 현재는 Firebase 프로젝트 URL을 아는 사람만 접근 가능 — 내부 운영 환경에서는 충분한 수준</span>
             </div>
             <div class="form-group full" style="margin-bottom:12px;">
               <label class="form-label">연결된 프로젝트</label>
@@ -1586,7 +1587,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.2</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 2.3</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -1704,7 +1705,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.2</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 2.3</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -1729,7 +1730,7 @@ select { -webkit-appearance: auto; }
         <!-- v1.0 최초 출시 -->
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.2</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 2.3</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최초 출시</span>
           </div>
@@ -5238,9 +5239,16 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build2.2';
+const CURRENT_SW_VERSION = 'v1.0-build2.3';
 
 async function checkVersionAndReload() {
+  // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
+  const RELOAD_FLAG = 'luke_sw_reload';
+  const lastReload = parseInt(sessionStorage.getItem(RELOAD_FLAG) || '0');
+  if (Date.now() - lastReload < 10000) {
+    console.log('버전 체크: 최근 새로고침 감지, 루프 방지로 건너뜀');
+    return;
+  }
   try {
     const res = await fetch('./sw.js?t=' + Date.now(), { cache: 'no-store' });
     if(!res.ok) return;
@@ -5255,6 +5263,7 @@ async function checkVersionAndReload() {
         const keys = await caches.keys();
         await Promise.all(keys.map(k => caches.delete(k)));
       }
+      sessionStorage.setItem(RELOAD_FLAG, Date.now().toString());
       window.location.reload(true);
     }
   } catch(e) {
@@ -5288,6 +5297,11 @@ if('serviceWorker' in navigator) {
             if(newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               newWorker.postMessage({ type: 'SKIP_WAITING' });
               navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // 무한 새로고침 방지 — checkVersionAndReload와 동일한 플래그 사용
+                const RELOAD_FLAG = 'luke_sw_reload';
+                const last = parseInt(sessionStorage.getItem(RELOAD_FLAG) || '0');
+                if (Date.now() - last < 10000) return;
+                sessionStorage.setItem(RELOAD_FLAG, Date.now().toString());
                 window.location.reload();
               });
             }
