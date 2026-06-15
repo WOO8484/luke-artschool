@@ -3415,7 +3415,19 @@ function startFirebaseListener() {
             if(!json) return;
             const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
             if(secData !== null && secData !== undefined) {
-              db[sec] = secData;
+              // auth 섹션: 현재 로그인 계정 보존
+              if (sec === 'auth' && _currentUser && secData.accounts) {
+                const myId = _currentUser.id;
+                const localAcc = (db.auth?.accounts || []).find(a => a.id === myId);
+                db[sec] = secData;
+                // Firebase auth에 내 계정이 없으면 로컬 계정 유지
+                const existsInRemote = db.auth.accounts.some(a => a.id === myId);
+                if (!existsInRemote && localAcc) {
+                  db.auth.accounts.push(localAcc);
+                }
+              } else {
+                db[sec] = secData;
+              }
               changed.push(sec);
             }
           } catch(e) { console.warn('섹션 fetch 실패:', sec, e.message); }
@@ -3474,7 +3486,23 @@ async function autoReconnectFirebase() {
             const json = await res.json();
             if(!json) return;
             const secData = typeof json.data === 'string' ? JSON.parse(json.data) : json.data;
-            if(secData !== null && secData !== undefined) db[sec] = secData;
+            if(secData !== null && secData !== undefined) {
+              // auth: 로그인 전이면 Firebase 데이터 우선, 현재 로그인 중이면 내 계정 보존
+              if (sec === 'auth' && secData.accounts) {
+                const localAccounts = db.auth?.accounts || [];
+                db[sec] = secData;
+                if (_currentUser) {
+                  const myId = _currentUser.id;
+                  const existsInRemote = db.auth.accounts.some(a => a.id === myId);
+                  if (!existsInRemote) {
+                    const localAcc = localAccounts.find(a => a.id === myId);
+                    if (localAcc) db.auth.accounts.push(localAcc);
+                  }
+                }
+              } else {
+                db[sec] = secData;
+              }
+            }
           } catch(e) { console.warn('섹션 로드 실패:', sec); }
         }));
         if(!db.attendance)      db.attendance = {};
