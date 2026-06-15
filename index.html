@@ -1084,7 +1084,7 @@ select { -webkit-appearance: auto; }
     <div class="login-error" id="loginError"></div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <!-- 임시 버전 표기 (확인용) -->
-    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.5</div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted-2);">v1.0 · build 1.6</div>
 
   </div>
 </div>
@@ -1694,7 +1694,7 @@ select { -webkit-appearance: auto; }
                 <strong>프로그램 버전</strong>
                 <span style="display:flex;align-items:center;gap:6px;margin-top:3px;">
                   <span style="background:var(--purple);color:#fff;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;">v1.0</span>
-                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.5</span>
+                  <span style="background:var(--bg-2);color:var(--muted);padding:2px 7px;border-radius:99px;font-size:10.5px;font-weight:600;">build 1.6</span>
                 </span>
               </div>
               <button class="btn btn-sm btn-outline" onclick="openUpdateHistoryModal()" style="flex-shrink:0;">📋 업데이트 이력</button>
@@ -2101,7 +2101,7 @@ select { -webkit-appearance: auto; }
     <!-- 버전 배지 -->
     <div style="display:flex;align-items:center;gap:10px;padding:0 0 16px;flex-shrink:0;border-bottom:1px solid var(--border);">
       <span style="background:var(--purple);color:#fff;padding:4px 14px;border-radius:99px;font-size:13px;font-weight:700;">v1.0</span>
-      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.5</span>
+      <span style="background:var(--bg-2);color:var(--muted);padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:600;">build 1.6</span>
       <span style="font-size:12px;color:var(--muted);margin-left:auto;">루크미술학원 관리프로그램</span>
     </div>
 
@@ -2125,7 +2125,7 @@ select { -webkit-appearance: auto; }
 
         <div style="padding:14px 0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.5</span>
+            <span style="background:var(--purple);color:#fff;padding:3px 11px;border-radius:99px;font-size:11.5px;font-weight:700;">v1.0 · build 1.6</span>
             <span style="font-size:12px;color:var(--muted);">2026년 06월 15일</span>
             <span style="background:var(--teal-bg);color:var(--teal);padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:600;">최신 · 최초 출시</span>
           </div>
@@ -3820,7 +3820,26 @@ async function doLogin() {
 
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPw').value;
-  const hashed = await sha256(pw);
+
+  if (!id || !pw) {
+    errorEl.textContent = '아이디와 비밀번호를 입력해주세요.';
+    return;
+  }
+
+  let hashed;
+  try {
+    hashed = await sha256(pw);
+  } catch(e) {
+    errorEl.textContent = 'SHA-256 오류: ' + e.message;
+    return;
+  }
+
+  // DB에 계정이 아예 없는 경우 방어
+  if (!db.auth?.accounts?.length) {
+    errorEl.textContent = '계정 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.';
+    return;
+  }
+
   const acc = (db.auth.accounts || []).find(a => a.id === id && a.pw === hashed);
   if (acc) {
     resetLoginFail();
@@ -3839,6 +3858,16 @@ async function doLogin() {
     saveLoginSession(acc.id);
     setTimeout(autoReconnectFirebase, 400);
   } else {
+    // 평문 비교도 시도 (마이그레이션 안 된 경우 대비)
+    const accPlain = (db.auth.accounts || []).find(a => a.id === id && !isHashed(a.pw) && a.pw === pw);
+    if (accPlain) {
+      // 마이그레이션 후 재시도
+      accPlain.pw = hashed;
+      markDirty('auth');
+      saveDb();
+      doLogin();
+      return;
+    }
     const newCount = count + 1;
     try { sessionStorage.setItem(LOGIN_FAIL_KEY, newCount.toString()); } catch(e) {}
     if (newCount >= MAX_FAIL) {
@@ -6314,7 +6343,7 @@ function deleteAccount(id) {
 //    불일치 시 무한 새로고침(reload loop) 발생 가능
 //    버전 변경 시 index.html과 sw.js 두 곳 동시 수정 필수
 // ══════════════════════════════════════════
-const CURRENT_SW_VERSION = 'v1.0-build1.5';
+const CURRENT_SW_VERSION = 'v1.0-build1.6';
 
 async function checkVersionAndReload() {
   // ── 무한 새로고침 방지: 10초 내 이미 reload 했으면 건너뜀
