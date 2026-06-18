@@ -85,11 +85,13 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-  padding: 48px 44px;
+  padding: 0 44px 48px;
   width: 420px;
+  overflow: hidden;
 }
 .login-logo {
   text-align: center; margin-bottom: 32px;
+  padding-top: 48px;
 }
 .login-logo-mark {
   width: 140px; height: 140px;
@@ -2330,11 +2332,11 @@ select { -webkit-appearance: auto; }
     <div id="pwConfirmDateCompare" style="display:none;margin-bottom:16px;">
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;color:var(--muted);font-weight:600;">📅 백업 파일</span>
+          <span id="pwConfirmFileDateLabel" style="font-size:12px;color:var(--muted);font-weight:600;">📅 백업 파일</span>
           <span style="font-size:12.5px;color:var(--ink-3);" id="pwConfirmFileDate">-</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;color:var(--muted);font-weight:600;">☁️ 현재 데이터</span>
+          <span id="pwConfirmCloudDateLabel" style="font-size:12px;color:var(--muted);font-weight:600;">☁️ 현재 데이터</span>
           <span style="font-size:12.5px;color:var(--ink-3);" id="pwConfirmCloudDate">-</span>
         </div>
         <div id="pwConfirmDateMsg" style="font-size:12px;font-weight:600;padding-top:4px;border-top:1px solid var(--border);"></div>
@@ -5867,9 +5869,10 @@ function openPwConfirmModal({ title, desc, warning, icon='⚠️', btnText='확�
   document.getElementById('pwConfirmDateCompare').style.display = 'none';
 
   // 날짜 레이블 업데이트
-  const dateRows = document.querySelectorAll('#pwConfirmDateCompare [style*="font-weight:600"]');
-  if(dateRows[0]) dateRows[0].textContent = fileDateLabel;
-  if(dateRows[1]) dateRows[1].textContent = cloudDateLabel;
+  const r0 = document.getElementById('pwConfirmFileDateLabel');
+  const r1 = document.getElementById('pwConfirmCloudDateLabel');
+  if(r0) r0.textContent = fileDateLabel;
+  if(r1) r1.textContent = cloudDateLabel;
 
   const warningEl = document.getElementById('pwConfirmWarning');
   if(warning) { warningEl.textContent = warning; warningEl.style.display = 'block'; }
@@ -5900,8 +5903,9 @@ async function confirmPwAction() {
   }
   const backupFirst = document.getElementById('pwConfirmBackupFirst').checked &&
                       document.getElementById('pwConfirmBackupOption').style.display !== 'none';
+  const cb = _pwConfirmCallback;
   closePwConfirmModal();
-  if(_pwConfirmCallback) _pwConfirmCallback({ backupFirst });
+  if(cb) cb({ backupFirst });
 }
 
 // ── 초기화 (비밀번호 확인)
